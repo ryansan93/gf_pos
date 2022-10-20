@@ -4,7 +4,6 @@ var login = {
         var username = $('input#username').val().toUpperCase();
         var password = $('input#password').val();
         var pin_branch = $('input#pin_branch').val();
-        var jml_uang = $('input#jumlah_uang').val();
 
         // NOTE : CHECK EMPTY USERNAME AND PASSWORD
         if ( empty(username) || empty(password) ) {
@@ -16,10 +15,10 @@ var login = {
             };
             $('#divinfo').html('<br><div class="alert alert-danger">Username dan Password tidak boleh kosong.</div>');
         } else {
-            if ( empty(jml_uang) ) {
-                $('input#jumlah_uang').parent().addClass('has-error');
-                $('#divinfo').html('<br><div class="alert alert-danger">Jumlah uang tidak boleh kosong.</div>');
-            } else {
+            // if ( empty(jml_uang) ) {
+            //     $('input#jumlah_uang').parent().addClass('has-error');
+            //     $('#divinfo').html('<br><div class="alert alert-danger">Jumlah uang tidak boleh kosong.</div>');
+            // } else {
                 $('input').parent().removeClass('has-error');
                 // var defaultPage = baseurl + 'home/Home';
                 var defaultPage = baseurl + 'transaksi/Penjualan';
@@ -28,8 +27,7 @@ var login = {
                     data: {
                         username: username,
                         password: password,
-                        pin_branch: pin_branch,
-                        jml_uang: numeral.unformat($('input#jumlah_uang').val())
+                        pin_branch: pin_branch
                     },
                     type: 'POST',
                     dataType: 'json',
@@ -48,7 +46,7 @@ var login = {
                         hideLoading();
                     }
                 });
-            }
+            // }
         };
 
         return false;

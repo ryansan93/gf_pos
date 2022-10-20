@@ -11,21 +11,32 @@
 		</div>
 		<div class="col-lg-12 no-padding">
 			<div class="col-md-12 no-padding">
-				<div class="col-lg-12 text-left">Nama</div>
+				<div class="col-lg-12 text-left"><label class="control-label">Nama</label></div>
 		        <div class="col-lg-12">
 		            <input type="text" class="form-control nama" placeholder="Nama (MAX : 50)" data-required="1" maxlength="50">
 		        </div>
 			</div>
-			<div class="col-md-12 no-padding">
-				<div class="col-lg-12 text-left">No. Telp</div>
+			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+				<div class="col-lg-12 text-left"><label class="control-label">No. Telp</label></div>
 		        <div class="col-lg-12">
 		            <input type="text" class="form-control no_telp" placeholder="No. Telp (MAX : 15)" data-required="1" maxlength="15">
 		        </div>
 			</div>
-			<div class="col-md-12 no-padding">
-				<div class="col-lg-12 text-left">Alamat</div>
+			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+				<div class="col-lg-12 text-left"><label class="control-label">Alamat</label></div>
 		        <div class="col-lg-12">
 		            <textarea class="form-control alamat" placeholder="Alamat" data-required="1"></textarea>
+		        </div>
+			</div>
+			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+				<div class="col-lg-12 text-left"><label class="control-label">Privilege</label></div>
+		        <div class="col-lg-12">
+		            <div class="radio" style="margin-top: 0px;">
+						<label><input type="radio" name="optradio" value="1" checked>Ya</label>
+					</div>
+					<div class="radio" style="margin-bottom: 0px;">
+						<label><input type="radio" name="optradio" value="0">Tidak</label>
+					</div>
 		        </div>
 			</div>
 		</div>

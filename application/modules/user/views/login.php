@@ -3,7 +3,7 @@
 
 <head>
   <base href="<?php echo base_url() ?>" />
-  <link rel="shortcut icon" type="image/x-icon" href="assets/images/logo.png">
+  <!-- <link rel="shortcut icon" type="image/x-icon" href="assets/images/logo.png"> -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
@@ -40,8 +40,8 @@
     <div class="container">
       <div class="form-login">
         <div class="login-heading text-center">
-          <!-- <h2 class="form-login-heading"><?php echo $this->config->item('judul_aplikasi'); ?></h2> -->
-          <img src="assets/images/logo.png" width="30%" height="30%">
+          <h2 class="form-login-heading"><?php echo $this->config->item('judul_aplikasi'); ?></h2>
+          <!-- <img src="assets/images/logo.png" width="30%" height="30%"> -->
         </div>
         <!-- <div class="dropdown-divider no-padding"></div> -->
         <div class="login-contain">
@@ -52,14 +52,14 @@
             <br>
             <input id="pin_branch" type="text" data-tipe="angka" class="form-control text-center" placeholder="PIN CABANG" maxlength="4">
             <span class="pull-right"><br></span>
-            <br>
+            <!-- <br>
             <div class="input-group">
                 <span class="input-group-addon">
                   <b>Rp</b>
                 </span>
                 <input id="jumlah_uang" type="text" data-tipe="decimal" class="form-control text-right" placeholder="JUMLAH UANG AWAL KASIR" maxlength="13">
             </div>
-            <span class="pull-right"><br></span>
+            <span class="pull-right"><br></span> -->
             <br>
             <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> SIGN IN</button>
             <div id="divinfo"></div>

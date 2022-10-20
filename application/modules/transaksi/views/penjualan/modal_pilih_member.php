@@ -15,11 +15,11 @@
 					<span><b>NON MEMBER</b></span>
 				</div>
 			</div>
-			<div class="col-md-12 no-padding" style="height: 100px; padding-top: 2%;">
+			<!-- <div class="col-md-12 no-padding" style="height: 100px; padding-top: 2%;">
 				<div class="col-md-12 text-center cursor-p btn-add-member button" style="height: 100%; display: flex; justify-content: center; align-items: center;">
 					<span><b>TAMBAH MEMBER</b></span>
 				</div>
-			</div>
+			</div> -->
 			<div class="col-md-12 no-padding" style="height: 100px; padding-top: 2%;">
 				<div class="col-md-12 text-center cursor-p btn-exit button" style="height: 100%; display: flex; justify-content: center; align-items: center;">
 					<span><b>KELUAR</b></span>

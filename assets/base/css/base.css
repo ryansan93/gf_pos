@@ -1,6 +1,10 @@
+.jml_uang.show {
+    display: flex!important;
+}
+
 #page-content-wrapper {
     min-width: 100% !important;
-    padding-left: 0px;
+    /*padding-left: 0px;*/
     height: 100%;
 }
 
@@ -100,12 +104,12 @@ div.bootstrap-datetimepicker-widget .table-condensed tbody tr:hover {
 }
 
 div.container-fluid{
-  background-color: #ededed;
+  background-color: #ffffff;
   /*padding-top: 0.5rem;*/
   /*padding-bottom: 0.5rem;*/
   padding-left: 0px;
   padding-right: 0px;
-  height: 92%;
+  height: 92.3%;
 }
 
 body{
@@ -288,7 +292,7 @@ a.list-group-item > span{
 }
 
 li.menu{
-  padding-left: 1rem;
+  padding-left: 12%;
 }
 
 div#sidebar-wrapper{
@@ -366,7 +370,7 @@ div#sidebar-wrapper li.open a.dropdown-toggle::after{
 
 .list-group-item {
   border: 0px;
-  padding: 0.25rem 1.25rem;
+  padding: 0.5rem 1rem;
 }
 
 .notify-row{

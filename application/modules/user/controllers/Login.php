@@ -3,6 +3,8 @@
 class Login extends MY_Controller
 {
 	private $permission;
+	private $userid;
+	private $branch_kode;
 	private $username;
 	private $password;
 	private $isLogin = FALSE;
@@ -108,27 +110,16 @@ class Login extends MY_Controller
 						$dataUser = $user->toArray();
 						$dataUser['isLogin'] = 1;
 						$dataUser['kodeBranch'] = $branch->kode_branch;
+						$dataUser['namaBranch'] = $branch->nama;
 						$dataUser['alamatBranch'] = $branch->alamat;
 						$dataUser['telpBranch'] = $branch->telp;
 						$dataUser['Fitur'] = $data_fitur;
 
-						$m_jua = new \Model\Storage\JumlahUangAwal_model();
-						$d_jua = $m_jua->where('tanggal', date('Y-m-d'))->where('user_id', $user['id_user'])->first();
-						if ( $d_jua ) {
-							$m_jua->where('tanggal', date('Y-m-d'))->where('user_id', $user['id_user'])->update(
-								array(
-									'jumlah' => $jml_uang
-								)
-							);
-						} else {
-							$m_jua->tanggal = date('Y-m-d');
-							$m_jua->user_id = $user['id_user'];
-							$m_jua->jumlah = $jml_uang;
-							$m_jua->save();
-						}
+						$this->userid = $user['id_user'];
+						$this->branch_kode = $branch->kode_branch;
 
 						$this->session->set_userdata($dataUser);
-						
+
 						$this->result['status'] = 1;
 					} else {
 						/* password tidak sesuai */

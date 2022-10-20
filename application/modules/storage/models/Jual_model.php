@@ -21,11 +21,16 @@ class Jual_model extends Conf {
 
 	public function jual_diskon()
 	{
-		return $this->hasMany('\Model\Storage\JualDiskon_model', 'faktur_kode', 'kode_faktur');
+		return $this->hasMany('\Model\Storage\JualDiskon_model', 'faktur_kode', 'kode_faktur')->with(['diskon']);
 	}
 
 	public function bayar()
 	{
 		return $this->hasMany('\Model\Storage\Bayar_model', 'faktur_kode', 'kode_faktur')->with(['jenis_kartu']);
+	}
+
+	public function pesanan()
+	{
+		return $this->hasOne('\Model\Storage\Pesanan_model', 'kode_pesanan', 'pesanan_kode');
 	}
 }

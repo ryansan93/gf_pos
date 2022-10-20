@@ -5,7 +5,7 @@
 		<?php endforeach ?>
 	</ul>
 </div>
-<div class="col-md-7 list_menu" style="height: 100%;">
+<div class="col-md-6 list_menu" style="height: 100%;">
 	<div class="col-md-12 no-padding" style="padding: 0px 5px 10px 5px; height: 7%;">
 		<div class="input-group">
             <span class="input-group-addon">
@@ -22,7 +22,7 @@
 		<span style="font-weight: bold;"><span class="jenis_pesanan" data-kode=""></span></span>
 	</div>
 </div>
-<div class="col-md-3 nota" style="padding: 0.8% 0.8%; height: 100%;">
+<div class="col-md-4 nota" style="padding: 0.8% 0.8%; height: 100%;">
 	<div class="col-md-12 no-padding" style="height: 100%;">
 		<div class="col-md-12 no-padding" style="height: 10%;">
 			<div class="col-md-5 no-padding" style="height: 100%; padding-right: 5px;">
@@ -71,14 +71,33 @@
 					</div>
 				</div>
 				<div class="col-md-12 no-padding" style="padding-bottom: 1%; height: 20%;">
-					<div class="col-md-6 no-padding" style="height: 100%; padding-right: 1%;">
-						<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalPilihBayar()">
-							<span><b>BAYAR</b></span>
+					<div class="col-md-12 no-padding simpan_pesanan" style="height: 100%;">
+						<div class="col-md-6 no-padding" style="height: 100%; padding-right: 1%;">
+							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.savePesanan('simpan'); // jual.modalPilihBayar();">
+								<span><b>SIMPAN</b></span>
+							</div>
+						</div>
+						<div class="col-md-6 no-padding" style="height: 100%; padding-left: 1%;">
+							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalListBayar()">
+								<span><b>LIST PESANAN</b></span>
+							</div>
 						</div>
 					</div>
-					<div class="col-md-6 no-padding" style="height: 100%; padding-left: 1%;">
-						<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalListBayar()">
-							<span><b>LIST BAYAR</b></span>
+					<div class="col-md-12 no-padding edit_pesanan hide" style="height: 100%;">
+						<div class="col-md-4 no-padding" style="height: 100%; padding-right: 1%;">
+							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.editPesanan(this);" data-kode="">
+								<span><b>SIMPAN PERUBAHAN</b></span>
+							</div>
+						</div>
+						<div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
+							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.batalEdit()">
+								<span><b>BATAL UBAH</b></span>
+							</div>
+						</div>
+						<div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
+							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalPembayaran(this)" data-kode="">
+								<span><b>PEMBAYARAN</b></span>
+							</div>
 						</div>
 					</div>
 				</div>

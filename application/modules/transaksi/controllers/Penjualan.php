@@ -31,13 +31,21 @@ class Penjualan extends Public_Controller
             $this->add_external_js(
                 array(
                     "assets/select2/js/select2.min.js",
-                    'assets/transaksi/penjualan/js/penjualan.js'
+                    "assets/master/member/js/member.js",
+                    "assets/transaksi/penjualan/js/penjualan.js",
+                    "assets/transaksi/pembayaran/js/pembayaran.js",
+                    // "assets/transaksi/saldo_awal_kasir/js/saldo-awal-kasir.js",
+                    // "assets/transaksi/penjualan/js/penjualan.js",
                 )
             );
             $this->add_external_css(
                 array(
                     "assets/select2/css/select2.min.css",
-                    'assets/transaksi/penjualan/css/penjualan.css'
+                    "assets/master/member/css/member.css",
+                    "assets/transaksi/penjualan/css/penjualan.css",
+                    "assets/transaksi/pembayaran/css/pembayaran.css",
+                    // "assets/transaksi/saldo_awal_kasir/css/saldo-awal-kasir.css",
+                    // "assets/transaksi/penjualan/css/penjualan.css",
                 )
             );
             $data = $this->includes;
@@ -133,6 +141,7 @@ class Penjualan extends Public_Controller
             $m_member->nama = $params['nama'];
             $m_member->no_telp = $params['no_telp'];
             $m_member->alamat = $params['alamat'];
+            $m_member->privilege = $params['privilege'];
             $m_member->save();
 
             $d_member = $m_member->where('kode_member', $kode_member)->first()->toArray();
@@ -265,57 +274,174 @@ class Penjualan extends Public_Controller
         echo $html;
     }
 
-    public function savePenjualan()
+    public function savePesanan()
     {
         $params = $this->input->post('params');
 
         try {
-            $m_jual = new \Model\Storage\Jual_model();
-            $now = $m_jual->getDate();
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $now = $m_pesanan->getDate();
 
-            $kode_faktur = $m_jual->getNextKode($this->kodebranch);
-            $m_jual->kode_faktur = $kode_faktur;
-            $m_jual->tgl_trans = $now['waktu'];
-            $m_jual->branch = $this->kodebranch;
-            $m_jual->member = $params['member'];
-            $m_jual->kode_member = $params['kode_member'];
-            $m_jual->kasir = $this->userid;
-            $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
-            $m_jual->total = $params['sub_total'];
-            $m_jual->diskon = $params['diskon'];
-            $m_jual->ppn = $params['ppn'];
-            $m_jual->grand_total = $params['grand_total'];
-            $m_jual->lunas = 0;
-            $m_jual->mstatus = 1;
-            $m_jual->save();
+            $kode_pesanan = $m_pesanan->getNextKode($this->kodebranch);
+            $m_pesanan->kode_pesanan = $kode_pesanan;
+            $m_pesanan->tgl_pesan = $now['waktu'];
+            $m_pesanan->branch = $this->kodebranch;
+            $m_pesanan->member = $params['member'];
+            $m_pesanan->kode_member = $params['kode_member'];
+            $m_pesanan->user_id = $this->userid;
+            $m_pesanan->nama_user = $this->userdata['detail_user']['nama_detuser'];
+            $m_pesanan->total = $params['sub_total'];
+            $m_pesanan->diskon = $params['diskon'];
+            $m_pesanan->ppn = $params['ppn'];
+            $m_pesanan->grand_total = $params['grand_total'];
+            $m_pesanan->status = 1;
+            $m_pesanan->mstatus = 1;
+            $m_pesanan->save();
 
             foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
                 foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
-                    $m_juali = new \Model\Storage\JualItem_model();
+                    $m_pesanani = new \Model\Storage\PesananItem_model();
 
-                    $kode_faktur_item = $m_juali->getNextKode('FKI');
-                    $m_juali->kode_faktur_item = $kode_faktur_item;
-                    $m_juali->faktur_kode = $kode_faktur;
-                    $m_juali->kode_jenis_pesanan = $v_lp['kode_jp'];
-                    $m_juali->menu_nama = $v_lm['nama_menu'];
-                    $m_juali->menu_kode = $v_lm['kode_menu'];
-                    $m_juali->jumlah = $v_lm['jumlah'];
-                    $m_juali->harga = $v_lm['harga'];
-                    $m_juali->total = $v_lm['total'];
-                    $m_juali->save();
+                    $kode_pesanan_item = $m_pesanani->getNextKode('PSI');
+                    $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
+                    $m_pesanani->pesanan_kode = $kode_pesanan;
+                    $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
+                    $m_pesanani->menu_nama = $v_lm['nama_menu'];
+                    $m_pesanani->menu_kode = $v_lm['kode_menu'];
+                    $m_pesanani->jumlah = $v_lm['jumlah'];
+                    $m_pesanani->harga = $v_lm['harga'];
+                    $m_pesanani->total = $v_lm['total'];
+                    $m_pesanani->request = $v_lm['request'];
+                    $m_pesanani->save();
 
                     if ( !empty($v_lm['detail_menu']) ) {
                         foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
-                            $m_jualid = new \Model\Storage\JualItemDetail_model();
-                            $m_jualid->faktur_item_kode = $kode_faktur_item;
-                            $m_jualid->menu_nama = $v_dm['nama_menu'];
-                            $m_jualid->menu_kode = $v_dm['kode_menu'];
-                            $m_jualid->jumlah = $v_dm['jumlah'];
-                            $m_jualid->save();
+                            $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                            $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                            $m_pesananid->menu_nama = $v_dm['nama_menu'];
+                            $m_pesananid->menu_kode = $v_dm['kode_menu'];
+                            $m_pesananid->jumlah = $v_dm['jumlah'];
+                            $m_pesananid->save();
                         }
                     }
                 }
             }
+
+            // if ( !empty($params['list_diskon']) ) {
+            //     foreach ($params['list_diskon'] as $k_ld => $v_ld) {
+            //         $m_juald = new \Model\Storage\JualDiskon_model();
+            //         $m_juald->faktur_kode = $kode_faktur;
+            //         $m_juald->diskon_kode = $v_ld['kode_diskon'];
+            //         $m_juald->diskon_nama = $v_ld['nama_diskon'];
+            //         $m_juald->save();
+            //     }
+            // }
+
+            $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/save', $m_pesanan, $deskripsi_log_gaktifitas );
+            
+            $this->result['status'] = 1;
+            $this->result['content'] = array('kode_pesanan' => $kode_pesanan);
+            $this->result['message'] = 'Data berhasil di simpan.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function savePenjualan()
+    {
+        $params = $this->input->post('params');
+        $kode_pesanan = $this->input->post('kode_pesanan');
+
+        $result = $this->execSavePenjualan( $params, $kode_pesanan );
+
+        display_json( $result );
+    }
+
+    public function execSavePenjualan($params, $kode_pesanan)
+    {
+        try {
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->with(['pesanan_item'])->first()->toArray();
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $now = $m_jual->getDate();
+
+            $kode_faktur = $m_jual->getNextKode('FAK');
+            $m_jual->kode_faktur = $kode_faktur;
+            $m_jual->tgl_trans = $now['waktu'];
+            $m_jual->branch = $d_pesanan['branch'];
+            $m_jual->member = $d_pesanan['member'];
+            $m_jual->kode_member = $d_pesanan['kode_member'];
+            $m_jual->kasir = $this->userid;
+            $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
+            $m_jual->total = $d_pesanan['total'];
+            $m_jual->diskon = $d_pesanan['diskon'];
+            $m_jual->ppn = $d_pesanan['ppn'];
+            $m_jual->grand_total = $d_pesanan['grand_total'];
+            $m_jual->lunas = 0;
+            $m_jual->mstatus = 1;
+            $m_jual->pesanan_kode = $kode_pesanan;
+            $m_jual->utama = 1;
+            $m_jual->hutang = 0;
+            $m_jual->save();
+
+            foreach ($d_pesanan['pesanan_item'] as $k_pi => $v_pi) {
+                $m_juali = new \Model\Storage\JualItem_model();
+
+                $kode_faktur_item = $m_juali->getNextKode('FKI');
+                $m_juali->kode_faktur_item = $kode_faktur_item;
+                $m_juali->faktur_kode = $kode_faktur;
+                $m_juali->kode_jenis_pesanan = $v_pi['kode_jenis_pesanan'];
+                $m_juali->menu_nama = $v_pi['menu_nama'];
+                $m_juali->menu_kode = $v_pi['menu_kode'];
+                $m_juali->jumlah = $v_pi['jumlah'];
+                $m_juali->harga = $v_pi['harga'];
+                $m_juali->total = $v_pi['total'];
+                $m_juali->request = $v_pi['request'];
+                $m_juali->pesanan_item_kode = $v_pi['kode_pesanan_item'];
+                $m_juali->save();
+
+                foreach ($v_pi['pesanan_item_detail'] as $k_pid => $v_pid) {
+                    $m_jualid = new \Model\Storage\JualItemDetail_model();
+                    $m_jualid->faktur_item_kode = $kode_faktur_item;
+                    $m_jualid->menu_nama = $v_pid['menu_nama'];
+                    $m_jualid->menu_kode = $v_pid['menu_kode'];
+                    $m_jualid->jumlah = $v_pid['jumlah'];
+                    $m_jualid->save();
+                }
+            }
+
+            // foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
+            //     foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
+            //         $m_juali = new \Model\Storage\JualItem_model();
+
+            //         $kode_faktur_item = $m_juali->getNextKode('FKI');
+            //         $m_juali->kode_faktur_item = $kode_faktur_item;
+            //         $m_juali->faktur_kode = $kode_faktur;
+            //         $m_juali->kode_jenis_pesanan = $v_lp['kode_jp'];
+            //         $m_juali->menu_nama = $v_lm['nama_menu'];
+            //         $m_juali->menu_kode = $v_lm['kode_menu'];
+            //         $m_juali->jumlah = $v_lm['jumlah'];
+            //         $m_juali->harga = $v_lm['harga'];
+            //         $m_juali->total = $v_lm['total'];
+            //         $m_juali->request = $v_lm['request'];
+            //         $m_juali->save();
+
+            //         if ( !empty($v_lm['detail_menu']) ) {
+            //             foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
+            //                 $m_jualid = new \Model\Storage\JualItemDetail_model();
+            //                 $m_jualid->faktur_item_kode = $kode_faktur_item;
+            //                 $m_jualid->menu_nama = $v_dm['nama_menu'];
+            //                 $m_jualid->menu_kode = $v_dm['kode_menu'];
+            //                 $m_jualid->jumlah = $v_dm['jumlah'];
+            //                 $m_jualid->save();
+            //             }
+            //         }
+            //     }
+            // }
 
             if ( !empty($params['list_diskon']) ) {
                 foreach ($params['list_diskon'] as $k_ld => $v_ld) {
@@ -337,13 +463,20 @@ class Penjualan extends Public_Controller
             $this->result['message'] = $e->getMessage();
         }
 
-        display_json( $this->result );
+        return $this->result;
     }
 
     public function deletePenjualan()
     {
         $params = $this->input->post('params');
 
+        $result = $this->execDeletePenjualan( $params );
+
+        display_json( $result );
+    }
+
+    public function execDeletePenjualan($params)
+    {
         try {
             $m_jual = new \Model\Storage\Jual_model();
             $m_jual->where('kode_faktur', $params)->update(
@@ -363,7 +496,7 @@ class Penjualan extends Public_Controller
             $this->result['message'] = $e->getMessage();
         }
 
-        display_json( $this->result );
+        return $this->result;
     }
 
     public function deletePembayaran()
@@ -1619,6 +1752,196 @@ class Penjualan extends Public_Controller
         }
 
         return $this->result;
+    }
+
+    public function edit()
+    {
+        $params = $this->input->post('params');
+
+        try {
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $params['pesanan_kode'])->with(['pesanan_item'])->first();
+
+            $jenis_pesanan = null;
+            $nama_jenis_pesanan = null;
+
+            $kode_member = null;
+            $member = null;
+
+            $data = null;
+            if ( $d_pesanan ) {
+                $d_pesanan = $d_pesanan->toArray();
+
+                $pesanan_item = null;
+                foreach ($d_pesanan['pesanan_item'] as $k_ji => $v_ji) {
+                    $jenis_pesanan = $v_ji['kode_jenis_pesanan'];
+                    $nama_jenis_pesanan = $v_ji['jenis_pesanan'][0]['nama'];
+
+                    $key_jp = $v_ji['kode_jenis_pesanan'];
+                    $pesanan_item[$key_jp]['kode'] = $v_ji['kode_jenis_pesanan'];
+                    $pesanan_item[$key_jp]['nama'] = $v_ji['jenis_pesanan'][0]['nama'];
+
+                    $key_ji = $k_ji;
+                    $pesanan_item[$key_jp]['detail'][$key_ji] = array(
+                        'kode_pesanan_item' => $v_ji['kode_pesanan_item'],
+                        'pesanan_kode' => $v_ji['pesanan_kode'],
+                        'kode_jenis_pesanan' => $v_ji['kode_jenis_pesanan'],
+                        'menu_nama' => $v_ji['menu_nama'],
+                        'menu_kode' => $v_ji['menu_kode'],
+                        'jumlah' => $v_ji['jumlah'],
+                        'harga' => $v_ji['harga'],
+                        'total' => $v_ji['total'],
+                        'request' => $v_ji['request'],
+                        'pesanan_item_detail' => $v_ji['pesanan_item_detail']
+                    );
+                }
+                $pesanan_diskon = null;
+
+                $kode_member = $d_pesanan['kode_member'];
+                $member = $d_pesanan['member'];
+
+                $data = array(
+                    'kode_pesanan' => $d_pesanan['kode_pesanan'],
+                    'tgl_pesan' => $d_pesanan['tgl_pesan'],
+                    'branch' => $d_pesanan['branch'],
+                    'member' => $d_pesanan['member'],
+                    'kode_member' => $d_pesanan['kode_member'],
+                    'user_id' => $d_pesanan['user_id'],
+                    'nama_user' => $d_pesanan['nama_user'],
+                    'total' => $d_pesanan['total'],
+                    'diskon' => $d_pesanan['diskon'],
+                    'ppn' => $d_pesanan['ppn'],
+                    'grand_total' => $d_pesanan['grand_total'],
+                    'status' => $d_pesanan['status'],
+                    'mstatus' => $d_pesanan['mstatus'],
+                    'pesanan_item' => $pesanan_item,
+                    'pesanan_diskon' => $pesanan_diskon
+                );
+            }
+
+            $content['data'] = $data;
+
+            $html = $this->load->view($this->pathView . 'detail_pesanan', $content, TRUE);
+
+            $content = array(
+                'html' => $html,
+                'pesanan_kode' => $data['kode_pesanan'],
+                'jenis_pesanan' => $jenis_pesanan,
+                'nama_jenis_pesanan' => $nama_jenis_pesanan,
+                'kode_member' => $kode_member,
+                'member' => $member
+            );
+
+            $this->result['status'] = 1;
+            $this->result['content'] = $content;
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function editPesanan()
+    {
+        $params = $this->input->post('params');
+
+        try {
+            $kode_pesanan = $params['pesanan_kode'];
+
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $now = $m_pesanan->getDate();
+
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->first();
+
+            $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
+                array(
+                    'branch' => $this->kodebranch,
+                    'member' => $params['member'],
+                    'kode_member' => $params['kode_member'],
+                    'user_id' => $this->userid,
+                    'nama_user' => $this->userdata['detail_user']['nama_detuser'],
+                    'total' => $params['sub_total'],
+                    'diskon' => $params['diskon'],
+                    'ppn' => $params['ppn'],
+                    'grand_total' => $params['grand_total'],
+                    'mstatus' => 1,
+                )
+            );
+
+            $m_pesanani = new \Model\Storage\PesananItem_model();
+            $d_pesanani = $m_pesanani->select('kode_pesanan_item')->where('pesanan_kode', $kode_pesanan)->get()->toArray();
+
+            $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+            $m_pesananid->whereIn('pesanan_item_kode', $d_pesanani)->delete();
+            $m_pesanani->where('pesanan_kode', $kode_pesanan)->delete();
+
+            foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
+                foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
+                    $m_pesanani = new \Model\Storage\PesananItem_model();
+
+                    $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
+                    $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
+                    $m_pesanani->pesanan_kode = $kode_pesanan;
+                    $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
+                    $m_pesanani->menu_nama = $v_lm['nama_menu'];
+                    $m_pesanani->menu_kode = $v_lm['kode_menu'];
+                    $m_pesanani->jumlah = $v_lm['jumlah'];
+                    $m_pesanani->harga = $v_lm['harga'];
+                    $m_pesanani->total = $v_lm['total'];
+                    $m_pesanani->request = $v_lm['request'];
+                    $m_pesanani->save();
+
+                    if ( !empty($v_lm['detail_menu']) ) {
+                        foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
+                            $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                            $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                            $m_pesananid->menu_nama = $v_dm['nama_menu'];
+                            $m_pesananid->menu_kode = $v_dm['kode_menu'];
+                            $m_pesananid->jumlah = $v_dm['jumlah'];
+                            $m_pesananid->save();
+                        }
+                    }
+                }
+            }
+
+
+            if ( !empty($params['list_diskon']) ) {
+                $m_pesanand = new \Model\Storage\PesananDiskon_model();
+                $m_pesanand->where('pesanan_kode', $kode_pesanan)->delete();
+
+                foreach ($params['list_diskon'] as $k_ld => $v_ld) {
+                    $m_pesanand = new \Model\Storage\PesananDiskon_model();
+                    $m_pesanand->pesanan_kode = $kode_pesanan;
+                    $m_pesanand->diskon_kode = $v_ld['kode_diskon'];
+                    $m_pesanand->diskon_nama = $v_ld['nama_diskon'];
+                    $m_pesanand->save();
+                }
+            }
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->get();
+
+            if ( $d_jual->count() > 0 ) {
+                $d_jual = $d_jual->toArray();
+
+                foreach ($d_jual as $k_jual => $v_jual) {
+                    $this->execDeletePenjualan( $v_jual['kode_faktur'] );
+                }
+            }
+
+            $this->execSavePenjualan( $params, $kode_pesanan );
+
+            $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas );
+            
+            $this->result['status'] = 1;
+            $this->result['content'] = array('kode_pesanan' => $kode_pesanan);
+            $this->result['message'] = 'Data berhasil di ubah.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
     }
 
     public function tes()

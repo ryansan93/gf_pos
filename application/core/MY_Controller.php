@@ -140,6 +140,7 @@ class MY_Controller extends DB_Controller
           "assets/base/common.js",
           "assets/base/index.js",
           "assets/base/app.js",
+          "assets/transaksi/saldo_awal_kasir/js/saldo-awal-kasir.js",
         ));
     $this->add_external_css(
         array(
@@ -156,6 +157,7 @@ class MY_Controller extends DB_Controller
           "assets/themes/lib/font-awesome/css/font-awesome.css",
           "assets/jquery-ui/css/jquery-ui.min.css", // YES
           "assets/base/css/base.css",
+          "assets/transaksi/saldo_awal_kasir/css/saldo-awal-kasir.css",
         ));
     
     $this->user = $this->session->userdata('logged_in');
@@ -446,6 +448,7 @@ class Public_Controller extends MY_Controller
   protected $userid;
   protected $userdata;
   protected $kodebranch;
+  protected $namabranch;
   protected $alamatbranch;
   protected $telpbranch;
   function __construct()
@@ -461,6 +464,7 @@ class Public_Controller extends MY_Controller
 
     $this->userid = $this->session->userdata('id_user');
     $this->kodebranch = $this->session->userdata('kodeBranch');
+    $this->namabranch = $this->session->userdata('namaBranch');
     $this->alamatbranch = $this->session->userdata('alamatBranch');
     $this->telpbranch = $this->session->userdata('telpBranch');
     $this->userdata = $this->session->userdata();
