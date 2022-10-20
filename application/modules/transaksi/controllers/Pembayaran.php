@@ -19,7 +19,9 @@ class Pembayaran extends Public_Controller
     public function modalListBayar()
     {
         try {
-            $today = date('Y-m-d');
+            $m_conf = new \Model\Storage\Conf();
+            $now = $m_conf->getDatee();
+            $today = $now['tanggal'];
 
             $start_date = $today.' 00:00:00';
             $end_date = $today.' 23:59:59';
