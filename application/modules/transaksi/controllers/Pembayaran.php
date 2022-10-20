@@ -28,7 +28,7 @@ class Pembayaran extends Public_Controller
             // $kasir = 'USR2207003';
 
             $m_pesanan = new \Model\Storage\Pesanan_model();
-            $d_pesanan = $m_pesanan->whereBetween('tgl_trans', [$start_date, $end_date])->where('mstatus', 1)->get();
+            $d_pesanan = $m_pesanan->whereBetween('tgl_pesan', [$start_date, $end_date])->where('mstatus', 1)->get();
             // $d_pesanan = $m_pesanan->where('tgl_pesan', '>=', '2022-10-12')->where('mstatus', 1)->get();
 
             $data_bayar = ($d_pesanan->count() > 0) ? $this->getDataBayar($d_pesanan) : null;
