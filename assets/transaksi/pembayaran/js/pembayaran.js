@@ -879,6 +879,36 @@ var bayar = {
             }
         });
     }, // end - loadDataPembayaran
+
+    deletePembayaran: function(elm) {
+        bootbox.confirm('Apakah anda yakin ingin menghapus data pembayaran ini ?', function (result) {
+            if ( result ) {                
+                var params = {
+                    'faktur_kode': $(elm).data('kode')
+                }
+
+                $.ajax({
+                    url: 'transaksi/Pembayaran/deletePembayaran',
+                    data: {
+                        'params': params
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    beforeSend: function() { showLoading(); },
+                    success: function(data) {
+                        hideLoading();
+                        if ( data.status == 1 ) {
+                            bootbox.alert(data.message, function() {
+                                bayar.penjualanForm();
+                            });
+                        } else {
+                            bootbox.alert(data.message);
+                        }
+                    }
+                });
+            }
+        });
+    }, // end - deletePembayaran
 };
 
 bayar.startUp();
