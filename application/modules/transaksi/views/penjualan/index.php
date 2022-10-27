@@ -14,29 +14,39 @@
             <input type="text" class="form-control filter_menu" placeholder="Nama Menu" onkeyup="jual.filterMenu()">
         </div>
 	</div>
-	<div class="col-md-12 no-padding detail_menu" style="height: 87%;"></div>
-	<div class="col-md-12 no-padding" style="height: 3%; padding-left: 5px; border-top: 1px solid #dedede;">
-		<span style="font-weight: bold;">CUSTOMER : <span class="member" data-kode="">-</span></span>
+	<div class="col-md-12 no-padding detail_menu" style="height: 81%;"></div>
+	<div class="col-md-12 no-padding" style="height: 4%; padding-left: 5px; padding-top: 5px; border-top: 1px solid #dedede;">
+		<span style="font-weight: bold;"><div class="col-xs-3" style="padding-left: 0px;">CUSTOMER</div><div class="col-xs-9"> : <span class="member" data-kode="">-</span></div></span>
 	</div>
-	<div class="col-md-12 no-padding" style="height: 3%; padding-left: 5px;">
-		<span style="font-weight: bold;"><span class="jenis_pesanan" data-kode=""></span></span>
+	<div class="col-md-12 no-padding" style="height: 4%; padding-left: 5px; padding-top: 5px;">
+		<span style="font-weight: bold;"><div class="col-xs-3" style="padding-left: 0px;">JENIS PESANAN</div><div class="col-xs-9"> : <span class="jenis_pesanan" data-kode="">-</span></div></span>
+	</div>
+	<div class="col-md-12 no-padding" style="height: 4%; padding-left: 5px; padding-top: 3px;">
+		<span style="font-weight: bold;"><div class="col-xs-3" style="padding-left: 0px;">MEJA</div><div class="col-xs-9"> : <span class="meja" data-id="">-</span></div></span>
 	</div>
 </div>
 <div class="col-md-4 nota" style="padding: 0.8% 0.8%; height: 100%;">
 	<div class="col-md-12 no-padding" style="height: 100%;">
 		<div class="col-md-12 no-padding" style="height: 10%;">
-			<div class="col-md-5 no-padding" style="height: 100%; padding-right: 5px;">
-				<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalPilihMember()">
-					<span style=""><b><i class="fa fa-address-book-o" style="font-size: 28px;"></i></b></span>
+			<div class="col-md-10 no-padding" style="height: 100%;">
+				<div class="col-md-4 no-padding" style="height: 100%; padding-right: 5px;">
+					<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalPilihMember()" title="MEMBER">
+						<span style=""><b><i class="fa fa-address-book-o" style="font-size: 28px;"></i></b></span>
+					</div>
+				</div>
+				<div class="col-md-4 no-padding" style="height: 100%; padding-right: 5px;">
+					<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalJenisPesanan()" title="JENIS PESANAN">
+						<span style=""><b><i class="fa fa-cutlery" style="font-size: 28px;"></i></b></span>
+					</div>
+				</div>
+				<div class="col-md-4 no-padding" style="height: 100%; padding-right: 5px;">
+					<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalMeja()" title="MEJA">
+						<span style=""><b><i class="fa fa-table" style="font-size: 28px;"></i></b></span>
+					</div>
 				</div>
 			</div>
-			<div class="col-md-5 no-padding" style="height: 100%; padding-left: 5px;">
-				<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalJenisPesanan()">
-					<span style=""><b><i class="fa fa-cutlery" style="font-size: 28px;"></i></b></span>
-				</div>
-			</div>
-			<div class="col-md-2 no-padding" style="height: 100%; padding-left: 5px;">
-				<div class="col-md-12 no-padding text-center cursor-p button" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="location.reload()">
+			<div class="col-md-2 no-padding" style="height: 100%;">
+				<div class="col-md-12 no-padding text-center cursor-p btn-danger" style="border: 1px solid #dedede; height: 100%; display: flex; justify-content: center; align-items: center;" onclick="location.reload()" title="REFRESH">
 					<span style=""><b><i class="fa fa-refresh" style="font-size: 28px;"></i></b></span>
 				</div>
 			</div>

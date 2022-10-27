@@ -41,7 +41,7 @@
 													<td><?php echo $value['kasir']; ?></td>
 													<td><?php echo $value['kode_pesanan']; ?></td>
 													<td><?php echo $value['pelanggan']; ?></td>
-													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td> ?></td>
+													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
 													<td class="col-lg-1 text-center"><button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button></td>
 													<td class="col-lg-1 text-center"><button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="jual.edit(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-edit"></i></button></td>
 													<td class="col-lg-1 text-center"><button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;"><i class="fa fa-trash"></i></button></td>

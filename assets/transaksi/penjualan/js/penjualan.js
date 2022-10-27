@@ -12,6 +12,8 @@ var kodeKartu = null;
 var namaKartu = null;
 var noBukti = null;
 var kodeFaktur = null;
+var mejaId = null;
+var meja = null;
 
 var jual = {
 	start_up: function () {
@@ -45,15 +47,23 @@ var jual = {
                 });
 
                 $(this).find('.button:not(.btn-exit)').click(function() {
+                    var pilih_menu = $(this).data('pilihmenu');
                     jenis_pesanan = $(this).data('kode');
                     nama_jenis_pesanan = $(this).find('span b').text();
 
-                    if ( empty(member) ) {
-                        jual.modalPilihMember();
-                    } else {
-                        $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
-                        $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
+                    $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
+                    $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
+                    if ( empty(member) ) {
+                        if ( pilih_menu == 0 ) {
+                            jual.modalPilihMember();
+                        } else {
+                            mejaId = null;
+                            meja = null;
+
+                            jual.modalMeja();
+                        }
+                    } else {
                         $('div.kategori').find('ul.kategori li[data-aktif=1]').click();
 
                         $('.modal').modal('hide');
@@ -64,6 +74,80 @@ var jual = {
             });
         },'html');
     }, // end - modalJenisPesanan
+
+    modalMeja: function() {
+        $('.modal').modal('hide');
+
+        $.get('transaksi/Penjualan/modalMeja',{
+        },function(data){
+            var _options = {
+                className : 'large',
+                message : data,
+                addClass : 'form',
+                onEscape: true,
+            };
+            bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                $(this).css({'height': '100%'});
+                $(this).find('.modal-header').css({'padding-top': '0px'});
+                $(this).find('.modal-dialog').css({'width': '70%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'height': '100%'});
+                $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+                $(this).find('.modal-content').css({'height': '90%'});
+                $(this).find('.modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body .row').css({'height': '100%'});
+
+                $('input').keyup(function(){
+                    $(this).val($(this).val().toUpperCase());
+                });
+
+                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                });
+
+                var modal_body = $(this).find('.modal-body');
+
+                $(modal_body).find('.btn_lantai:first').click();
+            });
+        },'html');
+    }, // end - modalMeja
+
+    listMeja: function(elm) {
+        var modal = $(elm).closest('.modal');
+
+        var params = {
+            'lantai_id': $(elm).data('id')
+        };
+
+        $.ajax({
+            url: 'transaksi/Penjualan/listMeja',
+            data: {
+                'params': params
+            },
+            type: 'GET',
+            dataType: 'HTML',
+            beforeSend: function() {},
+            success: function(html) {
+                $(modal).find('.meja').html( html );
+            }
+        });
+    }, // end - listMeja
+
+    pilihMeja: function(elm) {
+        mejaId = $(elm).data('id');
+        namaLantai = $(elm).data('namalantai');
+        meja = $(elm).text();
+
+        $('.list_menu').find('.meja').attr('data-id', mejaId);
+        $('.list_menu').find('.meja').text(namaLantai+' - '+meja);
+
+        if ( empty(member) ) {
+            jual.modalPilihMember();
+        } else {
+            $('.modal').modal('hide');
+        }
+    }, // end - pilihMeja
 
     modalPilihMember: function () {
         $('.modal').modal('hide');
@@ -201,8 +285,8 @@ var jual = {
 
                     $('.member').attr('data-kode', kode_member);
                     $('.member').text(member+' (MEMBER)');
-                    $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
-                    $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
+                    // $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
+                    // $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
                     $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                         var kategori = $(li).text();
@@ -715,6 +799,20 @@ var jual = {
 
     resetPesanan: function() {
         $('div.list_pesanan').html('');
+
+        jenis_pesanan = null;
+        nama_jenis_pesanan = null;
+        mejaId = null;
+        meja = null;
+        kode_member = null;
+        member = null;
+
+        $('.list_menu').find('.jenis_pesanan').attr('data-kode', '');
+        $('.list_menu').find('.jenis_pesanan').text('-');
+        $('.list_menu').find('.meja').attr('data-id', '');
+        $('.list_menu').find('.meja').text('-');
+        $('.member').attr('data-kode', '');
+        $('.member').text('-');
     }, // end - resetPesanan
 
     jumlahPesanan: function (elm) {
@@ -969,7 +1067,7 @@ var jual = {
         gKurangBayar = grandtotal;
     }, // end - hitGrandTotal
 
-    getPenjualan: function(action) {
+    getPesanan: function(action) {
         var list_pesanan = $.map( $('.list_pesanan').find('.jenis_pesanan'), function(div_jp) {
             var list_menu = $.map( $(div_jp).find('.menu'), function(div_menu) {
                 var div_menu_utama = $(div_menu).find('.menu_utama');
@@ -1039,6 +1137,7 @@ var jual = {
         var grand_total = numeral.unformat($('.grandtotal').text());
 
         dataPenjualan = {
+            'meja_id': mejaId,
             'member': member,
             'kode_member': kode_member,
             'sub_total': sub_total,
@@ -1050,34 +1149,38 @@ var jual = {
         };
 
         action(dataPenjualan);
-    }, // end - getPenjualan
+    }, // end - getPesanan
 
     savePesanan: function(jenis) {
-        bootbox.confirm('Apakah anda yakin ingin menyimpan transaksi ?', function(result) {
-            if ( result ) {
-                jual.getPenjualan(function(data) {
-                    $('.modal').modal('hide');
+        jual.getPesanan(function(data) {
+            if ( !empty(data.list_pesanan) ) {
+                bootbox.confirm('Apakah anda yakin ingin menyimpan transaksi ?', function(result) {
+                    if ( result ) {
+                        $('.modal').modal('hide');
 
-                    var params = data;
+                        var params = data;
 
-                    $.ajax({
-                        url: 'transaksi/Penjualan/savePesanan',
-                        data: {
-                            'params': params
-                        },
-                        type: 'POST',
-                        dataType: 'JSON',
-                        beforeSend: function() { showLoading(); },
-                        success: function(data) {
-                            if ( data.status == 1 ) {
-                                jual.savePenjualan(params, data.content.kode_pesanan);
-                            } else {
-                                hideLoading();
-                                bootbox.alert(data.message);
+                        $.ajax({
+                            url: 'transaksi/Penjualan/savePesanan',
+                            data: {
+                                'params': params
+                            },
+                            type: 'POST',
+                            dataType: 'JSON',
+                            beforeSend: function() { showLoading(); },
+                            success: function(data) {
+                                if ( data.status == 1 ) {
+                                    jual.savePenjualan(params, data.content.kode_pesanan);
+                                } else {
+                                    hideLoading();
+                                    bootbox.alert(data.message);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 });
+            } else {
+                bootbox.alert('Belum ada menu yang di pilih.');
             }
         });
     }, // end - savePesanan
@@ -1824,6 +1927,8 @@ var jual = {
                     nama_jenis_pesanan = data.content.nama_jenis_pesanan;
                     kode_member = data.content.kode_member;
                     member = data.content.member;
+                    meja_id = data.content.meja_id;
+                    meja = data.content.meja;
 
                     $('.member').attr('data-kode', kode_member);
                     if ( !empty(kode_member) ) {
@@ -1835,6 +1940,9 @@ var jual = {
                     }
                     $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                     $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
+
+                    $('.list_menu').find('.meja').attr('data-kode', meja_id);
+                    $('.list_menu').find('.meja').text(meja);
 
                     $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                         var kategori = $(li).text();
@@ -1865,7 +1973,7 @@ var jual = {
 
         bootbox.confirm('Apakah anda yakin ingin meng-ubah transaksi ?', function(result) {
             if ( result ) {
-                jual.getPenjualan(function(data) {
+                jual.getPesanan(function(data) {
                     $('.modal').modal('hide');
 
                     data['pesanan_kode'] = kodePesanan;

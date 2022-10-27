@@ -65,7 +65,7 @@ class Pembayaran extends Public_Controller
                     $d_jual = $d_jual->toArray();
 
                     $m_bayar = new \Model\Storage\Bayar_model();
-                    $d_bayar = $m_bayar->whereIn('faktur_kode', $d_jual)->get();
+                    $d_bayar = $m_bayar->whereIn('faktur_kode', $d_jual)->where('mstatus', 1)->get();
 
                     if ( $d_bayar->count() > 0 ) {
                         $sudah_bayar = 1;
@@ -99,7 +99,7 @@ class Pembayaran extends Public_Controller
                     $d_jual = $d_jual->toArray();
 
                     $m_bayar = new \Model\Storage\Bayar_model();
-                    $d_bayar = $m_bayar->whereIn('faktur_kode', $d_jual)->get();
+                    $d_bayar = $m_bayar->whereIn('faktur_kode', $d_jual)->where('mstatus', 1)->get();
 
                     if ( $d_bayar->count() > 0 ) {
                         $sudah_bayar = 1;
@@ -136,7 +136,7 @@ class Pembayaran extends Public_Controller
 
             foreach ($data as $key => $value) {
                 $m_bayar = new \Model\Storage\Bayar_model();
-                $d_bayar = $m_bayar->where('faktur_kode', $value['kode_faktur'])->first();
+                $d_bayar = $m_bayar->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 1)->first();
 
                 if ( $d_bayar ) {
                     $bayar = 1;
@@ -503,8 +503,17 @@ class Pembayaran extends Public_Controller
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
+                    $m_bayar = new \Model\Storage\BayarHutang_model();
+                    $d_bayar_non_aktif = $m_bayar->select('id')->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 0)->get();
+
                     $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
-                    $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    if ( $d_bayar_non_aktif->count() > 0 ) {
+                        $d_bayar_non_aktif = $d_bayar_non_aktif->toArray();
+
+                        $d_bayar_hutang = $m_bayar_hutang->whereNotIn('id_header', $d_bayar_non_aktif)->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    } else {
+                        $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    }
 
                     $data[] = array(
                         'tgl_pesan' => !empty($value['pesanan']) ? $value['pesanan']['tgl_pesan'] : $value['tgl_trans'],
@@ -547,25 +556,38 @@ class Pembayaran extends Public_Controller
 
         try {
             $m_bayar = new \Model\Storage\Bayar_model();
+            $d_bayar = $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->first();
+            if ( $d_bayar ) {
+                $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->update(
+                    array(
+                        'mstatus' => 0
+                    )
+                );
+            }
+
+            $m_bayar = new \Model\Storage\Bayar_model();
             $now = $m_bayar->getDate();
 
             $m_bayar->tgl_trans = $now['waktu'];
             $m_bayar->faktur_kode = $params['faktur_kode'];
             $m_bayar->jml_tagihan = $params['jml_tagihan'];
             $m_bayar->jml_bayar = $params['jml_bayar'];
+            $m_bayar->mstatus = 1;
             $m_bayar->save();
 
             $id_header = $m_bayar->id;
 
             foreach ($params['dataMetodeBayar'] as $key => $value) {
-                $m_bayard = new \Model\Storage\BayarDet_model();
-                $m_bayard->id_header = $id_header;
-                $m_bayard->jenis_bayar = $value['nama'];
-                $m_bayard->kode_jenis_kartu = $value['kode_jenis_kartu'];
-                $m_bayard->nominal = $value['jumlah'];
-                $m_bayard->no_kartu = isset($value['no_kartu']) ? $value['no_kartu'] : null;
-                $m_bayard->nama_kartu = isset($value['nama_kartu']) ? $value['nama_kartu'] : null;
-                $m_bayard->save();
+                if ( !empty($value) ) {
+                    $m_bayard = new \Model\Storage\BayarDet_model();
+                    $m_bayard->id_header = $id_header;
+                    $m_bayard->jenis_bayar = $value['nama'];
+                    $m_bayard->kode_jenis_kartu = $value['kode_jenis_kartu'];
+                    $m_bayard->nominal = $value['jumlah'];
+                    $m_bayard->no_kartu = isset($value['no_kartu']) ? $value['no_kartu'] : null;
+                    $m_bayard->nama_kartu = isset($value['nama_kartu']) ? $value['nama_kartu'] : null;
+                    $m_bayard->save();
+                }
             }
 
             if ( !empty($params['dataHutangBayar']) ) {
@@ -574,19 +596,37 @@ class Pembayaran extends Public_Controller
                     $m_bayarh->id_header = $id_header;
                     $m_bayarh->faktur_kode = $value['faktur_kode'];
                     $m_bayarh->hutang = $value['hutang'];
+                    $m_bayarh->sudah_bayar = $value['sudah_bayar'];
                     $m_bayarh->bayar = $value['bayar'];
                     $m_bayard->save();
                 }
             }
 
+            $m_jual = new \Model\Storage\Jual_model();
             if ( $params['jml_bayar'] >= $params['jml_tagihan'] ) {
-                $m_jual = new \Model\Storage\Jual_model();
                 $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
                     array(
                         'lunas' => 1
                     )
                 );
+            } else {
+                $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
+                    array(
+                        'lunas' => 0
+                    )
+                );
             }
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
+
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $d_jual->pesanan_kode)->first();
+
+            $m_mejal = new \Model\Storage\MejaLog_model();
+            $m_mejal->where('pesanan_kode', $d_pesanan->kode_pesanan)->where('meja_id', $d_pesanan->meja_id)->where('status', 1)->update(
+                array('status' => 0)
+            );
 
             $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/save', $m_bayar, $deskripsi_log_gaktifitas );
@@ -606,6 +646,16 @@ class Pembayaran extends Public_Controller
         $params = $this->input->post('params');
 
         try {
+            $m_bayar = new \Model\Storage\Bayar_model();
+            $d_bayar = $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->first();
+            if ( $d_bayar ) {
+                $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->update(
+                    array(
+                        'mstatus' => 0
+                    )
+                );
+            }
+
             $m_jual = new \Model\Storage\Jual_model();
             $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
                 array(
@@ -615,11 +665,172 @@ class Pembayaran extends Public_Controller
 
             $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
 
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $d_jual->pesanan_kode)->first();
+
+            $m_mejal = new \Model\Storage\MejaLog_model();
+            $m_mejal->where('pesanan_kode', $d_pesanan->kode_pesanan)->where('meja_id', $d_pesanan->meja_id)->where('status', 1)->update(
+                array('status' => 0)
+            );
+
             $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas );
             
             $this->result['status'] = 1;
             $this->result['message'] = 'Data berhasil di simpan sebagai hutang.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function pembayaranFormEdit($_kode_faktur)
+    {
+        $kode_faktur = exDecrypt( $_kode_faktur );
+
+        $this->add_external_js(
+            array(
+                "assets/select2/js/select2.min.js",
+                "assets/transaksi/pembayaran/js/pembayaran.js",
+            )
+        );
+        $this->add_external_css(
+            array(
+                "assets/select2/css/select2.min.css",
+                "assets/transaksi/pembayaran/css/pembayaran.css",
+            )
+        );
+        $data = $this->includes;
+
+        $m_jual = new \Model\Storage\Jual_model();
+        $now = $m_jual->getDate();
+
+        $content['akses'] = $this->hasAkses;
+        $content['data'] = $this->getDataPenjualan($kode_faktur);
+        $content['data_bayar'] = $this->getDataPembayaran($kode_faktur);
+        $content['data_hutang'] = $this->getDataHutangEdit($kode_faktur);
+        $content['jenis_kartu'] = $this->getJenisKartu();
+        $content['data_branch'] = array(
+            'nama' => $this->namabranch,
+            'alamat' => $this->alamatbranch,
+            'telp' => $this->telpbranch,
+            'nama_kasir' => $this->userdata['detail_user']['nama_detuser'],
+            'waktu' => $now['waktu']
+        );
+
+        $data['view'] = $this->load->view($this->pathView . 'pembayaran_form_edit', $content, TRUE);
+
+        $this->load->view($this->template, $data);
+    }
+
+    public function getDataHutangEdit($kode_faktur)
+    {
+        $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
+        $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $kode_faktur)->get();
+
+        $data = null;
+        if ( $d_bayar_hutang->count() > 0 ) {
+            $d_bayar_hutang = $d_bayar_hutang->toArray();
+            foreach ($d_bayar_hutang as $key => $value) {
+                $m_jual = new \Model\Storage\BayarHutang_model();
+                $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->with(['pesanan'])->first()->toArray();
+
+                $data[] = array(
+                    'tgl_pesan' => !empty($d_jual['pesanan']) ? $d_jual['pesanan']['tgl_pesan'] : $d_jual['tgl_trans'],
+                    'faktur_kode' => $value['faktur_kode'],
+                    'hutang' => $value['hutang'],
+                    'sudah_bayar' => $value['sudah_bayar'],
+                    'bayar' => $value['bayar']
+                );
+            }
+        }
+
+        return $data;
+    }
+
+    public function getDataPembayaran($kode_faktur)
+    {
+        $m_bayar = new \Model\Storage\Bayar_model();
+        $d_bayar = $m_bayar->where('faktur_kode', $kode_faktur)->where('mstatus', 1)->first();
+
+        $data = null;
+        if ( $d_bayar ) {
+            $data = $d_bayar->toArray();
+        }
+
+        return $d_bayar;
+    }
+
+    public function loadDetailPembayaran()
+    {
+        $params = $this->input->post('params');
+        try {
+            $kode_faktur = exDecrypt( $params['faktur_kode'] );
+
+            $dataMetodeBayar = null;
+            $dataHutangBayar = null;
+            
+            $m_bayar = new \Model\Storage\Bayar_model();
+            $d_bayar = $m_bayar->where('faktur_kode', $kode_faktur)->where('mstatus', 1)->with(['bayar_det', 'bayar_hutang'])->first();
+
+            if ( $d_bayar ) {
+                $d_bayar = $d_bayar->toArray();
+
+                foreach ($d_bayar['bayar_det'] as $k_bd => $v_bd) {
+                    $dataMetodeBayar[] = array(
+                        'nama' => $v_bd['jenis_bayar'],
+                        'kode_jenis_kartu' => $v_bd['kode_jenis_kartu'],
+                        'no_kartu' => $v_bd['no_kartu'],
+                        'nama_kartu' => $v_bd['jenis_kartu']['nama'],
+                        'jumlah' => $v_bd['nominal']
+                    );
+                }
+
+                if ( !empty($d_bayar['bayar_hutang']) ) {
+                    foreach ($d_bayar['bayar_hutang'] as $k_bh => $v_bh) {
+                        $dataHutangBayar = array(
+                            'faktur_kode' => $kode_faktur,
+                            'hutang' => $v_bh['hutang'],
+                            'sudah_bayar' => $v_bh['sudah_bayar'],
+                            'bayar' => $v_bh['bayar']
+                        );
+                    }
+                }
+            }
+
+            $this->result['status'] = 1;
+            $this->result['content'] = array(
+                'dataMetodeBayar' => $dataMetodeBayar,
+                'dataHutangBayar' => $dataHutangBayar
+            );
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function deletePembayaran()
+    {
+        $params = $this->input->post('params');
+
+        try {
+            $m_bayar = new \Model\Storage\Bayar_model();
+            $d_bayar = $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->first();
+            if ( $d_bayar ) {
+                $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->update(
+                    array(
+                        'mstatus' => 0
+                    )
+                );
+            }
+
+            $deskripsi_log_gaktifitas = 'di-hapus oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/delete', $d_bayar, $deskripsi_log_gaktifitas );
+            
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Data berhasil di hapus.';
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
         }

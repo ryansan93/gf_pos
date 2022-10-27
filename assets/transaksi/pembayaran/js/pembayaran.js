@@ -6,6 +6,10 @@ var tr_split = null;
 
 var bayar = {
 	startUp: function () {
+        if (window.location.href.indexOf("pembayaranFormEdit") > -1) {
+            var kodeFaktur = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+            bayar.loadDetailPembayaran( kodeFaktur );
+        }
 	}, // end - startUp
 
 	modalListBayar: function () {
@@ -541,9 +545,9 @@ var bayar = {
 
             var faktur_kode = $(tr).find('td.faktur').attr('data-val');
             var hutang = $(tr).find('td.hutang').attr('data-val');
-            var bayar = $(tr).find('td.bayar').attr('data-val');
+            var sudah_bayar = $(tr).find('td.bayar').attr('data-val');
 
-            var sisa_hutang = hutang - bayar;
+            var sisa_hutang = hutang - sudah_bayar;
 
             if ( $(ipt_check).is(':checked') ) {
                 total_tagihan += sisa_hutang;
@@ -554,6 +558,7 @@ var bayar = {
                 var _dataHutangBayar = {
                     'faktur_kode': faktur_kode,
                     'hutang': hutang,
+                    'sudah_bayar': sudah_bayar,
                     'bayar': numeral.unformat($(tr).find('input').val())
                 };
 
@@ -815,6 +820,65 @@ var bayar = {
             }
         });
     }, // end - hutang
+
+    pembayaranFormEdit: function (elm) {
+        var kodeFaktur = $(elm).data('kode');
+
+        var baseurl = $('head base').attr('href');
+        var pagePembayaran = baseurl + 'transaksi/Pembayaran/pembayaranFormEdit/'+kodeFaktur;
+
+        window.location.href = pagePembayaran;
+    }, // end - pembayaranFormEdit
+
+    loadDetailPembayaran: function (kodeFaktur) {
+        var params = {
+            'faktur_kode': kodeFaktur
+        }
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/loadDetailPembayaran',
+            data: {
+                'params': params
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading(); },
+            success: function(data) {
+                hideLoading();
+
+                if ( data.status == 1 ) {
+                    if ( !empty(data.content.dataMetodeBayar) ) {
+                        for (var i = 0; i < data.content.dataMetodeBayar.length; i++) {
+                            var _dataMetodeBayar = {
+                                'nama': data.content.dataMetodeBayar[i].nama,
+                                'kode_jenis_kartu': data.content.dataMetodeBayar[i].kode_jenis_kartu,
+                                'no_kartu': data.content.dataMetodeBayar[i].no_kartu,
+                                'nama_kartu': data.content.dataMetodeBayar[i].nama_kartu,
+                                'jumlah': data.content.dataMetodeBayar[i].jumlah
+                            };
+
+                            dataMetodeBayar.push( _dataMetodeBayar );
+                        }
+                    }
+
+                    if ( !empty(data.content.dataHutangBayar) ) {
+                        for (var i = 0; i < data.content.dataHutangBayar.length; i++) {
+                            var _dataHutangBayar = {
+                                'faktur_kode': data.content.dataHutangBayar[i].faktur_kode,
+                                'hutang': data.content.dataHutangBayar[i].hutang,
+                                'sudah_bayar': data.content.dataHutangBayar[i].sudah_bayar,
+                                'bayar': data.content.dataHutangBayar[i].bayar,
+                            };
+
+                            dataHutangBayar.push( _dataHutangBayar );
+                        }
+                    }
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end - loadDataPembayaran
 };
 
 bayar.startUp();

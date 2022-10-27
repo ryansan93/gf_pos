@@ -18,19 +18,24 @@
 					$idx = 0;
 				}
 
+				$click = 'onclick="bayar.pembayaranForm(this);"';
 				$class_btn = 'btn-primary';
 				$disabled = '';
 				if ( $value['lunas'] == 1 ) {
-					$disabled = 'disabled';
-					$class_btn = 'btn-default';
+					// $disabled = 'disabled';
+					$class_btn = 'btn-success';
 				} else {
 					if ( $value['hutang'] == 1 ) {
-						$class_btn = 'btn-success';
+						$class_btn = 'btn-danger';
 					}
+				}
+
+				if ( $bayar == 1 ) {
+					$click = 'onclick="bayar.pembayaranFormEdit(this);"';
 				}
 			?>
 			<div class="col-xs-3 no-padding <?php echo $class; ?>">
-				<button class="col-xs-12 btn btn-primary text-left" data-kode="<?php echo exEncrypt($value['kode_faktur']); ?>" onclick="bayar.pembayaranForm(this);" <?php echo $disabled; ?> >
+				<button class="col-xs-12 btn <?php echo $class_btn; ?> text-left" data-kode="<?php echo exEncrypt($value['kode_faktur']); ?>" <?php echo $click; ?> <?php echo $disabled; ?> >
 					BILL : <?php echo $value['member']; ?>
 					<hr style="margin-top: 5px; margin-bottom: 5px;">
 					<?php echo 'Rp. '.angkaDecimal($value['grand_total']); ?>

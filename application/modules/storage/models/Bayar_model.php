@@ -7,7 +7,12 @@ class Bayar_model extends Conf {
 
 	public function bayar_det()
 	{
-		return $this->hasMany('\Model\Storage\BayarDet_model', 'id_header', 'id');
+		return $this->hasMany('\Model\Storage\BayarDet_model', 'id_header', 'id')->with(['jenis_kartu']);
+	}
+
+	public function bayar_hutang()
+	{
+		return $this->hasMany('\Model\Storage\BayarHutang_model', 'id_header', 'id');
 	}
 
 	public function jenis_kartu()

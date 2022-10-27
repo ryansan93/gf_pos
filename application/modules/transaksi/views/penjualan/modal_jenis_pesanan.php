@@ -12,7 +12,7 @@
 					<?php for (;$j < $_j; $j++) { ?>		
 						<?php if ( isset($jenis_pesanan[$j]) ): ?>
 							<div class="col-md-4 no-padding" style="height: 100px; padding-right: 1%; padding-bottom: 5px;">
-								<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" data-kode="<?php echo $jenis_pesanan[$j]['kode']; ?>">
+								<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" data-kode="<?php echo $jenis_pesanan[$j]['kode']; ?>" data-pilihmeja="<?php echo $jenis_pesanan[$j]['pilih_meja']; ?>">
 									<span><b><?php echo $jenis_pesanan[$j]['nama']; ?></b></span>
 								</div>
 							</div>

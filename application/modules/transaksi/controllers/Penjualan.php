@@ -82,11 +82,85 @@ class Penjualan extends Public_Controller
         return $data;
     }
 
+    public function getLantai()
+    {
+        $m_lantai = new \Model\Storage\Lantai_model();
+        $d_lantai = $m_lantai->with(['meja'])->get();
+
+        $data = null;
+        if ( $d_lantai->count() > 0 ) {
+            $d_lantai = $d_lantai->toArray();
+            foreach ($d_lantai as $k_lantai => $v_lantai) {
+                $key_lantai = $v_lantai['nama_lantai'].' | '.$v_lantai['id'];
+                $data[ $key_lantai ] = array(
+                    'id' => $v_lantai['id'],
+                    'nama' => $v_lantai['nama_lantai']
+                );
+            }
+        }
+
+        return $data;
+    }
+
+    public function listMeja()
+    {
+        $params = $this->input->get('params');
+
+        $m_lantai = new \Model\Storage\Lantai_model();
+        $d_lantai = $m_lantai->where('id', $params['lantai_id'])->with(['meja'])->first();
+
+        $start_date = date('Y-m-d').' 00:00:00';
+        $end_date = date('Y-m-d').' 23:59:59';
+
+        $data = null;
+        if ( $d_lantai ) {
+            $d_lantai = $d_lantai->toArray();
+
+            $key_lantai = $d_lantai['nama_lantai'].' | '.$d_lantai['id'];
+            $data[ $key_lantai ] = array(
+                'id' => $d_lantai['id'],
+                'nama' => $d_lantai['nama_lantai'],
+                'list_meja' => array()
+            );
+            foreach ($d_lantai['meja'] as $k_meja => $v_meja) {
+                $m_mejal = new \Model\Storage\MejaLog_model();
+                $d_mejal = $m_mejal->whereBetween('tgl_trans', [$start_date, $end_date])->where('meja_id', $v_meja['id'])->orderBy('tgl_trans', 'desc')->first();
+
+                $aktif = 0;
+                if ( $d_mejal ) {
+                    $aktif = $d_mejal->status;
+                }
+
+                $key_meja = $v_meja['nama_meja'].' | '.$v_meja['id'];
+                $data[ $key_lantai ]['list_meja'][] = array(
+                    'id' => $v_meja['id'],
+                    'nama' => $v_meja['nama_meja'],
+                    'aktif' => $aktif
+                );
+            }
+        }
+
+        $content['data'] = $data;
+
+        $html = $this->load->view($this->pathView . 'list_meja', $content, TRUE);
+
+        echo $html;
+    }
+
     public function modalJenisPesanan()
     {
         $content['jenis_pesanan'] = $this->getJenisPesanan();
 
         $html = $this->load->view($this->pathView . 'modal_jenis_pesanan', $content, TRUE);
+
+        echo $html;
+    }
+
+    public function modalMeja()
+    {
+        $content['lantai'] = $this->getLantai();
+
+        $html = $this->load->view($this->pathView . 'modal_meja', $content, TRUE);
 
         echo $html;
     }
@@ -282,9 +356,11 @@ class Penjualan extends Public_Controller
             $m_pesanan = new \Model\Storage\Pesanan_model();
             $now = $m_pesanan->getDate();
 
+            $waktu = $now['waktu'];
+
             $kode_pesanan = $m_pesanan->getNextKode($this->kodebranch);
             $m_pesanan->kode_pesanan = $kode_pesanan;
-            $m_pesanan->tgl_pesan = $now['waktu'];
+            $m_pesanan->tgl_pesan = $waktu;
             $m_pesanan->branch = $this->kodebranch;
             $m_pesanan->member = $params['member'];
             $m_pesanan->kode_member = $params['kode_member'];
@@ -296,6 +372,7 @@ class Penjualan extends Public_Controller
             $m_pesanan->grand_total = $params['grand_total'];
             $m_pesanan->status = 1;
             $m_pesanan->mstatus = 1;
+            $m_pesanan->meja_id = $params['meja_id'];
             $m_pesanan->save();
 
             foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
@@ -327,15 +404,12 @@ class Penjualan extends Public_Controller
                 }
             }
 
-            // if ( !empty($params['list_diskon']) ) {
-            //     foreach ($params['list_diskon'] as $k_ld => $v_ld) {
-            //         $m_juald = new \Model\Storage\JualDiskon_model();
-            //         $m_juald->faktur_kode = $kode_faktur;
-            //         $m_juald->diskon_kode = $v_ld['kode_diskon'];
-            //         $m_juald->diskon_nama = $v_ld['nama_diskon'];
-            //         $m_juald->save();
-            //     }
-            // }
+            $m_mejal = new \Model\Storage\MejaLog_model();
+            $m_mejal->pesanan_kode = $kode_pesanan;
+            $m_mejal->tgl_trans = $waktu;
+            $m_mejal->meja_id = $params['meja_id'];
+            $m_mejal->status = 1;
+            $m_mejal->save();
 
             $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/save', $m_pesanan, $deskripsi_log_gaktifitas );
@@ -1760,13 +1834,16 @@ class Penjualan extends Public_Controller
 
         try {
             $m_pesanan = new \Model\Storage\Pesanan_model();
-            $d_pesanan = $m_pesanan->where('kode_pesanan', $params['pesanan_kode'])->with(['pesanan_item'])->first();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $params['pesanan_kode'])->with(['pesanan_item', 'meja'])->first();
 
             $jenis_pesanan = null;
             $nama_jenis_pesanan = null;
 
             $kode_member = null;
             $member = null;
+
+            $meja_id = null;
+            $meja = null;
 
             $data = null;
             if ( $d_pesanan ) {
@@ -1800,6 +1877,9 @@ class Penjualan extends Public_Controller
                 $kode_member = $d_pesanan['kode_member'];
                 $member = $d_pesanan['member'];
 
+                $meja_id = $d_pesanan['meja']['id'];
+                $meja = $d_pesanan['meja']['lantai']['nama_lantai'].' - '.$d_pesanan['meja']['nama_meja'];
+
                 $data = array(
                     'kode_pesanan' => $d_pesanan['kode_pesanan'],
                     'tgl_pesan' => $d_pesanan['tgl_pesan'],
@@ -1829,7 +1909,9 @@ class Penjualan extends Public_Controller
                 'jenis_pesanan' => $jenis_pesanan,
                 'nama_jenis_pesanan' => $nama_jenis_pesanan,
                 'kode_member' => $kode_member,
-                'member' => $member
+                'member' => $member,
+                'meja_id' => $meja_id,
+                'meja' => $meja
             );
 
             $this->result['status'] = 1;
@@ -1864,6 +1946,7 @@ class Penjualan extends Public_Controller
                     'diskon' => $params['diskon'],
                     'ppn' => $params['ppn'],
                     'grand_total' => $params['grand_total'],
+                    'meja_id' => $params['meja_id'],
                     'mstatus' => 1,
                 )
             );
@@ -1928,6 +2011,13 @@ class Penjualan extends Public_Controller
                     $this->execDeletePenjualan( $v_jual['kode_faktur'] );
                 }
             }
+
+            $m_mejal = new \Model\Storage\MejaLog_model();
+            $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
+                array(
+                    'meja_id' => $params['meja_id']
+                )
+            );
 
             $this->execSavePenjualan( $params, $kode_pesanan );
 

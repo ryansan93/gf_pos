@@ -19,8 +19,8 @@ class Pesanan_model extends Conf {
 		return $this->hasMany('\Model\Storage\PesananItem_model', 'pesanan_kode', 'kode_pesanan')->with(['pesanan_item_detail', 'jenis_pesanan']);
 	}
 
-	// public function pesanan_diskon()
-	// {
-	// 	return $this->hasMany('\Model\Storage\PesananDiskon_model', 'pesanan_kode', 'kode_pesanan')->with(['diskon']);
-	// }
+	public function meja()
+	{
+		return $this->hasOne('\Model\Storage\Meja_model', 'id', 'meja_id')->with(['lantai']);
+	}
 }
