@@ -599,7 +599,7 @@ class Pembayaran extends Public_Controller
                     $m_bayarh->hutang = $value['hutang'];
                     $m_bayarh->sudah_bayar = $value['sudah_bayar'];
                     $m_bayarh->bayar = $value['bayar'];
-                    $m_bayard->save();
+                    $m_bayarh->save();
                 }
             }
 
@@ -727,14 +727,19 @@ class Pembayaran extends Public_Controller
 
     public function getDataHutangEdit($kode_faktur)
     {
-        $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
-        $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $kode_faktur)->get();
+        $m_bayar = new \Model\Storage\Bayar_model();
+        $d_bayar = $m_bayar->where('faktur_kode', $kode_faktur)->where('mstatus', 1)->first()->toArray();
 
+        $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
+        $d_bayar_hutang = $m_bayar_hutang->where('id_header', $d_bayar['id'])->get();
+
+        
         $data = null;
         if ( $d_bayar_hutang->count() > 0 ) {
             $d_bayar_hutang = $d_bayar_hutang->toArray();
+
             foreach ($d_bayar_hutang as $key => $value) {
-                $m_jual = new \Model\Storage\BayarHutang_model();
+                $m_jual = new \Model\Storage\Jual_model();
                 $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->with(['pesanan'])->first()->toArray();
 
                 $data[] = array(
