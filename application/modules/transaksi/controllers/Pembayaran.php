@@ -27,10 +27,11 @@ class Pembayaran extends Public_Controller
             $end_date = $today.' 23:59:59';
 
             $kasir = $this->userid;
+            $kode_branch = $this->kodebranch;
             // $kasir = 'USR2207003';
 
             $m_pesanan = new \Model\Storage\Pesanan_model();
-            $d_pesanan = $m_pesanan->whereBetween('tgl_pesan', [$start_date, $end_date])->where('mstatus', 1)->get();
+            $d_pesanan = $m_pesanan->whereBetween('tgl_pesan', [$start_date, $end_date])->where('branch', $kode_branch)->where('mstatus', 1)->get();
             // $d_pesanan = $m_pesanan->where('tgl_pesan', '>=', '2022-10-12')->where('mstatus', 1)->get();
 
             $data_bayar = ($d_pesanan->count() > 0) ? $this->getDataBayar($d_pesanan) : null;
@@ -503,7 +504,7 @@ class Pembayaran extends Public_Controller
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
-                    $m_bayar = new \Model\Storage\BayarHutang_model();
+                    $m_bayar = new \Model\Storage\Bayar_model();
                     $d_bayar_non_aktif = $m_bayar->select('id')->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 0)->get();
 
                     $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
