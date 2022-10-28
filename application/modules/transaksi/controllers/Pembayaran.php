@@ -504,23 +504,42 @@ class Pembayaran extends Public_Controller
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
-                    $m_bayar = new \Model\Storage\Bayar_model();
-                    $d_bayar_non_aktif = $m_bayar->select('id')->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 0)->get();
+                    // $m_bayar = new \Model\Storage\Bayar_model();
+                    // $d_bayar_non_aktif = $m_bayar->select('id')->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 0)->get();
+
+                    // if ( $d_bayar_non_aktif->count() > 0 ) {
+                    //     $d_bayar_non_aktif = $d_bayar_non_aktif->toArray();
+
+                    //     cetak_r($d_jual_hutang, 1);
+
+                    //     $d_bayar_hutang = $m_bayar_hutang->whereNotIn('id_header', $d_bayar_non_aktif)->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    // } else {
+                    //     $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    // }
+
+                    $sql = "select sum(bayar) as total_bayar from bayar_hutang bh 
+                        left join
+                            bayar b 
+                            on
+                                bh.id_header = b.id
+                        where
+                            b.mstatus = 1 and
+                            bh.faktur_kode = '".$value['kode_faktur']."'
+                    ";
 
                     $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
-                    if ( $d_bayar_non_aktif->count() > 0 ) {
-                        $d_bayar_non_aktif = $d_bayar_non_aktif->toArray();
+                    $d_bayar_hutang = $m_bayar_hutang->hydrateRaw($sql);
 
-                        $d_bayar_hutang = $m_bayar_hutang->whereNotIn('id_header', $d_bayar_non_aktif)->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
-                    } else {
-                        $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
+                    $total_bayar = 0;
+                    if ( $d_bayar_hutang->count() > 0 ) {
+                        $total_bayar = $d_bayar_hutang->toArray()[0]['total_bayar'];
                     }
 
                     $data[] = array(
                         'tgl_pesan' => !empty($value['pesanan']) ? $value['pesanan']['tgl_pesan'] : $value['tgl_trans'],
                         'faktur_kode' => $value['kode_faktur'],
                         'hutang' => $value['grand_total'],
-                        'bayar' => $d_bayar_hutang
+                        'bayar' => $total_bayar
                     );
                 }
             }
@@ -597,7 +616,7 @@ class Pembayaran extends Public_Controller
                     $m_bayarh->id_header = $id_header;
                     $m_bayarh->faktur_kode = $value['faktur_kode'];
                     $m_bayarh->hutang = $value['hutang'];
-                    $m_bayarh->sudah_bayar = $value['sudah_bayar'];
+                    $m_bayarh->sudah_bayar = (isset($value['sudah_bayar']) && !empty($value['sudah_bayar']) && $value['sudah_bayar'] > 0) ? $value['sudah_bayar'] : 0;
                     $m_bayarh->bayar = $value['bayar'];
                     $m_bayarh->save();
                 }
@@ -828,6 +847,13 @@ class Pembayaran extends Public_Controller
                 $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->update(
                     array(
                         'mstatus' => 0
+                    )
+                );
+
+                $m_jual = new \Model\Storage\Jual_model();
+                $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
+                    array(
+                        'lunas' => 0
                     )
                 );
             }
