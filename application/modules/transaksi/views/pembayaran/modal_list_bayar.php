@@ -24,6 +24,20 @@
 								<i class="fa fa-search"></i><input class="form-control" type="search" data-table="tbl_belum_bayar" placeholder="Search" onkeyup="filter_all(this)">
 							</div>
 							<small>
+								<?php
+									$colspan_action = 3;
+									if ( $akses_kasir['a_submit'] == 0 ) {
+										$colspan_action -= 1;
+									}
+
+									if ( $akses_waitress['a_edit'] == 0 ) {
+										$colspan_action -= 1;
+									}
+
+									if ( $akses_waitress['a_delete'] == 0 ) {
+										$colspan_action -= 1;
+									}
+								?>
 								<table class="table table-bordered tbl_belum_bayar" style="margin-bottom: 0px;">
 									<thead>
 										<tr>
@@ -31,7 +45,7 @@
 											<th class="col-lg-2">No. Pesanan</th>
 											<th class="col-lg-3">Pelanggan</th>
 											<th class="col-lg-2">Total</th>
-											<th colspan="3">Action</th>
+											<th colspan="<?php echo $colspan_action; ?>">Action</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -42,9 +56,21 @@
 													<td><?php echo $value['kode_pesanan']; ?></td>
 													<td><?php echo $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
-													<td class="col-lg-1 text-center"><button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button></td>
-													<td class="col-lg-1 text-center"><button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="jual.edit(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-edit"></i></button></td>
-													<td class="col-lg-1 text-center"><button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.delete(this)"><i class="fa fa-trash"></i></button></td>
+													<?php if ( $akses_kasir['a_submit'] == 1 ): ?>
+														<td class="col-lg-1 text-center">
+															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button>
+														</td>
+													<?php endif ?>
+													<?php if ( $akses_waitress['a_edit'] == 1 ): ?>
+														<td class="col-lg-1 text-center">
+															<button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="jual.edit(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-edit"></i></button>
+														</td>
+													<?php endif ?>
+													<?php if ( $akses_waitress['a_delete'] == 1 ): ?>
+														<td class="col-lg-1 text-center">
+															<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.delete(this)"><i class="fa fa-trash"></i></button>
+														</td>
+													<?php endif ?>
 												</tr>
 												<?php $jml_transaksi++; $grand_total += $value['total']; ?>
 											<?php endforeach ?>
@@ -97,7 +123,10 @@
 													<td><?php echo $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
 													<td class="col-lg-1 text-center">
-														<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button>
+														<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
+															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button>
+														<?php endif ?>
+														</td>
 													</td>
 												</tr>
 												<?php $jml_transaksi++; $grand_total += $value['total']; ?>

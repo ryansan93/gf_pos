@@ -13,7 +13,7 @@ class Pembayaran extends Public_Controller
     {
         parent::__construct();
         $this->url = $this->current_base_uri;
-        $this->hasAkses = hakAkses($this->url);
+        $this->hakAkses = hakAkses($this->url);
     }
 
     public function modalListBayar()
@@ -41,6 +41,8 @@ class Pembayaran extends Public_Controller
                 'data_bayar' => $data_bayar,
                 'data_belum_bayar' => $data_belum_bayar
             );
+            $content['akses_waitress'] = hakAkses('/transaksi/Penjualan');
+            $content['akses_kasir'] = hakAkses('/transaksi/Pembayaran');
 
             $html = $this->load->view($this->pathView . 'modal_list_bayar', $content, TRUE);
             
@@ -392,7 +394,7 @@ class Pembayaran extends Public_Controller
         $m_jual = new \Model\Storage\Jual_model();
         $now = $m_jual->getDate();
 
-        $content['akses'] = $this->hasAkses;
+        $content['akses'] = $this->hakAkses;
         $content['data'] = $this->getDataPenjualan($kode_faktur);
         $content['data_hutang'] = $this->getDataHutang($kode_faktur);
         $content['jenis_kartu'] = $this->getJenisKartu();
@@ -726,7 +728,7 @@ class Pembayaran extends Public_Controller
         $m_jual = new \Model\Storage\Jual_model();
         $now = $m_jual->getDate();
 
-        $content['akses'] = $this->hasAkses;
+        $content['akses'] = $this->hakAkses;
         $content['data'] = $this->getDataPenjualan($kode_faktur);
         $content['data_bayar'] = $this->getDataPembayaran($kode_faktur);
         $content['data_hutang'] = $this->getDataHutangEdit($kode_faktur);

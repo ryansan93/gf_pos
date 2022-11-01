@@ -238,7 +238,9 @@
 					<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.batal();"><i class="fa fa-times"></i> Batal</button>
 				</div>
 				<div class="col-xs-4 no-padding cb_left cb_right">
-					<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.deletePembayaran(this);" data-kode="<?php echo $data['kode_faktur']; ?>"><i class="fa fa-trash"></i> Hapus</button>
+					<?php if ( $akses['a_delete'] == 1 ): ?>
+						<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.deletePembayaran(this);" data-kode="<?php echo $data['kode_faktur']; ?>"><i class="fa fa-trash"></i> Hapus</button>
+					<?php endif ?>
 				</div>
 				<div class="col-xs-4 no-padding cb_right">
 					<button type="button" class="col-xs-12 btn btn-success" data-kode="<?php echo $data['kode_faktur']; ?>" onclick="bayar.modalPembayaran(this)"><i class="fa fa-check"></i> Bayar</button>

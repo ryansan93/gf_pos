@@ -82,33 +82,43 @@
 				</div>
 				<div class="col-md-12 no-padding" style="padding-bottom: 1%; height: 20%;">
 					<div class="col-md-12 no-padding simpan_pesanan" style="height: 100%;">
-						<div class="col-md-6 no-padding" style="height: 100%; padding-right: 1%;">
-							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.savePesanan('simpan'); // jual.modalPilihBayar();">
-								<span><b>SIMPAN</b></span>
-							</div>
+						<?php 
+							$hide_div_submit = 'hide';
+							$col_md = 'col-md-12';
+							$padding = 0;
+							if ( $akses['a_submit'] == 1 ) {
+								$hide_div_submit = '';
+								$col_md = 'col-md-6';
+								$padding = 1;
+							}
+						?>
+						<div class="no-padding <?php echo $hide_div_submit.' '.$col_md; ?>" style="height: 100%; padding-right: <?php echo $padding.'%'; ?>;">
+								<div class="col-md-12 text-center cursor-p button save" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="/* jual.savePesanan('simpan'); */ jual.modalPilihPrivilege(this);">
+									<span><b>SIMPAN</b></span>
+								</div>
 						</div>
-						<div class="col-md-6 no-padding" style="height: 100%; padding-left: 1%;">
+						<div class="no-padding <?php echo $col_md; ?>" style="height: 100%; padding-left: <?php echo $padding.'%'; ?>;">
 							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalListBayar()">
 								<span><b>LIST PESANAN</b></span>
 							</div>
 						</div>
 					</div>
 					<div class="col-md-12 no-padding edit_pesanan hide" style="height: 100%;">
-						<div class="col-md-4 no-padding" style="height: 100%; padding-right: 1%;">
-							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.editPesanan(this);" data-kode="">
+						<div class="col-md-6 no-padding" style="height: 100%; padding-right: 1%;">
+							<div class="col-md-12 text-center cursor-p button edit" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="/* jual.editPesanan(this); */ jual.modalPilihPrivilege(this);" data-kode="">
 								<span><b>SIMPAN PERUBAHAN</b></span>
 							</div>
 						</div>
-						<div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
+						<div class="col-md-6 no-padding" style="height: 100%; padding-left: 1%;">
 							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.batalEdit()">
 								<span><b>BATAL UBAH</b></span>
 							</div>
 						</div>
-						<div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
+						<!-- <div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
 							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalPembayaran(this)" data-kode="">
 								<span><b>PEMBAYARAN</b></span>
 							</div>
-						</div>
+						</div> -->
 					</div>
 				</div>
 			</div>

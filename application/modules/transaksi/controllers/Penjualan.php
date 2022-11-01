@@ -13,7 +13,7 @@ class Penjualan extends Public_Controller
     {
         parent::__construct();
         $this->url = $this->current_base_uri;
-        $this->hasAkses = hakAkses($this->url);
+        $this->hakAkses = hakAkses($this->url);
     }
 
     /**************************************************************************************
@@ -24,7 +24,7 @@ class Penjualan extends Public_Controller
      */
     public function index()
     {
-        // if ( $this->hasAkses['a_view'] == 1 ) {
+        // if ( $this->hakAkses['a_view'] == 1 ) {
             $this->load->library('Mobile_Detect');
             $detect = new Mobile_Detect();
 
@@ -55,7 +55,7 @@ class Penjualan extends Public_Controller
                 $isMobile = true;
             }
 
-            $content['akses'] = $this->hasAkses;
+            $content['akses'] = $this->hakAkses;
             $content['isMobile'] = $isMobile;
             $content['persen_ppn'] = $this->persen_ppn;
 
@@ -348,6 +348,13 @@ class Penjualan extends Public_Controller
         echo $html;
     }
 
+    public function modalPilihPrivilege()
+    {
+        $html = $this->load->view($this->pathView . 'modal_pilih_privilege', null, TRUE);
+
+        echo $html;
+    }
+
     public function savePesanan()
     {
         $params = $this->input->post('params');
@@ -373,6 +380,7 @@ class Penjualan extends Public_Controller
             $m_pesanan->status = 1;
             $m_pesanan->mstatus = 1;
             $m_pesanan->meja_id = $params['meja_id'];
+            $m_pesanan->privilege = $params['privilege'];
             $m_pesanan->save();
 
             foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
@@ -1948,6 +1956,7 @@ class Penjualan extends Public_Controller
                     'grand_total' => $params['grand_total'],
                     'meja_id' => $params['meja_id'],
                     'mstatus' => 1,
+                    'privilege' => $params['privilege'],
                 )
             );
 
