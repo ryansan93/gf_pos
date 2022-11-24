@@ -22,11 +22,11 @@ var waste = [];
 var jual = {
 	start_up: function () {
         // jual.modalJenisPesanan();
-        // sak.cekSaldoAwalKasir();
+        sak.cekSaldoAwalKasir();
 
-        ws.addEventListener("open", () => {
-            ws.send(JSON.stringify("pesan"));
-        });
+        // ws.addEventListener("open", () => {
+        //     ws.send(JSON.stringify("pesan"));
+        // });
 	}, // end - start_up
 
     modalPilihBranch: function() {
