@@ -45,7 +45,7 @@
               <span style="width: 92%;">Saldo Awal Kasir</span>
             </a>
           </li>
-          <?php if ( hakAkses('master/Member') ): ?>
+          <?php if ( hasAkses('master/Member') ): ?>
             <li class="">
               <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
                 <i class="fa fa-users" style="width: 8%;"></i>
@@ -61,13 +61,15 @@
                 </ul>
             </li>
           <?php endif ?>
-          <?php if ( hakAkses('transaksi/MenuGagal') ): ?>
+          <?php if ( hasAkses('transaksi/Dapur') ): ?>
             <li class="">
               <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Dapur">
                 <i class="fa fa-usd" style="width: 8%;"></i>
                 <span style="width: 92%;">Dapur</span>
               </a>
             </li>
+          <?php endif ?>
+          <?php if ( hasAkses('transaksi/MenuGagal') ): ?>
             <li class="">
               <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/MenuGagal">
                 <i class="fa fa-trash" style="width: 8%;"></i>
