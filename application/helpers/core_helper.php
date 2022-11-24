@@ -533,8 +533,6 @@ if(!function_exists('next_date')){
 if (! function_exists ( 'hasAkses' )) {
 	function hasAkses($route) {
         $CI = & get_instance();
-        
-        cetak_r( $CI->session->userdata('url') );
 
         $permission = json_decode($CI->session->userdata('url'),1);
 
