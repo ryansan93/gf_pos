@@ -121,6 +121,18 @@ $(function(){
     }
   });
 
+  $('.btn-tab').click(function() {
+    var href = $(this).attr('data-href');
+
+    var div_tab_contain = $(this).closest('div.tab-contain');
+
+    $(div_tab_contain).find('div.div-tab').removeClass('active');
+    $(div_tab_contain).find('div.div-tab').addClass('non-active');
+
+    $(div_tab_contain).find('div#'+href).removeClass('non-active');
+    $(div_tab_contain).find('div#'+href).addClass('active');
+  });
+
   /* set default filter content */
   // filter_content($('input:first'));
 

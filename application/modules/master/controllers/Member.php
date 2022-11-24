@@ -19,6 +19,8 @@ class Member extends Public_Controller
     public function modalMember()
     {
         $m_member = new \Model\Storage\Member_model();
+        $now = $m_member->getDate();
+
         $d_member = $m_member->where('status', 1)->orderBy('kode_member', 'desc')->get();
 
         $data = null;
@@ -26,6 +28,8 @@ class Member extends Public_Controller
             $data = $d_member->toArray();
         }
 
+        $content['akses'] = $this->hasAkses;
+        $content['tanggal'] = $now['tanggal'];
         $content['data'] = $data;
 
         $html = $this->load->view($this->pathView . 'modal_member', $content, TRUE);
@@ -47,6 +51,8 @@ class Member extends Public_Controller
         $kode = $this->input->get('kode');
 
         $m_member = new \Model\Storage\Member_model();
+        $now = $m_member->getDate();
+
         $d_member = $m_member->where('kode_member', $kode)->first();
 
         $data = null;
@@ -54,6 +60,7 @@ class Member extends Public_Controller
             $data = $d_member->toArray();
         }
 
+        $content['tanggal'] = $now['tanggal'];
         $content['data'] = $data;
 
         $html = $this->load->view($this->pathView . 'view_form', $content, TRUE);
@@ -66,6 +73,7 @@ class Member extends Public_Controller
         $params = $this->input->post('params');
         try {
             $m_member = new \Model\Storage\Member_model();
+            $now = $m_member->getDate();
 
             $kode_member = $m_member->getNextId();
 
@@ -73,8 +81,10 @@ class Member extends Public_Controller
             $m_member->nama = $params['nama'];
             $m_member->no_telp = $params['no_telp'];
             $m_member->alamat = $params['alamat'];
-            $m_member->privilege = $params['privilege'];
+            $m_member->privilege = 0;
             $m_member->status = 1;
+            $m_member->tgl_berakhir = prev_date(date('Y-m-d', strtotime($now['tanggal']. ' + 1 years')));
+            $m_member->mstatus = 1;
             $m_member->save();
 
             $d_member = $m_member->where('kode_member', $kode_member)->first()->toArray();
@@ -143,6 +153,65 @@ class Member extends Public_Controller
             
             $this->result['status'] = 1;
             $this->result['message'] = 'Data member berhasil di hapus.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function aktif()
+    {
+        $params = $this->input->post('params');
+        try {
+            $m_member = new \Model\Storage\Member_model();
+            $now = $m_member->getDate();
+
+            $kode_member = $params['kode'];
+
+            $m_member->where('kode_member', $kode_member)->update(
+                array(
+                    'mstatus' => 1,
+                    'tgl_berakhir' => prev_date(date('Y-m-d', strtotime($now['tanggal']. ' + 1 years')))
+                )
+            );
+
+            $d_member = $m_member->where('kode_member', $kode_member)->first()->toArray();
+
+            $deskripsi_log = 'di-aktifkan oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/update', $m_member, $deskripsi_log, $kode_member );
+            
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Data member berhasil di aktifkan.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function nonAktif()
+    {
+        $params = $this->input->post('params');
+        try {
+            $m_member = new \Model\Storage\Member_model();
+            $now = $m_member->getDate();
+
+            $kode_member = $params['kode'];
+
+            $m_member->where('kode_member', $kode_member)->update(
+                array(
+                    'mstatus' => 0
+                )
+            );
+
+            $d_member = $m_member->where('kode_member', $kode_member)->first()->toArray();
+
+            $deskripsi_log = 'di-nonaktifkan oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/update', $m_member, $deskripsi_log, $kode_member );
+            
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Data member berhasil di nonaktifkan.';
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
         }

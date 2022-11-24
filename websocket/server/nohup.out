@@ -1,0 +1,60 @@
+node:events:505
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8033
+    at Server.setupListenHandle [as _listen2] (node:net:1372:16)
+    at listenInCluster (node:net:1420:12)
+    at Server.listen (node:net:1508:7)
+    at new WebSocketServer (C:\xampp_php7\htdocs\gf_pos\websocket\server\node_modules\ws\lib\websocket-server.js:97:20)
+    at Object.<anonymous> (C:\xampp_php7\htdocs\gf_pos\websocket\server\index.js:3:13)
+    at Module._compile (node:internal/modules/cjs/loader:1105:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1159:10)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:527:28)
+    at emitErrorNT (node:net:1399:8)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 8033
+}
+node:events:505
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8033
+    at Server.setupListenHandle [as _listen2] (node:net:1372:16)
+    at listenInCluster (node:net:1420:12)
+    at Server.listen (node:net:1508:7)
+    at new WebSocketServer (C:\xampp_php7\htdocs\gf_pos\websocket\server\node_modules\ws\lib\websocket-server.js:97:20)
+    at Object.<anonymous> (C:\xampp_php7\htdocs\gf_pos\websocket\server\index.js:3:13)
+    at Module._compile (node:internal/modules/cjs/loader:1105:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1159:10)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:527:28)
+    at emitErrorNT (node:net:1399:8)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 8033
+}
+New client connected!
+Client has disconnected!
+New client connected!
+Client has disconnected!
+New client connected!
+Client has disconnected!
+New client connected!
+Client has disconnected!
+New client connected!
+Client has disconnected!

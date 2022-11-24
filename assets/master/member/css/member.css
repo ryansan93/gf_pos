@@ -26,7 +26,7 @@
 }
 
 .modal-member div.detail div {
-	border-bottom: 1px solid #dedede;
+	/*border-bottom: 1px solid #dedede;*/
 	height: 100%;
 	/*border: none;*/
 
@@ -41,6 +41,10 @@
 
 .modal-member div.detail.abu div {
 	background-color: #eeeeee;
+}
+
+.modal-member div.detail.merah div {
+	background-color: #d9534f;
 }
 
 .modal-member div.detail:hover div {

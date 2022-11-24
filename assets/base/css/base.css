@@ -1,3 +1,11 @@
+div.div-tab.active {
+  display: block;
+}
+
+div.div-tab.non-active {
+  display: none;
+}
+
 .jml_uang.show {
     display: flex!important;
 }

@@ -24,7 +24,7 @@
 		            <textarea class="form-control alamat" placeholder="Alamat" data-required="1"></textarea>
 		        </div>
 			</div>
-			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+			<div class="col-md-12 no-padding hide" style="margin-top: 10px;">
 				<div class="col-lg-12 text-left"><label class="control-label">Privilege</label></div>
 		        <div class="col-lg-12">
 		            <div class="radio" style="margin-top: 0px;">

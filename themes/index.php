@@ -59,6 +59,18 @@
                 </li>
               </ul>
           </li>
+          <li class="">
+            <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Dapur">
+              <i class="fa fa-usd" style="width: 8%;"></i>
+              <span style="width: 92%;">Dapur</span>
+            </a>
+          </li>
+          <li class="">
+            <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/MenuGagal">
+              <i class="fa fa-trash" style="width: 8%;"></i>
+              <span style="width: 92%;">Menu Gagal</span>
+            </a>
+          </li>
           <!-- <?php $arr_fitur = $this->session->userdata()['Fitur']; ?>
           <?php foreach ($arr_fitur as $key => $v_fitur): ?>
             <li>
@@ -201,9 +213,9 @@
 
     var url = window.location.href;
 
-    if ( url != defaultPage && !url.includes(pagePembayaran) ) {
-      window.location.href = defaultPage;
-    }
+    // if ( url != defaultPage && !url.includes(pagePembayaran) ) {
+    //   window.location.href = defaultPage;
+    // }
 
     $("#menu-toggle").click(function(e) {
       e.preventDefault();

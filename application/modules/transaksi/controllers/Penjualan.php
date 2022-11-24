@@ -55,9 +55,13 @@ class Penjualan extends Public_Controller
                 $isMobile = true;
             }
 
+            // exec("cd websocket\server && forever stopall 2>&1");
+            // exec("cd websocket\server && forever start index.js 2>&1");
+
             $content['akses'] = $this->hakAkses;
             $content['isMobile'] = $isMobile;
             $content['persen_ppn'] = $this->persen_ppn;
+            $content['kode_branch'] = $this->kodebranch;
 
             $content['kategori'] = $this->getKategori();
 
@@ -67,6 +71,19 @@ class Penjualan extends Public_Controller
         // } else {
         //     showErrorAkses();
         // }
+    }
+
+    public function getBranch()
+    {
+        $m_branch = new \Model\Storage\Branch_model();
+        $d_branch = $m_branch->get();
+
+        $data = null;
+        if ( $d_branch->count() > 0 ) {
+            $data = $d_branch->toArray();
+        }
+
+        return $data;
     }
 
     public function getJenisPesanan()
@@ -143,6 +160,15 @@ class Penjualan extends Public_Controller
         $content['data'] = $data;
 
         $html = $this->load->view($this->pathView . 'list_meja', $content, TRUE);
+
+        echo $html;
+    }
+
+    public function modalPilihBranch()
+    {
+        $content['branch'] = $this->getBranch();
+
+        $html = $this->load->view($this->pathView . 'modal_pilih_branch', $content, TRUE);
 
         echo $html;
     }
@@ -253,6 +279,7 @@ class Penjualan extends Public_Controller
     {
         $id_kategori = $this->input->get('id_kategori');
         $jenis_pesanan = $this->input->get('jenis_pesanan');
+        $branch_kode = $this->input->get('branch_kode');
 
         $m_menu = new \Model\Storage\Menu_model();
         $sql = "
@@ -270,7 +297,8 @@ class Penjualan extends Public_Controller
                         menu.kode_menu = pm.menu_kode
                 where
                     menu.kategori_menu_id = ".$id_kategori." and
-                    hm.jenis_pesanan_kode = '".$jenis_pesanan."'
+                    hm.jenis_pesanan_kode = '".$jenis_pesanan."' and
+                    menu.branch_kode = '".trim($branch_kode)."'
             group by menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga, menu.kategori_menu_id, hm.jenis_pesanan_kode
             order by menu.nama asc
         ";
@@ -1877,7 +1905,8 @@ class Penjualan extends Public_Controller
                         'harga' => $v_ji['harga'],
                         'total' => $v_ji['total'],
                         'request' => $v_ji['request'],
-                        'pesanan_item_detail' => $v_ji['pesanan_item_detail']
+                        'pesanan_item_detail' => $v_ji['pesanan_item_detail'],
+                        'proses' => $v_ji['proses']
                     );
                 }
                 $pesanan_diskon = null;
@@ -1981,6 +2010,7 @@ class Penjualan extends Public_Controller
                     $m_pesanani->harga = $v_lm['harga'];
                     $m_pesanani->total = $v_lm['total'];
                     $m_pesanani->request = $v_lm['request'];
+                    $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
                     $m_pesanani->save();
 
                     if ( !empty($v_lm['detail_menu']) ) {
@@ -1996,7 +2026,6 @@ class Penjualan extends Public_Controller
                 }
             }
 
-
             if ( !empty($params['list_diskon']) ) {
                 $m_pesanand = new \Model\Storage\PesananDiskon_model();
                 $m_pesanand->where('pesanan_kode', $kode_pesanan)->delete();
@@ -2007,6 +2036,17 @@ class Penjualan extends Public_Controller
                     $m_pesanand->diskon_kode = $v_ld['kode_diskon'];
                     $m_pesanand->diskon_nama = $v_ld['nama_diskon'];
                     $m_pesanand->save();
+                }
+            }
+
+            if ( !empty($params['waste']) ) {
+                $m_waste = new \Model\Storage\Waste_model();
+                foreach ($params['waste'] as $k_waste => $v_waste) {
+                    $m_waste = new \Model\Storage\PesananDiskon_model();
+                    $m_waste->pesanan_kode = $kode_pesanan;
+                    $m_waste->menu_kode = $v_ld['menu_kode'];
+                    $m_waste->jumlah = $v_ld['jumlah'];
+                    $m_waste->save();
                 }
             }
 
@@ -2045,11 +2085,23 @@ class Penjualan extends Public_Controller
 
     public function tes()
     {
-        $kasir = 'USR2207003';
-        $date = '2022-09-12';
+        // $kasir = 'USR2207003';
+        // $date = '2022-09-12';
 
-        $data = $this->getDataClosingShift( $date, $kasir );
+        // $data = $this->getDataClosingShift( $date, $kasir );
 
-        cetak_r($data);
+        // cetak_r($data);
+
+        $out = '';
+        $err = '';
+
+        exec("cd assets\websocket\server && node index.js 2>&1", $out, $err);
+
+        echo "<pre>";
+        print_r($out);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($err);
+        echo "</pre>";
     }
 }

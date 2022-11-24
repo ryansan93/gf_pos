@@ -13,7 +13,7 @@ class SaldoAwalKasir extends Public_Controller
     {
         parent::__construct();
         $this->url = $this->current_base_uri;
-        $this->hasAkses = hakAkses($this->url);
+        $this->hakAkses = hakAkses($this->url);
     }
 
     public function cekSaldoAwalKasir()
@@ -21,10 +21,14 @@ class SaldoAwalKasir extends Public_Controller
         $status = 0;
 
         try {
-            $m_sak = new \Model\Storage\SaldoAwalKasir_model();
-            $d_sak = $m_sak->where('tanggal', date('Y-m-d'))->where('user_id', $this->userid)->where('branch_kode', $this->kodebranch)->first();
+            if ( $this->hakAkses['a_submit'] == 1 ) {
+                $m_sak = new \Model\Storage\SaldoAwalKasir_model();
+                $d_sak = $m_sak->where('tanggal', date('Y-m-d'))->where('user_id', $this->userid)->where('branch_kode', $this->kodebranch)->first();
 
-            if ( $d_sak ) {
+                if ( $d_sak ) {
+                    $status = 1;
+                }
+            } else {
                 $status = 1;
             }
 
@@ -34,12 +38,6 @@ class SaldoAwalKasir extends Public_Controller
         }        
 
         echo display_json( $this->result );
-
-        // $status = 2;
-        // if ( $this->session->userdata('isLogin') ) {
-        // }
-
-        // echo $status;
     }
 
     public function modalSaldoAwalKasir()

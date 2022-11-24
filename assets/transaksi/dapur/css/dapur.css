@@ -1,0 +1,45 @@
+div.contain_pesanan {
+	/*border: 1px solid #dedede;*/
+	/*border-radius: 5px;*/
+	/*padding: 5px;*/
+	margin: 10px 0px;
+}
+
+div.contain_pesanan:hover {
+	background-color: #ededed;
+}
+
+div.contain_pesanan.privilege {
+	/*border: 5px solid #3dcc6f;*/
+}
+
+.control-label {
+	margin-bottom: 0px;
+}
+
+.listPesanan {
+	height: 100%;
+	-ms-overflow-style: none; /* for Internet Explorer, Edge */
+    scrollbar-width: none; /* for Firefox */
+    overflow-y: scroll;
+}
+
+.header_contain {
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	background-color: #337ab7;
+	padding: 5px;
+	color: #fff;
+}
+
+.detail_contain {
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	/*background-color: #337ab7;*/
+	padding: 5px;
+	border: 1px solid #dedede;
+}
+
+div.contain_pesanan.privilege > .header_contain {
+	background-color: #3dcc6f;
+}

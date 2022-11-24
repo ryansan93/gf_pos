@@ -2,6 +2,45 @@ var mbr = {
 	// startUp: function () {
 	// }, // end - startUp
 
+    filter_all: function (elm) {
+        var _target = $(elm).data('target');
+
+        var _div_target = $('.'+_target);
+        var _div = $(_div_target).find('div.detail');
+        var _content, _target;
+
+        _div.show();
+        _content = $(elm).val().toUpperCase().trim();
+
+        if (!empty(_content) && _content != '') {
+            $.map( $(_div), function(div){
+
+                // CEK DI TR ADA ATAU TIDAK
+                var ada = 0;
+                $.map( $(div).find('.search'), function(div_val){
+                    var _div_val = $(div_val).find('label').html().trim();
+                    var _sensitive = $(div_val).attr('data-sensitive');
+
+                    if ( _sensitive == 'false' ) {
+                        if (_div_val.toUpperCase().indexOf(_content) > -1) {
+                            ada = 1;
+                        }
+                    } else {
+                        if (_div_val.toUpperCase() == _content) {
+                            ada = 1;
+                        }
+                    }
+                });
+
+                if ( ada == 0 ) {
+                    $(div).hide();
+                } else {
+                    $(div).show();
+                };
+            });
+        }
+    }, // end - filter_all
+
 	modalMember: function () {
 		$('.modal').modal('hide');
 
@@ -16,7 +55,7 @@ var mbr = {
             bootbox.dialog(_options).bind('shown.bs.modal', function(){
                 $(this).css({'height': '100%'});
                 $(this).find('.modal-header').css({'padding-top': '0px'});
-                $(this).find('.modal-dialog').css({'width': '70%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'width': '90%', 'max-width': '100%'});
                 $(this).find('.modal-dialog').css({'height': '100%'});
                 $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
                 $(this).find('.modal-content').css({'height': '90%'});
@@ -292,6 +331,68 @@ var mbr = {
             }
         });
     }, // end - delete
+
+    aktif: function (elm) {
+        bootbox.confirm('Apakah anda yakin ingin meng aktifkan data member ?', function( result ) {
+            if ( result ) {
+                var params = {
+                    'kode': $(elm).data('kode')
+                };
+
+                $.ajax({
+                    url: 'master/Member/aktif',
+                    data: {
+                        'params': params
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    beforeSend: function() { showLoading(); },
+                    success: function(data) {
+                        hideLoading();
+
+                        if ( data.status == 1 ) {
+                            bootbox.alert(data.message, function() {
+                                mbr.modalMember();
+                            });
+                        } else {
+                            bootbox.alert(data.message);
+                        }
+                    }
+                });
+            }
+        });
+    }, // end - nonAktif
+
+    nonAktif: function (elm) {
+        bootbox.confirm('Apakah anda yakin ingin menonaktifkan data member ?', function( result ) {
+            if ( result ) {
+                var params = {
+                    'kode': $(elm).data('kode')
+                };
+
+                $.ajax({
+                    url: 'master/Member/nonAktif',
+                    data: {
+                        'params': params
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    beforeSend: function() { showLoading(); },
+                    success: function(data) {
+                        hideLoading();
+
+                        if ( data.status == 1 ) {
+                            bootbox.alert(data.message, function() {
+                                mbr.modalMember();
+                            });
+                        } else {
+                            bootbox.alert(data.message);
+                        }
+                    }
+                });
+            }
+        });
+    }, // end - nonAktif
 
     modalSaldoMember: function () {
         $('.modal').modal('hide');

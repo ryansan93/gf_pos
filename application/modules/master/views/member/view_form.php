@@ -30,7 +30,7 @@
 		            <textarea class="form-control alamat" placeholder="Alamat" data-required="1" disabled><?php echo $data['alamat']; ?></textarea>
 		        </div>
 			</div>
-			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+			<div class="col-md-12 no-padding hide" style="margin-top: 10px;">
 				<div class="col-lg-12 text-left"><label class="control-label">Privilege</label></div>
 		        <div class="col-lg-12">
 		            <div class="radio" style="margin-top: 0px;">
@@ -44,13 +44,33 @@
 		</div>
 		<div class="col-lg-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 		<div class="col-lg-12 no-padding btn_view">
-			<div class="col-md-12">
+			<div class="col-md-12" style="padding-bottom: 10px;">
 				<div class="col-md-6 no-padding" style="padding-right: 5px;">
-					<button class="btn btn-danger col-md-12" onclick="mbr.delete(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-trash"> Hapus</i></button>
+					<?php if ( $akses['a_delete'] == 1 ): ?>
+						<button class="btn btn-danger col-md-12" onclick="mbr.delete(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-trash"> Hapus</i></button>
+					<?php endif ?>
 				</div>
 				<div class="col-md-6 no-padding" style="padding-left: 5px;">
-					<button class="btn btn-primary col-md-12" onclick="mbr.editForm(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-edit"> Edit</i></button>
+					<?php if ( $akses['a_edit'] == 1 ): ?>
+						<button class="btn btn-primary col-md-12" onclick="mbr.editForm(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-edit"> Edit</i></button>
+					<?php endif ?>
 				</div>
+			</div>
+			<div class="col-md-12">
+				<?php if ( $tanggal <= $data['tgl_berakhir'] && $data['mstatus'] == 1 ): ?>
+					<div class="col-md-12 no-padding" style="padding-bottom: 10px;">
+						<?php if ( $akses['a_reject'] == 1 ): ?>
+							<button class="btn btn-danger col-md-12" onclick="mbr.nonAktif(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-ban"> Non Aktif</i></button>
+						<?php endif ?>
+					</div>
+				<?php endif ?>
+				<?php if ( $tanggal > $data['tgl_berakhir'] || $data['mstatus'] == 0 ): ?>
+					<div class="col-md-12 no-padding">
+						<?php if ( $akses['a_ack'] == 1 ): ?>
+							<button class="btn btn-primary col-md-12" onclick="mbr.aktif(this)" data-kode="<?php echo $data['kode_member']; ?>"><i class="fa fa-check"> Aktif</i></button>
+						<?php endif ?>
+					</div>
+				<?php endif ?>
 			</div>
 		</div>
 		<div class="col-lg-12 no-padding btn_edit hide">

@@ -359,7 +359,7 @@ $config['encryption_key'] = 'Ñ`╣ò╕n~Å╪‼╘♀Vσ≤♫';
 |
 */
 $config['sess_driver'] = 'files';
-$config['sess_cookie_name'] = 'mgb_pos';
+$config['sess_cookie_name'] = 'gf_pos';
 $config['sess_expiration'] = 36000;
 $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;

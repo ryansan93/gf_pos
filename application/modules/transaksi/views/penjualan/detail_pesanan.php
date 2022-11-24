@@ -16,7 +16,7 @@
 		    		}
 	    		?>
 		        <div class="col-md-12 cursor-p no-padding menu" style="margin-bottom: 10px;" data-kode="<?php echo $v_det['menu_kode']; ?>" data-detail="<?php echo $data_detail; ?>">
-			        <div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="<?php echo $v_det['menu_kode']; ?>">
+			        <div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="<?php echo $v_det['menu_kode']; ?>" data-proses="<?php echo $v_det['proses']; ?>">
 				        <div class="col-md-6 no-padding">
 				        <span class="nama_menu"><?php echo strtoupper($v_det['menu_nama']); ?></span>
 				        <span> @ <span class="hrg"><?php echo angkaRibuan($v_det['harga']); ?></span></span>
@@ -25,7 +25,7 @@
 				        <div class="col-md-3 text-right no-padding"><span class="total"><?php echo angkaRibuan($v_det['total']); ?></span></div>
 			        </div>
 			        <div class="col-md-1 text-center no-padding">
-				        <span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)">
+				        <span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)" data-proses="<?php echo $v_det['proses']; ?>">
 				        	<i class="fa fa-times"></i>
 				        </span>
 			        </div>
