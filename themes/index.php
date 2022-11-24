@@ -45,32 +45,36 @@
               <span style="width: 92%;">Saldo Awal Kasir</span>
             </a>
           </li>
-          <li class="">
-            <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
-              <i class="fa fa-users" style="width: 8%;"></i>
-              <span style="width: 92%;">Member</span>
-            </a>
-            <ul class="collapse list-unstyled" id="member">
-                <li class="menu">
-                  <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalMember()">List Member</a>
-                </li>
-                <li class="menu">
-                  <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalSaldoMember()">Saldo Member</a>
-                </li>
-              </ul>
-          </li>
-          <li class="">
-            <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Dapur">
-              <i class="fa fa-usd" style="width: 8%;"></i>
-              <span style="width: 92%;">Dapur</span>
-            </a>
-          </li>
-          <li class="">
-            <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/MenuGagal">
-              <i class="fa fa-trash" style="width: 8%;"></i>
-              <span style="width: 92%;">Menu Gagal</span>
-            </a>
-          </li>
+          <?php if ( hakAkses('master/Member') ): ?>
+            <li class="">
+              <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
+                <i class="fa fa-users" style="width: 8%;"></i>
+                <span style="width: 92%;">Member</span>
+              </a>
+              <ul class="collapse list-unstyled" id="member">
+                  <li class="menu">
+                    <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalMember()">List Member</a>
+                  </li>
+                  <li class="menu">
+                    <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalSaldoMember()">Saldo Member</a>
+                  </li>
+                </ul>
+            </li>
+          <?php endif ?>
+          <?php if ( hakAkses('transaksi/MenuGagal') ): ?>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Dapur">
+                <i class="fa fa-usd" style="width: 8%;"></i>
+                <span style="width: 92%;">Dapur</span>
+              </a>
+            </li>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/MenuGagal">
+                <i class="fa fa-trash" style="width: 8%;"></i>
+                <span style="width: 92%;">Menu Gagal</span>
+              </a>
+            </li>
+          <?php endif ?>
           <!-- <?php $arr_fitur = $this->session->userdata()['Fitur']; ?>
           <?php foreach ($arr_fitur as $key => $v_fitur): ?>
             <li>
