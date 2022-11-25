@@ -1,4 +1,4 @@
-const ws = new WebSocket("ws://localhost:8033");
+const ws = new WebSocket("ws://103.137.111.6:8033");
 
 var kode_member = null;
 var member = null;
