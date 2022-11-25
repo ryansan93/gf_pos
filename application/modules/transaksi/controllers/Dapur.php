@@ -42,8 +42,8 @@ class Dapur extends Public_Controller
             );
             $data = $this->includes;
 
-            exec("cd websocket\server && forever stopall 2>&1");
-            exec("cd websocket\server && forever start index.js 2>&1");
+            // exec("cd websocket\server && forever stopall 2>&1");
+            // exec("cd websocket\server && forever start index.js 2>&1");
 
             $content['akses'] = $this->hakAkses;
             $content['persen_ppn'] = $this->persen_ppn;
