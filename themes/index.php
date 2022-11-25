@@ -215,13 +215,16 @@
   <script>
     var baseurl = $('head base').attr('href');
     var defaultPage = baseurl + 'transaksi/Penjualan';
-    var pagePembayaran = baseurl + 'transaksi/Pembayaran';
+    <?php if ( hasAkses('transaksi/Dapur') ) { ?>
+      defaultPage = baseurl + 'transaksi/Dapur';
+    <?php } ?>
+    // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
 
     var url = window.location.href;
 
-    // if ( url != defaultPage && !url.includes(pagePembayaran) ) {
-    //   window.location.href = defaultPage;
-    // }
+    if ( url != defaultPage ) {
+      window.location.href = defaultPage;
+    }
 
     $("#menu-toggle").click(function(e) {
       e.preventDefault();
