@@ -15,6 +15,8 @@ var sak = {
 
                 if ( data.status == 1 ) {
                 	jual.modalJenisPesanan();
+                } else if ( data.status == 2 ) {
+                    $('.btn-list-pesanan').click();
                 } else {
                     sak.modalSaldoAwalKasir();
                 }

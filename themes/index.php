@@ -222,8 +222,10 @@
 
     var url = window.location.href;
 
-    if ( url != defaultPage ) {
-      window.location.href = defaultPage;
+    if ( window.location.href.indexOf("pembayaran") == -1 ) {
+      if ( url != defaultPage ) {
+        window.location.href = defaultPage;
+      }
     }
 
     $("#menu-toggle").click(function(e) {

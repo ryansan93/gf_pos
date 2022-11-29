@@ -104,7 +104,7 @@
 								</div>
 						</div>
 						<div class="no-padding <?php echo $col_md; ?>" style="height: 100%; padding-left: <?php echo $padding.'%'; ?>;">
-							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalListBayar()">
+							<div class="col-md-12 text-center cursor-p button btn-list-pesanan" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalListBayar()">
 								<span><b>LIST PESANAN</b></span>
 							</div>
 						</div>

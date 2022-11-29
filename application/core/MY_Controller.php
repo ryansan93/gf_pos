@@ -157,7 +157,7 @@ class MY_Controller extends DB_Controller
           "assets/themes/lib/font-awesome/css/font-awesome.css",
           "assets/jquery-ui/css/jquery-ui.min.css", // YES
           "assets/base/css/base.css",
-          "assets/transaksi/saldo_awal_kasir/css/saldo-awal-kasir.css",
+          // "assets/transaksi/saldo_awal_kasir/css/saldo-awal-kasir.css",
         ));
     
     $this->user = $this->session->userdata('logged_in');

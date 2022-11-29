@@ -6,6 +6,7 @@ var tr_split = null;
 
 var bayar = {
 	startUp: function () {
+        // console.log( window.location.href.indexOf("pembayaranFormEdit") );
         if (window.location.href.indexOf("pembayaranFormEdit") > -1) {
             var kodeFaktur = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
             bayar.loadDetailPembayaran( kodeFaktur );
@@ -911,4 +912,4 @@ var bayar = {
     }, // end - deletePembayaran
 };
 
-bayar.startUp();
+// bayar.startUp();

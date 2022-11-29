@@ -29,7 +29,13 @@ class SaldoAwalKasir extends Public_Controller
                     $status = 1;
                 }
             } else {
-                $status = 1;
+                if ( hasAkses('transaksi/Pembayaran') ) {
+                    $status = 2;
+                } else if ( hasAkses('transaksi/Penjualan') ) {
+                    if ( hakAkses('transaksi/Penjualan')['a_submit'] == 1 ) {
+                        $status = 1;
+                    }
+                }
             }
 
             $this->result['status'] = $status;
