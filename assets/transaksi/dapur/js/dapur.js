@@ -75,6 +75,9 @@ var dapur = {
     ubahContain: function(elm) {
         var tujuan = $(elm).attr('data-tujuan');
 
+        console.log( tujuan );
+        console.log( $('div.'+tujuan).length );
+
         $('div.contain').addClass('hide');
 
         $('div.'+tujuan).removeClass('hide');

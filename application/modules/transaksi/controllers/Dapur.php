@@ -61,6 +61,7 @@ class Dapur extends Public_Controller
     {
         $content['data_outstanding'] = $this->getDataPesananOutstanding( $this->kodebranch );
         $content['data_done'] = $this->getDataPesananDone( $this->kodebranch );
+
         $html = $this->load->view($this->pathView . 'list_pesanan', $content, TRUE);
 
         echo $html;
@@ -92,8 +93,7 @@ class Dapur extends Public_Controller
                         on 
                             pi.menu_kode = mn.kode_menu 
                     where 
-                        pi.proses is null or
-                        pi.proses = 0 and
+                        pi.proses <> 2 and
                         mn.branch_kode = '".$kodebranch."'
                     group by 
                         pi.pesanan_kode

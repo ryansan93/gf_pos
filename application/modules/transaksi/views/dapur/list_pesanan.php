@@ -1,6 +1,6 @@
 <div class="col-xs-12 no-padding contain outstanding">
 	<?php if ( !empty($data_outstanding) ): ?>
-		<?php $idx = 0; ?>
+		<?php $idx = 0; $jml_data = 0; ?>
 		<?php foreach ($data_outstanding as $key => $value): ?>
 			<?php
 				$privilege = '';
@@ -59,9 +59,9 @@
 						            <?php if ( !empty($v_pi['request']) ): ?>
 						                <div class="col-xs-12 request no-padding" style="font-size:10px;">
 							                <div class="col-xs-2 text-left no-padding"></div>
-								                <div class="col-xs-10 no-padding">
-								                	<span class="nama_menu"><?php echo $v_pi['request']; ?></span>
-								                </div>
+							                <div class="col-xs-10 no-padding">
+							                	<span class="nama_menu"><?php echo $v_pi['request']; ?></span>
+							                </div>
 						                </div>
 						            <?php endif ?>
 					            </div>
@@ -69,18 +69,18 @@
 						</div>
 					</div>
 				</div>
-			<?php if ( $idx == 3 ): ?>
+			<?php if ( $idx == 3 || $jml_data == (count($data_outstanding) - 1) ): ?>
 				<?php $idx = 0; ?>
 				</div>
 			<?php else: ?>
-				<?php $idx++; ?>
+				<?php $idx++; $jml_data++; ?>
 			<?php endif ?>
 		<?php endforeach ?>
 	<?php endif ?>
 </div>
 <div class="col-xs-12 no-padding contain done hide">
 	<?php if ( !empty($data_done) ): ?>
-		<?php $idx = 0; ?>
+		<?php $idx = 0; $jml_data = 0; ?>
 		<?php foreach ($data_done as $key => $value): ?>
 			<?php
 				$privilege = '';
@@ -149,11 +149,11 @@
 						</div>
 					</div>
 				</div>
-			<?php if ( $idx == 3 ): ?>
+			<?php if ( $idx == 3 || $jml_data == (count($data_outstanding) - 1) ): ?>
 				<?php $idx = 0; ?>
 				</div>
 			<?php else: ?>
-				<?php $idx++; ?>
+				<?php $idx++; $jml_data++; ?>
 			<?php endif ?>
 		<?php endforeach ?>
 	<?php endif ?>
