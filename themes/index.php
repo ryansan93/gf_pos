@@ -218,6 +218,9 @@
     <?php if ( hasAkses('transaksi/Dapur') ) { ?>
       defaultPage = baseurl + 'transaksi/Dapur';
     <?php } ?>
+    <?php if ( hasAkses('transaksi/MenuGagal') ) { ?>
+      defaultPage = baseurl + 'transaksi/MenuGagal';
+    <?php } ?>
     // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
 
     var url = window.location.href;
