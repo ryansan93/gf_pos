@@ -221,7 +221,7 @@
       }
 
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
-        defaultPage = baseurl + 'transaksi/Dapur';
+        defaultPage = baseurl + 'transaksi/MenuGagal';
       }
     <?php } ?>
     // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
