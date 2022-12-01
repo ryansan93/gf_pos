@@ -149,7 +149,7 @@
 						</div>
 					</div>
 				</div>
-			<?php if ( $idx == 3 || $jml_data == (count($data_outstanding) - 1) ): ?>
+			<?php if ( $idx == 3 || $jml_data == (count($data_done) - 1) ): ?>
 				<?php $idx = 0; ?>
 				</div>
 			<?php else: ?>

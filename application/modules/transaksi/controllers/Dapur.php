@@ -93,6 +93,7 @@ class Dapur extends Public_Controller
                         on 
                             pi.menu_kode = mn.kode_menu 
                     where 
+                        pi.proses is null and
                         pi.proses <> 2 and
                         mn.branch_kode = '".$kodebranch."'
                     group by 
