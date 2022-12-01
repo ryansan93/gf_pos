@@ -17,7 +17,7 @@ var sak = {
                 	jual.modalJenisPesanan();
                 } else if ( data.status == 2 ) {
                     $('.btn-list-pesanan').click();
-                } else {
+                } else if ( data.status == 0 ) {
                     sak.modalSaldoAwalKasir();
                 }
             }

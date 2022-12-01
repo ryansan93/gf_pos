@@ -35,6 +35,8 @@ class SaldoAwalKasir extends Public_Controller
                     if ( hakAkses('/transaksi/Penjualan')['a_submit'] == 1 ) {
                         $status = 1;
                     }
+                } else if ( !hasAkses('transaksi/SaldoAwalKasir') ) {
+                    $status = 3;
                 }
             }
 
