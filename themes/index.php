@@ -218,9 +218,7 @@
     var baseurl = $('head base').attr('href');
     var defaultPage = baseurl + 'transaksi/Penjualan';
     <?php if ( hasAkses('transaksi/Dapur') or hasAkses('transaksi/MenuGagal') ) { ?>
-      if ( window.location.href.indexOf("Dapur") > -1 ) {
-        defaultPage = baseurl + 'transaksi/Dapur';
-      }
+      defaultPage = baseurl + 'transaksi/Dapur';
 
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
         defaultPage = baseurl + 'transaksi/MenuGagal';
