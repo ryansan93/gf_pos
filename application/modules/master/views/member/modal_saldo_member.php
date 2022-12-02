@@ -28,8 +28,9 @@
 				<div class="col-md-12 no-padding" style="padding: 5px; height: 86.5%;">
 					<div class="col-md-12 text-center no-padding head_sm">
 						<div class="col-md-12 no-padding head">
-							<div class="col-md-6"><label class="label-control">Nama</label></div>
-							<div class="col-md-4"><label class="label-control">Saldo</label></div>
+							<div class="col-md-4"><label class="label-control">Nama</label></div>
+							<div class="col-md-3"><label class="label-control">Saldo (Rp.)</label></div>
+							<div class="col-md-3"><label class="label-control">Sisa Saldo (Rp.)</label></div>
 							<div class="col-md-2"><label class="label-control">Action</label></div>
 						</div>
 					</div>
@@ -46,8 +47,9 @@
 									$idx++;
 								?>
 								<div class="col-md-12 no-padding detail <?php echo $bgcolor; ?>">
-									<div class="col-md-6"><label class="label-control"><?php echo $value['member']['nama']; ?></label></div>
-									<div class="col-md-4 text-right"><label class="label-control"><?php echo angkaDecimal($value['saldo']); ?></label></div>
+									<div class="col-md-4"><label class="label-control"><?php echo $value['member']['nama']; ?></label></div>
+									<div class="col-md-3 text-right"><label class="label-control"><?php echo angkaDecimal($value['saldo']); ?></label></div>
+									<div class="col-md-3 text-right"><label class="label-control"><?php echo angkaDecimal($value['sisa_saldo']); ?></label></div>
 									<div class="col-md-2">
 										<div class="col-md-12 no-padding"><button type="button" class="btn btn-primary col-md-12" style="padding: 0px; margin-right: 5px;" onclick="mbr.viewSaldoForm(this)" data-kode="<?php echo $value['id']; ?>"><i class="fa fa-file"></i></button></div>
 									</div>

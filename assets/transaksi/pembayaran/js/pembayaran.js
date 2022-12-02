@@ -620,10 +620,26 @@ var bayar = {
         var nominal_bayar_hutang = numeral.unformat($(elm).val());
         var hutang = $(elm).attr('data-val');
 
-        if ( nominal_bayar_hutang > hutang ) {
-            bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
-                $(elm).val( numeral.formatInt(hutang) );
-            });
+        var div_saldo_member = $('div.saldo_member');
+        if ( $(div_saldo_member).length > 0 ) {
+            var jumlah = numeral.unformat( $(elm).val() );
+            var saldo = numeral.unformat( $(div_saldo_member).find('input.saldo').val() );
+
+            if ( jumlah > saldo ) {
+                bootbox.alert('Nominal yang anda masukkan melebihi saldo, harap cek kembali nominal yang anda inputkan.', function() {
+                    $(elm).val( numeral.formatInt(0) );
+                });
+            } else {
+                var sisa_saldo = saldo - jumlah;
+
+                $(div_saldo_member).find('input.sisa_saldo').val( numeral.formatInt(sisa_saldo) );
+            }
+        } else {
+            if ( nominal_bayar_hutang > hutang ) {
+                bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
+                    $(elm).val( numeral.formatInt(hutang) );
+                });
+            }
         }
     }, // end - cekNominalBayarHutang
 
@@ -633,7 +649,9 @@ var bayar = {
         var params = {
             'nama': $(elm).text(),
             'kode_jenis_kartu': $(elm).data('kode'),
-            'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val())
+            'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val()),
+            'member_kode': $('.kode_member').attr('data-val'),
+            'faktur_kode': $('.kode_faktur').attr('data-val')
         };
 
         $.get('transaksi/Pembayaran/modalMetodePembayaran',{
@@ -912,4 +930,4 @@ var bayar = {
     }, // end - deletePembayaran
 };
 
-// bayar.startUp();
+bayar.startUp();

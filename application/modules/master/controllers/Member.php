@@ -286,6 +286,7 @@ class Member extends Public_Controller
 
             $m_sm->member_kode = $params['kode_member'];
             $m_sm->saldo = $params['saldo'];
+            $m_sm->sisa_saldo = $params['saldo'];
             $m_sm->status = 1;
             $m_sm->save();
 

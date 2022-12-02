@@ -22,8 +22,8 @@
 									<td><?php echo $value['nama']; ?></td>
 									<td>
 										<?php if ( !empty($value['kode_jenis_kartu']) ): ?>
-											<div class="col-xs-12 no-padding"><?php echo $value['no_kartu']; ?></div>
-											<div class="col-xs-12 no-padding"><?php echo $value['nama_kartu']; ?></div>
+											<div class="col-xs-12 no-padding"><?php echo !empty($value['no_kartu']) ? $value['no_kartu'] : ''; ?></div>
+											<div class="col-xs-12 no-padding"><?php echo !empty($value['nama_kartu']) ? $value['nama_kartu'] : ''; ?></div>
 										<?php endif ?>
 									</td>
 									<td class="text-right"><?php echo angkaRibuan($value['jumlah']); ?></td>

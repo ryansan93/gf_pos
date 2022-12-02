@@ -15,7 +15,7 @@
 						<div class="col-xs-5 no-padding"><label class="control-label">MEMBER / PELANGGAN</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo $data['member']; ?></label></div>
 					</div>
-					<div class="col-xs-12 no-padding">
+					<div class="col-xs-12 no-padding kode_member" data-val="<?php echo $data['kode_member']; ?>">
 						<div class="col-xs-5 no-padding"><label class="control-label">KODE MEMBER</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo !empty($data['kode_member']) ? $data['kode_member'] : '-'; ?></label></div>
 					</div>
@@ -27,24 +27,35 @@
 						<?php $idx = 1; ?>
 						<?php foreach ($jenis_kartu as $key => $value): ?>
 							<?php
-								if ( $idx > 3 ) {
-									$idx = 1;
+								$tampil = 1;
+								if ( $value['kode_jenis_kartu'] == 'saldo_member' ) {
+									if ( empty($data['kode_member']) ) {
+										$tampil = 0;
+									}
 								}
 
-								$class = 'cb_left';
-								if ( $idx % 2 == 0 ) {
-									$class = 'cb_left cb_right';
-								}
+								if ( $tampil == 1 ) {
+									if ( $idx > 3 ) {
+										$idx = 1;
+									}
 
-								if ( $idx % 3 == 0 ) {
-									$class = 'cb_right';
-								}
+									$class = 'cb_left';
+									if ( $idx % 2 == 0 ) {
+										$class = 'cb_left cb_right';
+									}
 
-								$idx++;
+									if ( $idx % 3 == 0 ) {
+										$class = 'cb_right';
+									}
+
+									$idx++;
+								}
 							?>
-							<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
-								<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
-							</div>
+							<?php if ( $tampil == 1 ) { ?>
+								<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
+									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
+								</div>
+							<?php } ?>
 						<?php endforeach ?>
 					</div>
 					<!-- <div class="col-xs-6 no-padding" style="padding-right: 1%;">

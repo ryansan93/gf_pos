@@ -3,6 +3,25 @@
 	<!-- <button type="button" class="close" data-dismiss="modal" style="color: #000000;">&times;</button> -->
 </div>
 <div class="modal-body body no-padding">
+	<?php if ( !empty($data['kode_jenis_kartu']) ): ?>
+		<?php if ( $data['kode_jenis_kartu'] == 'saldo_member' ): ?>
+			<div class="col-xs-12 no-padding saldo_member" style="padding-top: 10px;">
+				<div class="col-xs-6 no-padding cb_left">
+					<div class="col-xs-12 no-padding"><label class="label-control">SALDO MEMBER</label></div>
+					<div class="col-xs-12 no-padding">
+						<input type="text" class="form-control text-right saldo" placeholder="SALDO" value="<?php echo angkaRibuan($saldo_member); ?>" disabled>
+					</div>
+				</div>
+				<div class="col-xs-6 no-padding cb_right">
+					<div class="col-xs-12 no-padding"><label class="label-control">SISA SALDO</label></div>
+					<div class="col-xs-12 no-padding">
+						<input type="text" class="form-control text-right sisa_saldo" placeholder="SISA SALDO" value="<?php echo angkaRibuan($saldo_member); ?>" disabled>
+					</div>
+				</div>
+			</div>
+		<?php endif ?>
+	<?php endif ?>
+
 	<div class="col-xs-12 no-padding" style="padding-top: 10px;">
 		<div class="col-xs-6 no-padding cb_left">
 			<div class="col-xs-12 no-padding"><label class="label-control">SISA TAGIHAN</label></div>
@@ -13,25 +32,35 @@
 		<div class="col-xs-6 no-padding cb_right">
 			<div class="col-xs-12 no-padding"><label class="label-control">JUMLAH</label></div>
 			<div class="col-xs-12 no-padding">
-				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaRibuan($data['sisa_tagihan']); ?>" data-tipe="integer" data-val="<?php echo $data['sisa_tagihan']; ?>" onkeyup="bayar.cekNominalBayarHutang(this)">
+				<?php 
+					$jumlah = $data['sisa_tagihan']; 
+					if ( !empty($data['kode_jenis_kartu']) ) {
+						if ( $data['kode_jenis_kartu'] == 'saldo_member' ) {
+							$jumlah = 0; 
+						}
+					}
+				?>
+				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaRibuan($jumlah); ?>" data-tipe="integer" data-val="<?php echo $jumlah; ?>" onkeyup="bayar.cekNominalBayarHutang(this)">
 			</div>
 		</div>
 	</div>
 	<?php if ( !empty($data['kode_jenis_kartu']) ): ?>
-		<div class="col-xs-12 no-padding" style="padding-top: 10px;">
-			<div class="col-xs-6 no-padding cb_left">
-				<div class="col-xs-12 no-padding"><label class="label-control">NO. KARTU</label></div>
-				<div class="col-xs-12 no-padding">
-					<input type="text" class="form-control no_kartu" placeholder="NO. KARTU">
+		<?php if ( $data['kode_jenis_kartu'] != 'saldo_member' ): ?>
+			<div class="col-xs-12 no-padding" style="padding-top: 10px;">
+				<div class="col-xs-6 no-padding cb_left">
+					<div class="col-xs-12 no-padding"><label class="label-control">NO. KARTU</label></div>
+					<div class="col-xs-12 no-padding">
+						<input type="text" class="form-control no_kartu" placeholder="NO. KARTU">
+					</div>
+				</div>
+				<div class="col-xs-6 no-padding cb_right">
+					<div class="col-xs-12 no-padding"><label class="label-control">NAMA KARTU</label></div>
+					<div class="col-xs-12 no-padding">
+						<input type="text" class="form-control nama_kartu" placeholder="NAMA KARTU">
+					</div>
 				</div>
 			</div>
-			<div class="col-xs-6 no-padding cb_right">
-				<div class="col-xs-12 no-padding"><label class="label-control">NAMA KARTU</label></div>
-				<div class="col-xs-12 no-padding">
-					<input type="text" class="form-control nama_kartu" placeholder="NAMA KARTU">
-				</div>
-			</div>
-		</div>
+		<?php endif ?>
 	<?php endif ?>
 	<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 	<div class="col-xs-12 no-padding">

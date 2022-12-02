@@ -83,10 +83,63 @@
 	height: 94%;
 }
 
-.modal-member .head_sm {
+.modal-saldo-member div.head {
+	height: 100%;
+	vertical-align: middle;
+}
+
+.modal-saldo-member div.head div {
+	border: 1px solid #dedede;
+	height: 100%;
+	background-color: #d8fcff;
+	border-bottom: none;
+
+	display: flex; 
+	justify-content: center; 
+	align-items: center;
+
+	padding: 3px;
+}
+
+.modal-saldo-member div.head div label, .modal-saldo-member div.detail div label {
+	margin-bottom: 0px;
+}
+
+.modal-saldo-member div.detail {
+	height: 7%;
+	vertical-align: middle;
+}
+
+.modal-saldo-member div.detail div {
+	/*border-bottom: 1px solid #dedede;*/
+	height: 100%;
+	/*border: none;*/
+
+	display: flex; 
+	justify-content: center; 
+	align-items: center;
+}
+
+.modal-saldo-member div.detail.putih div {
+	background-color: #ffffff;
+}
+
+.modal-saldo-member div.detail.abu div {
+	background-color: #eeeeee;
+}
+
+.modal-saldo-member div.detail.merah div {
+	background-color: #d9534f;
+}
+
+.modal-saldo-member div.detail:hover div {
+	background-color: #dedede;
+}
+
+.modal-saldo-member .head_sm {
 	height: 7%;
 }
-.modal-member .list_sm {
+.modal-saldo-member .list_sm {
 	border: 1px solid #dedede;
 	height: 94%;
 }

@@ -3,7 +3,7 @@
 		<div class="col-xs-12 no-padding jenis_pembayaran">
 			<div class="col-xs-6 no-padding contain_border cb_left">
 				<div class="col-xs-12 border">
-					<div class="col-xs-12 no-padding">
+					<div class="col-xs-12 no-padding kode_faktur" data-val="<?php echo $data['kode_faktur']; ?>">
 						<div class="col-xs-5 no-padding"><label class="control-label">NO. BILL</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo $data['kode_faktur']; ?></label></div>
 					</div>
@@ -15,7 +15,7 @@
 						<div class="col-xs-5 no-padding"><label class="control-label">MEMBER / PELANGGAN</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo $data['member']; ?></label></div>
 					</div>
-					<div class="col-xs-12 no-padding">
+					<div class="col-xs-12 no-padding kode_member" data-val="<?php echo $data['kode_member']; ?>">
 						<div class="col-xs-5 no-padding"><label class="control-label">KODE MEMBER</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo !empty($data['kode_member']) ? $data['kode_member'] : '-'; ?></label></div>
 					</div>

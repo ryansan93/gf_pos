@@ -480,6 +480,12 @@ class Pembayaran extends Public_Controller
                 'status' => 1
             );
 
+            $data[] = array(
+                'kode_jenis_kartu' => 'saldo_member',
+                'nama' => 'SALDO MEMBER',
+                'status' => 1
+            );
+
             foreach ($d_jenis_kartu as $key => $value) {
                 $data[] = array(
                     'kode_jenis_kartu' => $value['kode_jenis_kartu'],
@@ -554,6 +560,26 @@ class Pembayaran extends Public_Controller
     {
         $params = $this->input->get('params');
 
+        $saldo_member = 0;
+        if ( !empty($params['member_kode']) ) {
+            if ( empty($params['faktur_kode']) ) {
+                $m_sm = new \Model\Storage\SaldoMember_model();
+                $saldo_member = $m_sm->where('member_kode', $params['member_kode'])->where('sisa_saldo', '>', 0)->where('status', 1)->sum('sisa_saldo');
+            } else {
+                $m_bayar = new \Model\Storage\Bayar_model();
+                $d_bayar = $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->first();
+
+                if ( $d_bayar ) {
+                    $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                    $saldo_member += $m_smt->where('id_trans', $d_bayar->id)->where('tbl_name', $m_bayar->getTable())->sum('nominal');
+
+                    $m_sm = new \Model\Storage\SaldoMember_model();
+                    $saldo_member += $m_sm->where('member_kode', $params['member_kode'])->where('sisa_saldo', '>', 0)->where('status', 1)->sum('sisa_saldo');
+                }
+            }
+        }
+
+        $content['saldo_member'] = $saldo_member;
         $content['data'] = $params;
 
         $html = $this->load->view($this->pathView . 'modal_metode_pembayaran', $content, TRUE);
@@ -577,6 +603,12 @@ class Pembayaran extends Public_Controller
         $params = $this->input->post('params');
 
         try {
+            $m_jual = new \Model\Storage\Jual_model();
+            $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
+
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $d_jual->pesanan_kode)->first();
+
             $m_bayar = new \Model\Storage\Bayar_model();
             $d_bayar = $m_bayar->where('faktur_kode', $params['faktur_kode'])->where('mstatus', 1)->first();
             if ( $d_bayar ) {
@@ -585,6 +617,30 @@ class Pembayaran extends Public_Controller
                         'mstatus' => 0
                     )
                 );
+
+                $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                $d_smt = $m_smt->where('id_trans', $d_bayar->id)->where('tbl_name', $m_bayar->getTable())->get();
+
+                if ( $d_smt->count() > 0 ) {
+                    $d_smt = $d_smt->toArray();
+
+                    foreach ($d_smt as $k_smt => $v_smt) {
+                        $m_sm = new \Model\Storage\SaldoMember_model();
+                        $d_sm = $m_sm->where('id', $v_smt['id_header'])->first();
+
+                        if ( $d_sm ) {
+                            $m_sm = new \Model\Storage\SaldoMember_model();
+                            $m_sm->where('id', $v_smt['id_header'])->update(
+                                array(
+                                    'sisa_saldo' => ($d_sm->sisa_saldo + $v_smt['nominal'])
+                                )
+                            );
+                        }
+
+                        $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                        $m_smt->where('id_header', $v_smt['id_header'])->where('nominal', $v_smt['nominal'])->where('id_trans', $v_smt['id_trans'])->where('tbl_name', $v_smt['tbl_name'])->delete();
+                    }
+                }
             }
 
             $m_bayar = new \Model\Storage\Bayar_model();
@@ -604,11 +660,55 @@ class Pembayaran extends Public_Controller
                     $m_bayard = new \Model\Storage\BayarDet_model();
                     $m_bayard->id_header = $id_header;
                     $m_bayard->jenis_bayar = $value['nama'];
-                    $m_bayard->kode_jenis_kartu = $value['kode_jenis_kartu'];
+                    $m_bayard->kode_jenis_kartu = ($value['kode_jenis_kartu'] != 'saldo_member') ? $value['kode_jenis_kartu'] : '';
                     $m_bayard->nominal = $value['jumlah'];
                     $m_bayard->no_kartu = isset($value['no_kartu']) ? $value['no_kartu'] : null;
                     $m_bayard->nama_kartu = isset($value['nama_kartu']) ? $value['nama_kartu'] : null;
                     $m_bayard->save();
+
+                    if ( $value['kode_jenis_kartu'] == 'saldo_member' ) {
+                        $nominal = $value['jumlah'];
+
+                        while ( $nominal > 0 ) {
+                            $m_sm = new \Model\Storage\SaldoMember_model();
+                            $d_sm = $m_sm->where('member_kode', $d_pesanan->kode_member)->where('sisa_saldo', '>', 0)->where('status', 1)->orderBy('id', 'asc')->first();
+
+                            if ( $d_sm ) {
+                                $sisa_saldo = $d_sm->sisa_saldo;
+
+                                if ( $sisa_saldo > $nominal ) {
+                                    $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                                    $m_smt->id_header = $d_sm->id;
+                                    $m_smt->nominal = $nominal;
+                                    $m_smt->id_trans = $m_bayar->id;
+                                    $m_smt->tbl_name = $m_bayar->getTable();
+                                    $m_smt->save();
+
+                                    $sisa_saldo -= $nominal;
+                                    $nominal = 0;
+                                } else {
+                                    $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                                    $m_smt->id_header = $d_sm->id;
+                                    $m_smt->nominal = $sisa_saldo;
+                                    $m_smt->id_trans = $m_bayar->id;
+                                    $m_smt->tbl_name = $m_bayar->getTable();
+                                    $m_smt->save();
+
+                                    $nominal -= $sisa_saldo;
+                                    $sisa_saldo = 0;
+                                }
+
+                                $m_sm = new \Model\Storage\SaldoMember_model();
+                                $m_sm->where('id', $d_sm->id)->update(
+                                    array(
+                                        'sisa_saldo' => $sisa_saldo
+                                    )
+                                );
+                            } else {
+                                $nominal = 0;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -638,12 +738,6 @@ class Pembayaran extends Public_Controller
                     )
                 );
             }
-
-            $m_jual = new \Model\Storage\Jual_model();
-            $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
-
-            $m_pesanan = new \Model\Storage\Pesanan_model();
-            $d_pesanan = $m_pesanan->where('kode_pesanan', $d_jual->pesanan_kode)->first();
 
             $m_mejal = new \Model\Storage\MejaLog_model();
             $m_mejal->where('pesanan_kode', $d_pesanan->kode_pesanan)->where('meja_id', $d_pesanan->meja_id)->where('status', 1)->update(
@@ -858,6 +952,30 @@ class Pembayaran extends Public_Controller
                         'lunas' => 0
                     )
                 );
+
+                $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                $d_smt = $m_smt->where('id_trans', $d_bayar->id)->where('tbl_name', $m_bayar->getTable())->get();
+
+                if ( $d_smt->count() > 0 ) {
+                    $d_smt = $d_smt->toArray();
+
+                    foreach ($d_smt as $k_smt => $v_smt) {
+                        $m_sm = new \Model\Storage\SaldoMember_model();
+                        $d_sm = $m_sm->where('id', $v_smt['id_header'])->first();
+
+                        if ( $d_sm ) {
+                            $m_sm = new \Model\Storage\SaldoMember_model();
+                            $m_sm->where('id', $v_smt['id_header'])->update(
+                                array(
+                                    'sisa_saldo' => ($d_sm->sisa_saldo + $v_smt['nominal'])
+                                )
+                            );
+                        }
+
+                        $m_smt = new \Model\Storage\SaldoMemberTrans_model();
+                        $m_smt->where('id_header', $v_smt['id_header'])->where('nominal', $v_smt['nominal'])->where('id_trans', $v_smt['id_trans'])->where('tbl_name', $v_smt['tbl_name'])->delete();
+                    }
+                }
             }
 
             $deskripsi_log_gaktifitas = 'di-hapus oleh ' . $this->userdata['detail_user']['nama_detuser'];
