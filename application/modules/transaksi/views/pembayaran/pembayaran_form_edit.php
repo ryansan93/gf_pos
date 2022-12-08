@@ -229,11 +229,12 @@
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Jumlah Bayar. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label jml_bayar" data-val="0">0</label></div>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label jml_bayar" data-val="<?php echo $data_bayar['jml_bayar']; ?>"><?php echo angkaDecimal($data_bayar['jml_bayar']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Kembalian. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label kembalian" data-val="0">0</label></div>
+	        					<?php $kembalian = (($data_bayar['jml_bayar'] - $data['grand_total']) < 0) ? 0 : ($data_bayar['jml_bayar'] - $data['grand_total']); ?>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label kembalian" data-val="<?php echo $kembalian; ?>"><?php echo angkaDecimal($kembalian); ?></label></div>
 	        				</div>
 						</div>
 					<?php // } ?>
