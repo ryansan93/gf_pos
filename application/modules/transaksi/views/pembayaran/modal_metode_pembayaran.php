@@ -40,7 +40,7 @@
 						}
 					}
 				?>
-				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaRibuan($jumlah); ?>" data-tipe="integer" data-val="<?php echo $jumlah; ?>" onkeyup="bayar.cekNominalBayarHutang(this)">
+				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaRibuan($jumlah); ?>" data-tipe="integer" data-val="<?php echo $jumlah; ?>" data-jk="<?php echo $data['kode_jenis_kartu']; ?>" onkeyup="bayar.cekNominalBayarHutang(this)">
 			</div>
 		</div>
 	</div>

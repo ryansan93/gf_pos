@@ -5,7 +5,6 @@ class Penjualan extends Public_Controller
     private $pathView = 'transaksi/penjualan/';
     private $url;
     private $hakAkses;
-    private $persen_ppn = 0;
     /**
      * Constructor
      */
@@ -60,7 +59,8 @@ class Penjualan extends Public_Controller
 
             $content['akses'] = $this->hakAkses;
             $content['isMobile'] = $isMobile;
-            $content['persen_ppn'] = $this->persen_ppn;
+            $content['persen_ppn'] = $this->getPpn( $this->kodebranch );
+            $content['service_charge'] = $this->getServiceCharge( $this->kodebranch );
             $content['kode_branch'] = $this->kodebranch;
 
             $content['kategori'] = $this->getKategori();
@@ -71,6 +71,35 @@ class Penjualan extends Public_Controller
         // } else {
         //     showErrorAkses();
         // }
+    }
+
+    public function getPpn($kodeBranch)
+    {
+
+        $m_ppn = new \Model\Storage\Ppn_model();
+        $now = $m_ppn->getDate();
+        $d_ppn = $m_ppn->where('branch_kode', $kodeBranch)->where('tgl_berlaku', '<=', $now['tanggal'])->where('mstatus', 1)->first();
+
+        $nilai = 0;
+        if ( $d_ppn ) {
+            $nilai = $d_ppn->nilai;
+        }
+
+        return $nilai;
+    }
+
+    public function getServiceCharge($kodeBranch)
+    {
+        $m_sc = new \Model\Storage\ServiceCharge_model();
+        $now = $m_sc->getDate();
+        $d_sc = $m_sc->where('branch_kode', $kodeBranch)->where('tgl_berlaku', '<=', $now['tanggal'])->where('mstatus', 1)->first();
+
+        $nilai = 0;
+        if ( $d_sc ) {
+            $nilai = $d_sc->nilai;
+        }
+
+        return $nilai;
     }
 
     public function getBranch()
@@ -404,6 +433,7 @@ class Penjualan extends Public_Controller
             $m_pesanan->total = $params['sub_total'];
             $m_pesanan->diskon = $params['diskon'];
             $m_pesanan->ppn = $params['ppn'];
+            $m_pesanan->service_charge = $params['service_charge'];
             $m_pesanan->grand_total = $params['grand_total'];
             $m_pesanan->status = 1;
             $m_pesanan->mstatus = 1;
@@ -490,6 +520,7 @@ class Penjualan extends Public_Controller
             $m_jual->total = $d_pesanan['total'];
             $m_jual->diskon = $d_pesanan['diskon'];
             $m_jual->ppn = $d_pesanan['ppn'];
+            $m_jual->service_charge = $d_pesanan['service_charge'];
             $m_jual->grand_total = $d_pesanan['grand_total'];
             $m_jual->lunas = 0;
             $m_jual->mstatus = 1;
@@ -1982,6 +2013,7 @@ class Penjualan extends Public_Controller
                     'total' => $params['sub_total'],
                     'diskon' => $params['diskon'],
                     'ppn' => $params['ppn'],
+                    'service_charge' => $params['service_charge'],
                     'grand_total' => $params['grand_total'],
                     'meja_id' => $params['meja_id'],
                     'mstatus' => 1,

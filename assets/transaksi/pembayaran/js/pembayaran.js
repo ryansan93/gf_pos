@@ -594,12 +594,18 @@ var bayar = {
 
         kembalian = total_bayar - total_tagihan;
 
-        $('.total_bayar').val( numeral.formatInt(total_bayar) );
+        // $('.total_bayar').val( numeral.formatInt(total_bayar) );
+        $('.jml_bayar').text( numeral.formatDec(total_bayar) );
+        $('.jml_bayar').attr('data-val', total_bayar);
 
         if ( kembalian > 0 ) {
-            $('.kembalian').val( numeral.formatInt(kembalian) );
+            // $('.kembalian').val( numeral.formatInt(kembalian) );
+            $('.kembalian').text( numeral.formatDec(kembalian) );
+            $('.kembalian').attr('data-val', kembalian);
         } else {
-            $('.kembalian').val( numeral.formatInt(0) );
+            // $('.kembalian').val( numeral.formatInt(0) );
+            $('.kembalian').text( numeral.formatDec(0) );
+            $('.kembalian').attr('data-val', 0);
         }
 
         bayar.hitungSisaTagihan();
@@ -619,6 +625,7 @@ var bayar = {
     cekNominalBayarHutang: function(elm) {
         var nominal_bayar_hutang = numeral.unformat($(elm).val());
         var hutang = $(elm).attr('data-val');
+        var jenis_kartu = $(elm).attr('data-jk');
 
         var div_saldo_member = $('div.saldo_member');
         if ( $(div_saldo_member).length > 0 ) {
@@ -635,10 +642,12 @@ var bayar = {
                 $(div_saldo_member).find('input.sisa_saldo').val( numeral.formatInt(sisa_saldo) );
             }
         } else {
-            if ( nominal_bayar_hutang > hutang ) {
-                bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
-                    $(elm).val( numeral.formatInt(hutang) );
-                });
+            if ( !empty(jenis_kartu) ) {
+                if ( nominal_bayar_hutang > hutang ) {
+                    bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
+                        $(elm).val( numeral.formatInt(hutang) );
+                    });
+                }
             }
         }
     }, // end - cekNominalBayarHutang
@@ -777,7 +786,7 @@ var bayar = {
         
         var data = {
             'faktur_kode': $(elm).data('kode'),
-            'jml_tagihan': numeral.unformat($(modal).find('.total').val()),
+            'jml_tagihan': numeral.unformat($(modal).find('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($(modal).find('.total_bayar').val()),
             'kembalian': numeral.unformat($(modal).find('.kembalian').val()),
             'dataMetodeBayar': dataMetodeBayar,

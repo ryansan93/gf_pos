@@ -204,6 +204,24 @@
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Belanja. =</label></div>
 	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
 	        				</div>
+	        				<?php if ( $data['ppn'] > 0 ): ?>
+	        					<?php
+	        						$persen_ppn = ($data['ppn'] / $data['total']) * 100;
+	        					?>
+		        				<div class="col-xs-12 no-padding">
+		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PPN (<?php echo angkaDecimal($persen_ppn); ?> %). =</label></div>
+		        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
+		        				</div>
+	        				<?php endif ?>
+	        				<?php if ( $data['service_charge'] > 0 ): ?>
+	        					<?php
+	        						$persen_service_charge = ($data['service_charge'] / $data['total']) * 100;
+	        					?>
+		        				<div class="col-xs-12 no-padding">
+		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Service Charge (<?php echo angkaDecimal($persen_service_charge); ?> %). =</label></div>
+		        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
+		        				</div>
+	        				<?php endif ?>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Disc. =</label></div>
 	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo '('.angkaDecimal($data['diskon']).')'; ?></label></div>
@@ -213,12 +231,12 @@
 	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['grand_total']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Uang Tunai. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label">0</label></div>
+	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Jumlah Bayar. =</label></div>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label jml_bayar" data-val="0">0</label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Kembalian. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label">0</label></div>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label kembalian" data-val="0">0</label></div>
 	        				</div>
 						</div>
 					<?php // } ?>

@@ -411,6 +411,35 @@ class Pembayaran extends Public_Controller
         $this->load->view($this->template, $data);
     }
 
+    public function getPpn($kodeBranch)
+    {
+
+        $m_ppn = new \Model\Storage\Ppn_model();
+        $now = $m_ppn->getDate();
+        $d_ppn = $m_ppn->where('branch_kode', $kodeBranch)->where('tgl_berlaku', '<=', $now['tanggal'])->where('mstatus', 1)->first();
+
+        $nilai = 0;
+        if ( $d_ppn ) {
+            $nilai = $d_ppn->nilai;
+        }
+
+        return $nilai;
+    }
+
+    public function getServiceCharge($kodeBranch)
+    {
+        $m_sc = new \Model\Storage\ServiceCharge_model();
+        $now = $m_sc->getDate();
+        $d_sc = $m_sc->where('branch_kode', $kodeBranch)->where('tgl_berlaku', '<=', $now['tanggal'])->where('mstatus', 1)->first();
+
+        $nilai = 0;
+        if ( $d_sc ) {
+            $nilai = $d_sc->nilai;
+        }
+
+        return $nilai;
+    }
+
     public function getDataPenjualan($kode_faktur)
     {
         $m_jual = new \Model\Storage\Jual_model();
@@ -456,6 +485,7 @@ class Pembayaran extends Public_Controller
             'total' => $d_jual['total'],
             'diskon' => $d_jual['diskon'],
             'ppn' => $d_jual['ppn'],
+            'service_charge' => $d_jual['service_charge'],
             'grand_total' => $d_jual['grand_total'],
             'lunas' => $d_jual['lunas'],
             'jenis_pesanan' => $jenis_pesanan,

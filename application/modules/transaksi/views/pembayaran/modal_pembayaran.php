@@ -15,6 +15,7 @@
 					</tr>
 				</thead>
 				<tbody>
+					<?php $total_bayar = 0; ?>
 					<?php if ( isset($data['dataMetodeBayar']) ): ?>
 						<?php foreach ($data['dataMetodeBayar'] as $key => $value): ?>
 							<?php if ( !empty($value) ): ?>
@@ -31,6 +32,8 @@
 										<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.hapusMetodePembayaran(this)" data-id="<?php echo $key; ?>"><i class="fa fa-times"></i></button>
 									</td>
 								</tr>
+
+								<?php $total_bayar += $value['jumlah']; ?>
 							<?php endif ?>
 						<?php endforeach ?>
 					<?php else: ?>
@@ -61,13 +64,14 @@
 			<div class="col-md-6 no-padding cb_left">
 				<div class="col-md-12 no-padding"><label class="control-label">TOTAL BAYAR</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaRibuan($data['jml_bayar']); ?>" readonly>
+					<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaRibuan($total_bayar); ?>" readonly>
 				</div>
 			</div>
 			<div class="col-md-6 no-padding cb_right">
 				<div class="col-md-12 no-padding"><label class="control-label">KEMBALIAN</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaRibuan($data['kembalian']); ?>" readonly>
+					<?php $kembalian = (($total_bayar - $data['jml_tagihan']) < 0) ? 0 : $total_bayar - $data['jml_tagihan']; ?>
+					<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaRibuan($kembalian); ?>" readonly>
 				</div>
 			</div>
 		</div>

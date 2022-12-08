@@ -1103,10 +1103,14 @@ var jual = {
         });
 
         var persen_ppn = numeral.unformat($('.persen_ppn').text());
-        var total_ppn = (persen_ppn > 0) ? sub_total * (11/100) : 0;
+        var total_ppn = (persen_ppn > 0) ? sub_total * (persen_ppn/100) : 0;
+        
+        var persen_service_charge = numeral.unformat($('.persen_service_charge').text());
+        var total_service_charge = (persen_service_charge > 0) ? sub_total * (persen_service_charge/100) : 0;
 
         $('.subtotal').text(numeral.formatDec(sub_total));
         $('.ppn').text(numeral.formatDec(total_ppn));
+        $('.service_charge').text(numeral.formatDec(total_service_charge));
 
         jual.hitDiskon();
     }, // end - hitSubTotal
@@ -1161,8 +1165,9 @@ var jual = {
         var subtotal = numeral.unformat($('.subtotal').text());
         var diskon = numeral.unformat($('span.diskon').text());
         var ppn = numeral.unformat($('.ppn').text());
+        var service_charge = numeral.unformat($('.service_charge').text());
 
-        var grandtotal = (subtotal + ppn) - diskon;
+        var grandtotal = (subtotal + ppn + service_charge) - diskon;
 
         $('.grandtotal').text(numeral.formatDec(grandtotal));
 
@@ -1282,6 +1287,7 @@ var jual = {
         var sub_total = numeral.unformat($('.subtotal').text());
         var diskon = numeral.unformat($('span.diskon').text());
         var ppn = numeral.unformat($('.ppn').text());
+        var service_charge = numeral.unformat($('.service_charge').text());
         var grand_total = numeral.unformat($('.grandtotal').text());
 
         dataPenjualan = {
@@ -1291,6 +1297,7 @@ var jual = {
             'sub_total': sub_total,
             'diskon': diskon,
             'ppn': ppn,
+            'service_charge': service_charge,
             'grand_total': grand_total,
             'list_pesanan': list_pesanan,
             'list_diskon': list_diskon,
