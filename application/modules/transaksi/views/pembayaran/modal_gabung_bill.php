@@ -13,14 +13,16 @@
 				<small>
 					<table class="table table-bordered tbl_belum_bayar" style="margin-bottom: 0px;">
 						<tbody>
-							<?php foreach ($data_belum_bayar as $key => $value): ?>
-								<tr class="search cursor-p" onclick="bayar.activeRow(this)" data-aktif="0" data-kodepesanan="<?php echo $value['kode_pesanan']; ?>">
-									<td class="col-xs-3"><?php echo $value['lantai'].' - '.$value['meja']; ?></td>
-									<!-- <td class="col-xs-2"><?php echo $value['kode_pesanan']; ?></td> -->
-									<td class="col-xs-3"><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
-									<td class="col-xs-2 text-right total"><?php echo angkaDecimal($value['total']); ?></td>
-								</tr>
-							<?php endforeach ?>
+							<?php if ( !empty($data_belum_bayar) ): ?>
+								<?php foreach ($data_belum_bayar as $key => $value): ?>
+									<tr class="search cursor-p" onclick="bayar.activeRow(this)" data-aktif="0" data-kodepesanan="<?php echo $value['kode_pesanan']; ?>">
+										<td class="col-xs-3"><?php echo $value['lantai'].' - '.$value['meja']; ?></td>
+										<!-- <td class="col-xs-2"><?php echo $value['kode_pesanan']; ?></td> -->
+										<td class="col-xs-3"><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
+										<td class="col-xs-2 text-right total"><?php echo angkaDecimal($value['total']); ?></td>
+									</tr>
+								<?php endforeach ?>
+							<?php endif ?>
 						</tbody>
 					</table>
 				</small>
