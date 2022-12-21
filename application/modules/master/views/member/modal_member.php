@@ -30,11 +30,12 @@
 				<div class="col-md-12 no-padding" style="padding: 5px; height: 86.5%;">
 					<div class="col-md-12 text-center no-padding head_member">
 						<div class="col-md-12 no-padding head">
-							<div class="col-md-2"><label class="label-control">Kode</label></div>
+							<div class="col-md-1"><label class="label-control">Kode</label></div>
+							<div class="col-md-2"><label class="label-control">Grup</label></div>
 							<div class="col-md-2"><label class="label-control">Nama</label></div>
 							<div class="col-md-2"><label class="label-control">No. Telp</label></div>
 							<div class="col-md-2"><label class="label-control">Tgl Berakhir</label></div>
-							<div class="col-md-2"><label class="label-control">Status</label></div>
+							<div class="col-md-1"><label class="label-control">Status</label></div>
 							<div class="col-md-2"><label class="label-control">Action</label></div>
 						</div>
 					</div>
@@ -55,11 +56,12 @@
 									$idx++;
 								?>
 								<div class="col-md-12 no-padding detail <?php echo $bgcolor; ?>">
-									<div class="col-md-2 search kode" data-sensitive="false"><label class="label-control"><?php echo $value['kode_member']; ?></label></div>
+									<div class="col-md-1 search kode" data-sensitive="false"><label class="label-control"><?php echo $value['kode_member']; ?></label></div>
+									<div class="col-md-2 search grup" data-sensitive="false"><label class="label-control"><?php echo !empty($value['member_group_id']) ? $value['member_group']['nama'] : 'NON GRUP'; ?></label></div>
 									<div class="col-md-2 search nama" data-sensitive="false"><label class="label-control"><?php echo $value['nama']; ?></label></div>
 									<div class="col-md-2 search" data-sensitive="false"><label class="label-control"><?php echo $value['no_telp']; ?></label></div>
 									<div class="col-md-2 search" data-sensitive="false"><label class="label-control"><?php echo tglIndonesia($value['tgl_berakhir'], '-', ' '); ?></label></div>
-									<div class="col-md-2 search" data-sensitive="true">
+									<div class="col-md-1 search" data-sensitive="true">
 										<label class="label-control">
 											<?php if ( $tanggal > $value['tgl_berakhir'] || $value['mstatus'] == 0 ) : ?>
 												NON AKTIF

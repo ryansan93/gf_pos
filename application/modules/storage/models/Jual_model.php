@@ -14,6 +14,11 @@ class Jual_model extends Conf {
 		return $id->nextId;
 	}
 
+	public function jual_gabungan()
+	{
+		return $this->hasMany('\Model\Storage\JualGabungan_model', 'faktur_kode', 'kode_faktur')->with(['jual_item']);
+	}
+
     public function jual_item()
 	{
 		return $this->hasMany('\Model\Storage\JualItem_model', 'faktur_kode', 'kode_faktur')->with(['jual_item_detail', 'jenis_pesanan']);
@@ -31,6 +36,6 @@ class Jual_model extends Conf {
 
 	public function pesanan()
 	{
-		return $this->hasOne('\Model\Storage\Pesanan_model', 'kode_pesanan', 'pesanan_kode');
+		return $this->hasOne('\Model\Storage\Pesanan_model', 'kode_pesanan', 'pesanan_kode')->with(['meja']);
 	}
 }

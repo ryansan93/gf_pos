@@ -2,6 +2,7 @@ const ws = new WebSocket("ws://103.137.111.6:8033");
 
 var kode_member = null;
 var member = null;
+var member_group = null;
 var jenis_pesanan = null;
 var nama_jenis_pesanan = null;
 var detail_pesanan = null;
@@ -244,13 +245,19 @@ var jual = {
 
                 $(modal_dialog).find('input').focus();
 
+                $(this).find('.member_group').select2();
+                $(this).removeAttr('tabindex');
+
                 $(this).find('.btn-cancel').click(function() { jual.modalPilihMember(); });
                 $(this).find('.btn-ok').click(function() { 
                     kode_member = null;
                     member = $(modal_dialog).find('input').val().toUpperCase();
+                    member_group = $(modal_dialog).find('.member_group').val().toUpperCase();
+
+                    var _member = !empty(member_group) ? member_group+' - '+member : member;
 
                     $('.member').attr('data-kode', kode_member);
-                    $('.member').text(member);
+                    $('.member').text(_member);
                     $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                     $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
@@ -1290,9 +1297,11 @@ var jual = {
         var service_charge = numeral.unformat($('.service_charge').text());
         var grand_total = numeral.unformat($('.grandtotal').text());
 
+        var _member = !empty(member_group) ? member_group+' - '+member : member;
+
         dataPenjualan = {
             'meja_id': mejaId,
-            'member': member,
+            'member': _member,
             'kode_member': kode_member,
             'sub_total': sub_total,
             'diskon': diskon,
@@ -2151,7 +2160,8 @@ var jual = {
                             if ( data.status == 1 ) {
                                 ws.send(JSON.stringify("pesan"));
                                 
-                                jual.modalJenisPesanan();
+                                // jual.modalJenisPesanan();
+                                sak.cekSaldoAwalKasir();
                                 jual.resetPesanan();
                                 jual.resetDiskon();
 
@@ -2166,6 +2176,38 @@ var jual = {
             }
         });
     }, // end - editPesanan
+
+    bayarDenganUpdate: function (elm) {
+        kodePesanan = $(elm).data('kode');
+
+        bootbox.confirm('Apakah anda yakin ingin meng-ubah transaksi ?', function(result) {
+            if ( result ) {
+                jual.getPesanan(function(data) {
+                    $('.modal').modal('hide');
+
+                    data['pesanan_kode'] = kodePesanan;
+
+                    $.ajax({
+                        url: 'transaksi/Penjualan/editPesanan',
+                        data: {
+                            'params': data
+                        },
+                        type: 'POST',
+                        dataType: 'JSON',
+                        beforeSend: function() { showLoading(); },
+                        success: function(data) {
+                            hideLoading();
+                            if ( data.status == 1 ) {
+                                bayar.modalListBill( $(elm) );
+                            } else {
+                                bootbox.alert(data.message);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }, // end - bayarDenganUpdate
 };
 
 jual.start_up();

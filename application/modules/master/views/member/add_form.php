@@ -24,6 +24,19 @@
 		            <textarea class="form-control alamat" placeholder="Alamat" data-required="1"></textarea>
 		        </div>
 			</div>
+			<div class="col-md-12 no-padding" style="margin-top: 10px;">
+				<div class="col-lg-12 text-left"><label class="control-label">Grup Member</label></div>
+		        <div class="col-lg-12">
+		            <select class="form-control member_group">
+		            	<option value="">NON GRUP</option>
+		            	<?php if ( !empty($member_group) ): ?>
+		            		<?php foreach ($member_group as $k_mg => $v_mg): ?>
+		            			<option value="<?php echo $v_mg['id']; ?>"><?php echo $v_mg['nama']; ?></option>
+		            		<?php endforeach ?>
+		            	<?php endif ?>
+		            </select>
+		        </div>
+			</div>
 			<div class="col-md-12 no-padding hide" style="margin-top: 10px;">
 				<div class="col-lg-12 text-left"><label class="control-label">Privilege</label></div>
 		        <div class="col-lg-12">

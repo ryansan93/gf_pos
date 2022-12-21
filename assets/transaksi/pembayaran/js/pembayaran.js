@@ -786,6 +786,10 @@ var bayar = {
         
         var data = {
             'faktur_kode': $(elm).data('kode'),
+            'tot_belanja': numeral.unformat($('.tot_belanja').find('label').text()),
+            'ppn': numeral.unformat($('.ppn').find('label').text()),
+            'service_charge': numeral.unformat($('.service_charge').find('label').text()),
+            'diskon': numeral.unformat($(modal).find('.diskon').val()),
             'jml_tagihan': numeral.unformat($(modal).find('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($(modal).find('.total_bayar').val()),
             'kembalian': numeral.unformat($(modal).find('.kembalian').val()),
@@ -937,6 +941,154 @@ var bayar = {
             }
         });
     }, // end - deletePembayaran
+
+    modalGabungBill: function(elm) {
+        $('.modal').modal('hide');
+
+        var data = {
+            'pesanan_kode': $(elm).data('kode'),
+        };
+
+        $.get('transaksi/Pembayaran/modalGabungBill',{
+            'params': data
+        },function(data){
+            var _options = {
+                className : 'large',
+                message : data,
+                addClass : 'form',
+                onEscape: true,
+            };
+            bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                // $(this).find('.modal-header').css({'padding-top': '0px'});
+                // $(this).find('.modal-dialog').css({'width': '70%', 'max-width': '100%'});
+                // $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+
+                $(this).css({'height': '100%'});
+                $(this).find('.modal-header').css({'padding-top': '0px'});
+                $(this).find('.modal-dialog').css({'width': '80%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'height': '100%'});
+                $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+                $(this).find('.modal-content').css({'height': '90%'});
+                $(this).find('.modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body .row').css({'height': '100%'});
+
+                $('input').keyup(function(){
+                    $(this).val($(this).val().toUpperCase());
+                });
+
+                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                });
+
+                var modal_body = $(this).find('.modal-body');
+
+                // $(modal_body).find('.nav-tabs .nav-link:first').click();
+                // $(modal_body).find('.btn_remove').click(function() {
+                //     bayar.removeItem( $(this) );
+                // });
+
+                // $(modal_body).find('.btn_apply').click(function() {
+                //     bayar.modalJumlahSplit( $(this) );
+                // });
+            });
+        },'html');
+    }, // end - modalGabungBill
+
+    activeRow: function (elm) {
+        var aktif = $(elm).attr('data-aktif');
+
+        if ( aktif == 0 ) {
+            $(elm).attr('data-aktif', 1);
+        } else {
+            $(elm).attr('data-aktif', 0);
+        }
+    }, // end - activeRow
+
+    changeRightAll: function () {
+        var table_left = $('table.tbl_belum_bayar');
+        var table_right = $('div.bill_gabung table');
+
+        var tr_aktif = $(table_left).find('tr:visible').remove().clone();
+        $(tr_aktif).attr('data-aktif', 0);
+
+        $(table_right).find('tbody').append( $(tr_aktif) );
+    }, // end - changeRightAll
+
+    changeRight: function () {
+        var table_left = $('table.tbl_belum_bayar');
+        var table_right = $('div.bill_gabung table');
+
+        var tr_aktif = $(table_left).find('tr[data-aktif=1]').remove().clone();
+        $(tr_aktif).attr('data-aktif', 0);
+
+        $(table_right).find('tbody').append( $(tr_aktif) );
+    }, // end - changeRight
+
+    changeLeft: function () {
+        var table_left = $('table.tbl_belum_bayar');
+        var table_right = $('div.bill_gabung table');
+
+        var tr_aktif = $(table_right).find('tr[data-aktif=1]:not([data-utama=1])').remove().clone();
+        $(tr_aktif).attr('data-aktif', 0);
+
+        $(table_left).find('tbody').append( $(tr_aktif) );
+    }, // end - changeLeft
+
+    changeLeftAll: function () {
+        var table_left = $('table.tbl_belum_bayar');
+        var table_right = $('div.bill_gabung table');
+
+        var tr_aktif = $(table_right).find('tr:visible:not([data-utama=1])').remove().clone();
+        $(tr_aktif).attr('data-aktif', 0);
+
+        $(table_left).find('tbody').append( $(tr_aktif) );
+    }, // end - changeLeftAll
+
+    saveBillGabung: function () {
+        var table = $('div.bill_gabung table');
+
+        var data_utama = {
+            'utama': $(table).find('tbody tr[data-utama=1]').attr('data-utama'),
+            'kode_pesanan': $(table).find('tbody tr[data-utama=1]').attr('data-kodepesanan'),
+            'total': numeral.unformat($(table).find('tbody tr[data-utama=1] .total').text())
+        };
+
+        var data = $.map( $(table).find('tbody tr:not([data-utama=1])'), function (tr) {
+            var _data = {
+                'utama': $(tr).attr('data-utama'),
+                'kode_pesanan': $(tr).attr('data-kodepesanan'),
+                'total': numeral.unformat($(tr).find('.total').text())
+            };
+
+            return _data;
+        });
+
+        var params = {
+            'data_utama': data_utama,
+            'data': data
+        };
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/saveBillGabung',
+            data: {
+                'params': params
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading(); },
+            success: function(data) {
+                if ( data.status == 1 ) {
+                    var btn = '<button type="button" data-kode="'+data.content.kode+'"></button>';
+
+                    bayar.pembayaranForm( $(btn) );
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end - saveBillGabung
 };
 
 bayar.startUp();

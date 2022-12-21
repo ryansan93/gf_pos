@@ -46,11 +46,14 @@
 	<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 	<div class="col-xs-12 no-padding">
 		<?php if ( $bayar == 0 ): ?>
-			<div class="col-xs-6 no-padding cb_left">
+			<div class="col-xs-4 no-padding cb_left">
 				<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.modalListBayar()"><i class="fa fa-times"></i> BATAL</button>
 			</div>
-			<div class="col-xs-6 no-padding cb_right">
+			<div class="col-xs-4 no-padding cb_left cb_right">
 				<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $pesanan_kode; ?>" onclick="bayar.modalSplitBill(this)">Split Bill</button>
+			</div>
+			<div class="col-xs-4 no-padding cb_right">
+				<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $pesanan_kode; ?>" onclick="bayar.modalGabungBill(this)">Gabung Bill</button>
 			</div>
 		<?php else: ?>
 			<div class="col-xs-12 no-padding cb_left">

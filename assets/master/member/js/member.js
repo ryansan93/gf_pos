@@ -76,30 +76,6 @@ var mbr = {
                 var div = $(modal_dialog).find('.list_member');
 
                 $(this).find('.btn_pilih').click(function() {mbr.pilihMember( $(this) ); });
-
-                // $(this).find('.btn-cancel').click(function() { jual.modalPilihMember(); });
-                // $(this).find('.btn-ok').click(function() { 
-                //     kode_member = $(modal_dialog).find('tr[data-aktif=1] td.kode').text().toUpperCase();
-                //     member = $(modal_dialog).find('tr[data-aktif=1] td.nama').text().toUpperCase();
-
-                //     $('.member').attr('data-kode', kode_member);
-                //     $('.member').text(member+' (MEMBER)');
-                //     $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
-                //     $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
-
-                //     $.map( $('div.kategori').find('ul.kategori li'), function(li) {
-                //         var kategori = $(li).text();
-
-                //         if ( kategori == 'PAKET' ) {
-                //             $(li).click();
-                //         }
-                //     });
-
-                //     $('.list_diskon').find('div.diskon[data-member=0]').remove();
-                //     jual.hitDiskon();
-
-                //     $('.modal').modal('hide');
-                // });
             });
         },'html');
 	}, // end - modalMember
@@ -155,6 +131,9 @@ var mbr = {
                 $(this).find('.close').on('click', function() {
                     mbr.modalMember();
                 });
+
+                $(this).find('.member_group').select2();
+                $(this).removeAttr('tabindex');
             });
         },'html');
     }, // end - addForm
@@ -186,6 +165,9 @@ var mbr = {
                 $(this).find('.close').on('click', function() {
                     mbr.modalMember();
                 });
+
+                $(this).find('.member_group').select2();
+                $(this).removeAttr('tabindex');
             });
         },'html');
     }, // end - viewForm
@@ -193,7 +175,7 @@ var mbr = {
     editForm: function (elm) {
         var modal = $(elm).closest('.modal');
 
-        $(modal).find('input, textarea').removeAttr('disabled');
+        $(modal).find('input, select, textarea').removeAttr('disabled');
         $(modal).find('.btn_view').addClass('hide');
         $(modal).find('.btn_edit').removeClass('hide');
     }, // end - editForm
@@ -224,6 +206,7 @@ var mbr = {
                         'no_telp': $(modal).find('.no_telp').val(),
                         'alamat': $(modal).find('.alamat').val(),
                         'privilege': $(modal).find('[name=optradio]:checked').val(),
+                        'member_group_id': $(modal).find('.member_group').val()
                     };
 
                     $.ajax({
@@ -274,6 +257,7 @@ var mbr = {
                         'no_telp': $(modal).find('.no_telp').val(),
                         'alamat': $(modal).find('.alamat').val(),
                         'privilege': $(modal).find('[name=optradio]:checked').val(),
+                        'member_group_id': $(modal).find('.member_group').val()
                     };
 
                     $.ajax({

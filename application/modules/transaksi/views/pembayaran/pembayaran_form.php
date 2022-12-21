@@ -68,7 +68,7 @@
 				</div>
 			</div>
 			<div class="col-xs-6 no-padding contain_border cb_right">
-				<div class="col-xs-12 border">
+				<div class="col-xs-12 border" style="overflow-y: auto;">
 					<div class="col-xs-12 no-padding">
 						<div class="col-xs-12 no-padding"><label class="control-label">LIST HUTANG MEMBER</label></div>
 					</div>
@@ -76,7 +76,7 @@
 					<div class="col-xs-12 no-padding">
 						<?php if ( !empty($data_hutang) ): ?>
 							<small>
-								<table class="table table-bordered tbl_hutang" style="margin-bottom: 0px;">
+								<table class="table table-bordered tbl_hutang" style="margin-bottom: 0px; overflow-y: auto;">
 									<thead>
 										<tr>
 											<th class="col-xs-1"></th>
@@ -177,40 +177,48 @@
 					<div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo 'Telp. '.$data_branch['telp']; ?></label></div>
 					<div class="col-xs-12 text-center no-padding font10"><br></div>
 					<div class="col-xs-12 no-padding font10">
-						<div class="col-xs-3"><label class="control-label">No. Transaksi</label></div>
+						<div class="col-xs-3" style="padding-right: 0px;"><label class="control-label">No. Bill</label></div>
 						<div class="col-xs-9"><label class="control-label">: <?php echo $data['kode_faktur']; ?></label></div>
 					</div>
 					<div class="col-xs-12 no-padding font10">
 						<div class="col-xs-3"><label class="control-label">Kasir</label></div>
 						<div class="col-xs-9"><label class="control-label">: <?php echo $data_branch['nama_kasir']; ?></label></div>
 					</div>
-					<div class="col-xs-12 text-center no-padding font10"><label class="control-label">=======================================</label></div>
-					<div class="col-xs-12 font10">
-						<?php foreach ($data['jenis_pesanan'] as $k_jp => $v_jp) { ?>
-							<div class="col-xs-12 no-padding"><label class="control-label"><?php echo $v_jp['nama']; ?></label></div>
-                			<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji) { ?>
-                				<div class="col-xs-12 no-padding">
-                					<div class="col-xs-1 no-padding"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></div>
-                					<div class="col-xs-7 no-padding"><label class="control-label"><?php echo $v_ji['nama']; ?></label></div>
-                					<div class="col-xs-4 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($v_ji['total']); ?></label></div>
-                				</div>
-                		<?php } ?>
-            		<?php } ?>
-					</div>
-					<div class="col-xs-12 text-center no-padding font10"><label class="control-label">---------------------------------------------------------------------</label></div>
+					<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
+					<?php foreach ($data['detail'] as $k_det => $v_det): ?>						
+						<div class="col-xs-12 no-padding font10">
+							<div class="col-xs-3"><label class="control-label">Member</label></div>
+							<div class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></div>
+						</div>
+						<div class="col-xs-12 text-center no-padding font10"><hr class="dashed"></div>
+						<div class="col-xs-12 font10">
+							<?php foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp) { ?>
+								<div class="col-xs-12 no-padding"><label class="control-label"><?php echo $v_jp['nama']; ?></label></div>
+	                			<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji) { ?>
+	                				<div class="col-xs-12 no-padding">
+	                					<div class="col-xs-1 no-padding"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></div>
+	                					<div class="col-xs-7 no-padding"><label class="control-label"><?php echo $v_ji['nama']; ?></label></div>
+	                					<div class="col-xs-4 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($v_ji['total']); ?></label></div>
+	                				</div>
+	                		<?php } ?>
+	            		<?php } ?>
+						</div>
+						<div class="col-xs-12 text-center no-padding font10"><br></div>
+					<?php endforeach ?>
 					<?php // for ($i=0; $i < 10; $i++) { ?>
+						<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
 						<div class="col-xs-12 font10">
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Belanja. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
+	        					<div class="col-xs-3 no-padding text-right tot_belanja"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
 	        				</div>
 	        				<?php if ( $data['ppn'] > 0 ): ?>
 	        					<?php
 	        						$persen_ppn = ($data['ppn'] / $data['total']) * 100;
 	        					?>
 		        				<div class="col-xs-12 no-padding">
-		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PPN (<?php echo angkaDecimal($persen_ppn); ?> %). =</label></div>
-		        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
+		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PB1 (<?php echo angkaDecimal($persen_ppn); ?> %). =</label></div>
+		        					<div class="col-xs-3 no-padding text-right ppn"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
 		        				</div>
 	        				<?php endif ?>
 	        				<?php if ( $data['service_charge'] > 0 ): ?>
@@ -219,7 +227,7 @@
 	        					?>
 		        				<div class="col-xs-12 no-padding">
 		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Service Charge (<?php echo angkaDecimal($persen_service_charge); ?> %). =</label></div>
-		        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
+		        					<div class="col-xs-3 no-padding text-right service_charge"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
 		        				</div>
 	        				<?php endif ?>
 	        				<div class="col-xs-12 no-padding">
@@ -240,7 +248,7 @@
 	        				</div>
 						</div>
 					<?php // } ?>
-					<div class="col-xs-12 text-center no-padding font10"><label class="control-label">---------------------------------------------------------------------</label></div>
+					<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
 					<div class="col-xs-12 text-center no-padding font10"><label class="control-label">*** TERIMA KASIH ***</label></div>
 					<div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo $data_branch['waktu']; ?></label></div>
 				</div>

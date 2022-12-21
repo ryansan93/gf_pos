@@ -30,6 +30,7 @@ class Penjualan extends Public_Controller
             $this->add_external_js(
                 array(
                     "assets/select2/js/select2.min.js",
+                    "assets/master/member_group/js/member-group.js",
                     "assets/master/member/js/member.js",
                     "assets/transaksi/penjualan/js/penjualan.js",
                     "assets/transaksi/pembayaran/js/pembayaran.js",
@@ -40,6 +41,7 @@ class Penjualan extends Public_Controller
             $this->add_external_css(
                 array(
                     "assets/select2/css/select2.min.css",
+                    "assets/master/member_group/css/member-group.css",
                     "assets/master/member/css/member.css",
                     "assets/transaksi/penjualan/css/penjualan.css",
                     "assets/transaksi/pembayaran/css/pembayaran.css",
@@ -173,9 +175,9 @@ class Penjualan extends Public_Controller
                 $d_mejal = $m_mejal->whereBetween('tgl_trans', [$start_date, $end_date])->where('meja_id', $v_meja['id'])->orderBy('tgl_trans', 'desc')->first();
 
                 $aktif = 0;
-                if ( $d_mejal ) {
-                    $aktif = $d_mejal->status;
-                }
+                // if ( $d_mejal ) {
+                //     $aktif = $d_mejal->status;
+                // }
 
                 $key_meja = $v_meja['nama_meja'].' | '.$v_meja['id'];
                 $data[ $key_lantai ]['list_meja'][] = array(
@@ -227,9 +229,24 @@ class Penjualan extends Public_Controller
         echo $html;
     }
 
+    public function getDataMemberGroup()
+    {
+        $m_member_group = new \Model\Storage\MemberGroup_model();
+        $d_member_group = $m_member_group->where('status', 1)->orderBy('nama', 'desc')->get();
+
+        $data = null;
+        if ( $d_member_group->count() > 0 ) {
+            $data = $d_member_group->toArray();
+        }
+
+        return $data;
+    }
+
     public function modalNonMember()
     {
-        $html = $this->load->view($this->pathView . 'modal_non_member', null, TRUE);
+        $content['member_group'] = $this->getDataMemberGroup();
+        
+        $html = $this->load->view($this->pathView . 'modal_non_member', $content, TRUE);
 
         echo $html;
     }

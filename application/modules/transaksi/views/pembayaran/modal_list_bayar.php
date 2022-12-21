@@ -41,10 +41,11 @@
 								<table class="table table-bordered tbl_belum_bayar" style="margin-bottom: 0px;">
 									<thead>
 										<tr>
-											<th class="col-lg-2">Kasir</th>
+											<th class="col-lg-1">Kasir</th>
+											<th class="col-lg-2">No. Meja</th>
 											<th class="col-lg-2">No. Pesanan</th>
-											<th class="col-lg-3">Pelanggan</th>
-											<th class="col-lg-2">Total</th>
+											<th class="col-lg-2">Pelanggan</th>
+											<th class="col-lg-1">Total</th>
 											<th colspan="<?php echo $colspan_action; ?>">Action</th>
 										</tr>
 									</thead>
@@ -53,8 +54,9 @@
 											<?php foreach ($data['data_belum_bayar'] as $key => $value): ?>
 												<tr class="search belum_bayar">
 													<td><?php echo $value['kasir']; ?></td>
+													<td><?php echo $value['lantai'].' - '.$value['meja']; ?></td>
 													<td><?php echo $value['kode_pesanan']; ?></td>
-													<td><?php echo $value['pelanggan']; ?></td>
+													<td><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
 													<?php if ( $akses_kasir['a_submit'] == 1 ): ?>
 														<td class="col-lg-1 text-center">
@@ -107,11 +109,12 @@
 								<table class="table table-bordered tbl_bayar" style="margin-bottom: 0px;">
 									<thead>
 										<tr>
-											<th class="col-lg-2">Kasir</th>
-											<th class="col-lg-2">No. Pesanan</th>
-											<th class="col-lg-3">Pelanggan</th>
-											<th class="col-lg-2">Total</th>
-											<th>Action</th>
+											<th class="col-lg-1">Kasir</th>
+											<th class="col-lg-2">No. Bill</th>
+											<th class="col-lg-2">Pelanggan</th>
+											<th class="col-lg-1">Total</th>
+											<th class="col-lg-1">Bayar</th>
+											<th class="col-lg-1">Action</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -119,9 +122,10 @@
 											<?php foreach ($data['data_bayar'] as $key => $value): ?>
 												<tr class="search bayar">
 													<td><?php echo $value['kasir']; ?></td>
-													<td><?php echo $value['kode_pesanan']; ?></td>
-													<td><?php echo $value['pelanggan']; ?></td>
+													<td><?php echo $value['kode_faktur']; ?></td>
+													<td><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
+													<td class="text-right bayar"><?php echo angkaDecimal($value['bayar']); ?></td>
 													<td class="col-lg-1 text-center">
 														<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
 															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button>

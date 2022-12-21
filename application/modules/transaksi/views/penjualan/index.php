@@ -75,7 +75,7 @@
 				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="subtotal">0,00</span></label>
 				<label class="control-label col-md-4 no-padding" style="height: 10%; margin-bottom: 0.5%;">Diskon</label>
 				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="diskon">0,00</span></label>
-				<label class="control-label col-md-4 no-padding" style="height: 10%; margin-bottom: 0.5%;">PPN (<span class="persen_ppn"><?php echo angkaDecimal($persen_ppn); ?></span>%)</label>
+				<label class="control-label col-md-4 no-padding" style="height: 10%; margin-bottom: 0.5%;">PB1 (<span class="persen_ppn"><?php echo angkaDecimal($persen_ppn); ?></span>%)</label>
 				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="ppn">0,00</span></label>
 				<label class="control-label col-md-5 no-padding" style="height: 10%; margin-bottom: 0.5%;">Service Charge (<span class="persen_service_charge"><?php echo angkaDecimal($service_charge); ?></span>%)</label>
 				<label class="control-label col-md-7 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="service_charge">0,00</span></label>
@@ -112,21 +112,34 @@
 						</div>
 					</div>
 					<div class="col-md-12 no-padding edit_pesanan hide" style="height: 100%;">
-						<div class="col-md-6 no-padding" style="height: 100%; padding-right: 1%;">
+						<?php
+							$padding1 = 'padding-right: 1%;'; 
+							$padding2 = 'padding-left: 1%;'; 
+							$padding3 = 'padding-left: 1%;'; 
+							$col_size = 'col-md-6'; 
+							if ( hasAkses('transaksi/Pembayaran') ) {
+								$col_size = 'col-md-4';
+								$padding2 = 'padding-left: 1%; padding-right: 1%;'; 
+							}
+						?>
+
+						<div class="<?php echo $col_size; ?> no-padding" style="height: 100%; <?php echo $padding1; ?>">
 							<div class="col-md-12 text-center cursor-p button edit" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="/* jual.editPesanan(this); */ jual.modalPilihPrivilege(this);" data-kode="">
-								<span><b>SIMPAN PERUBAHAN</b></span>
+								<span><b>SIMPAN UBAH</b></span>
 							</div>
 						</div>
-						<div class="col-md-6 no-padding" style="height: 100%; padding-left: 1%;">
+						<div class="<?php echo $col_size; ?> no-padding" style="height: 100%; <?php echo $padding2; ?>">
 							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.batalEdit()">
 								<span><b>BATAL UBAH</b></span>
 							</div>
 						</div>
-						<!-- <div class="col-md-4 no-padding" style="height: 100%; padding-left: 1%;">
-							<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="bayar.modalPembayaran(this)" data-kode="">
-								<span><b>PEMBAYARAN</b></span>
+						<?php if ( hasAkses('transaksi/Pembayaran') ): ?>
+							<div class="col-md-4 no-padding" style="height: 100%; <?php echo $padding3; ?>">
+								<div class="col-md-12 text-center cursor-p button bayar" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.bayarDenganUpdate(this)" data-kode="">
+									<span><b>BAYAR</b></span>
+								</div>
 							</div>
-						</div> -->
+						<?php endif ?>
 					</div>
 				</div>
 			</div>

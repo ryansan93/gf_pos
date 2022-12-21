@@ -21,7 +21,7 @@ class Member extends Public_Controller
         $m_member = new \Model\Storage\Member_model();
         $now = $m_member->getDate();
 
-        $d_member = $m_member->where('status', 1)->orderBy('kode_member', 'desc')->get();
+        $d_member = $m_member->where('status', 1)->orderBy('kode_member', 'desc')->with(['member_group'])->get();
 
         $data = null;
         if ( $d_member->count() > 0 ) {
@@ -37,9 +37,22 @@ class Member extends Public_Controller
         echo $html;
     }
 
+    public function getDataMemberGroup()
+    {
+        $m_member_group = new \Model\Storage\MemberGroup_model();
+        $d_member_group = $m_member_group->where('status', 1)->orderBy('nama', 'desc')->get();
+
+        $data = null;
+        if ( $d_member_group->count() > 0 ) {
+            $data = $d_member_group->toArray();
+        }
+
+        return $data;
+    }
+
     public function addForm()
     {
-        $content = null;
+        $content['member_group'] = $this->getDataMemberGroup();
 
         $html = $this->load->view($this->pathView . 'add_form', $content, TRUE);
 
@@ -60,7 +73,9 @@ class Member extends Public_Controller
             $data = $d_member->toArray();
         }
 
+        $content['akses'] = $this->hasAkses;
         $content['tanggal'] = $now['tanggal'];
+        $content['member_group'] = $this->getDataMemberGroup();
         $content['data'] = $data;
 
         $html = $this->load->view($this->pathView . 'view_form', $content, TRUE);
@@ -85,6 +100,7 @@ class Member extends Public_Controller
             $m_member->status = 1;
             $m_member->tgl_berakhir = prev_date(date('Y-m-d', strtotime($now['tanggal']. ' + 1 years')));
             $m_member->mstatus = 1;
+            $m_member->member_group_id = $params['member_group_id'];
             $m_member->save();
 
             $d_member = $m_member->where('kode_member', $kode_member)->first()->toArray();
@@ -114,7 +130,8 @@ class Member extends Public_Controller
                     'nama' => $params['nama'],
                     'no_telp' => $params['no_telp'],
                     'alamat' => $params['alamat'],
-                    'privilege' => $params['privilege']
+                    'privilege' => $params['privilege'],
+                    'member_group_id' => $params['member_group_id']
                 )
             );
 

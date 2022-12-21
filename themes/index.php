@@ -47,22 +47,27 @@
               </a>
             </li>
           <?php endif ?>
-          <?php if ( hasAkses('master/Member') ): ?>
-            <li class="">
-              <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
-                <i class="fa fa-users" style="width: 8%;"></i>
-                <span style="width: 92%;">Member</span>
-              </a>
-              <ul class="collapse list-unstyled" id="member">
-                  <li class="menu">
-                    <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalMember()">List Member</a>
-                  </li>
-                  <li class="menu">
-                    <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalSaldoMember()">Saldo Member</a>
-                  </li>
-                </ul>
-            </li>
-          <?php endif ?>
+          <li class="">
+            <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
+              <i class="fa fa-users" style="width: 8%;"></i>
+              <span style="width: 92%;">Member</span>
+            </a>
+            <ul class="collapse list-unstyled" id="member">
+              <?php if ( hasAkses('master/MemberGroup') ): ?>
+                <li class="menu">
+                  <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mg.modalMemberGroup()">Grup Member</a>
+                </li>
+              <?php endif ?>
+              <?php if ( hasAkses('master/Member') ): ?>
+                <li class="menu">
+                  <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalMember()">List Member</a>
+                </li>
+                <li class="menu">
+                  <a class="list-group-item list-group-item-action bg-light-black cursor-p menu" onclick="mbr.modalSaldoMember()">Saldo Member</a>
+                </li>
+              <?php endif ?>
+            </ul>
+          </li>
           <?php if ( hasAkses('transaksi/Dapur') ): ?>
             <li class="">
               <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Dapur">

@@ -74,3 +74,45 @@ table.table.table-nobordered tbody td {
 	border-top: none;
 	padding-bottom: 0px;
 }
+
+.modal-gabung-bill table {
+	border: none;
+	padding: 0px;
+}
+
+.modal-gabung-bill table tbody tr td {
+	border: none;
+	padding: 0px 0px 5px 0px;
+}
+
+.modal-gabung-bill table tbody tr[data-aktif="1"] td {
+	background-color: #ededed;
+	border-color: #ededed;
+}
+
+.modal-gabung-bill .belum_bayar {
+	border: 1px solid #dedede;
+	padding: 5px;
+}
+.modal-gabung-bill .bill_gabung {
+	border: 1px solid #dedede;
+	padding: 5px;
+}
+
+hr.double-dashed {
+	border-top: dashed 1px #000000!important;
+	border-bottom: dashed 1px #000000!important;
+	height: 3px!important;
+	margin-right: 15px;
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+hr.dashed {
+	border-top: dashed 1px #000000!important;
+	margin-right: 15px;
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
