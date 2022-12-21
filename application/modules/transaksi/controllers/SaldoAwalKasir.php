@@ -27,6 +27,9 @@ class SaldoAwalKasir extends Public_Controller
 
                 if ( $d_sak ) {
                     $status = 1;
+                    if ( hasAkses('transaksi/Pembayaran') ) {
+                        $status = 2;
+                    }
                 }
             } else {
                 if ( hasAkses('transaksi/Pembayaran') ) {
