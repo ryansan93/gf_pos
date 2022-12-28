@@ -13,6 +13,45 @@ var bayar = {
         }
 	}, // end - startUp
 
+    filter_all: function (elm) {
+        var _target = $(elm).data('target');
+
+        var _div_target = $('.'+_target);
+        var _div = $(_div_target).find('div.detail');
+        var _content, _target;
+
+        _div.show();
+        _content = $(elm).val().toUpperCase().trim();
+
+        if (!empty(_content) && _content != '') {
+            $.map( $(_div), function(div){
+
+                // CEK DI TR ADA ATAU TIDAK
+                var ada = 0;
+                $.map( $(div).find('.search'), function(div_val){
+                    var _div_val = $(div_val).find('label').html().trim();
+                    var _sensitive = $(div_val).attr('data-sensitive');
+
+                    if ( _sensitive == 'false' ) {
+                        if (_div_val.toUpperCase().indexOf(_content) > -1) {
+                            ada = 1;
+                        }
+                    } else {
+                        if (_div_val.toUpperCase() == _content) {
+                            ada = 1;
+                        }
+                    }
+                });
+
+                if ( ada == 0 ) {
+                    $(div).hide();
+                } else {
+                    $(div).show();
+                };
+            });
+        }
+    }, // end - filter_all
+
 	modalListBayar: function () {
         $('.modal').modal('hide');
 
@@ -828,27 +867,34 @@ var bayar = {
     }, // end - batal
 
     saveHutang: function(elm) {
-        var params = {
-            'faktur_kode': $(elm).data('kode')
-        }
-
-        $.ajax({
-            url: 'transaksi/Pembayaran/saveHutang',
-            data: {
-                'params': params
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            beforeSend: function() { showLoading(); },
-            success: function(data) {
-                hideLoading();
-                if ( data.status == 1 ) {
-                    bootbox.alert(data.message, function() {
-                        bayar.batal();
-                    });
-                } else {
-                    bootbox.alert(data.message);
+        bootbox.prompt({
+            title: 'Alasan Hutang',
+            inputType: 'textarea',
+            callback: function (alasan) {
+                var params = {
+                    'faktur_kode': $(elm).data('kode'),
+                    'alasan': alasan
                 }
+
+                $.ajax({
+                    url: 'transaksi/Pembayaran/saveHutang',
+                    data: {
+                        'params': params
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    beforeSend: function() { showLoading(); },
+                    success: function(data) {
+                        hideLoading();
+                        if ( data.status == 1 ) {
+                            bootbox.alert(data.message, function() {
+                                bayar.batal();
+                            });
+                        } else {
+                            bootbox.alert(data.message);
+                        }
+                    }
+                });
             }
         });
     }, // end - hutang
@@ -946,7 +992,7 @@ var bayar = {
         $('.modal').modal('hide');
 
         var data = {
-            'pesanan_kode': $(elm).data('kode'),
+            'faktur_kode': $(elm).data('kode'),
         };
 
         $.get('transaksi/Pembayaran/modalGabungBill',{
@@ -1051,14 +1097,14 @@ var bayar = {
 
         var data_utama = {
             'utama': $(table).find('tbody tr[data-utama=1]').attr('data-utama'),
-            'kode_pesanan': $(table).find('tbody tr[data-utama=1]').attr('data-kodepesanan'),
+            'kode_faktur': $(table).find('tbody tr[data-utama=1]').attr('data-kodefaktur'),
             'total': numeral.unformat($(table).find('tbody tr[data-utama=1] .total').text())
         };
 
         var data = $.map( $(table).find('tbody tr:not([data-utama=1])'), function (tr) {
             var _data = {
                 'utama': $(tr).attr('data-utama'),
-                'kode_pesanan': $(tr).attr('data-kodepesanan'),
+                'kode_faktur': $(tr).attr('data-kodefaktur'),
                 'total': numeral.unformat($(tr).find('.total').text())
             };
 
@@ -1089,6 +1135,43 @@ var bayar = {
             }
         });
     }, // end - saveBillGabung
+
+    modalMemberSplitBill: function () {
+        $.get('transaksi/Pembayaran/modalMemberSplitBill',{
+        },function(data){
+            var _options = {
+                className : 'large',
+                message : data,
+                addClass : 'form',
+                onEscape: true,
+            };
+            bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                $(this).css({'height': '100%'});
+                $(this).find('.modal-header').css({'padding-top': '0px'});
+                $(this).find('.modal-dialog').css({'width': '90%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'height': '100%'});
+                $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+                $(this).find('.modal-content').css({'height': '90%'});
+                $(this).find('.modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body .row').css({'height': '100%'});
+
+                $('input').keyup(function(){
+                    $(this).val($(this).val().toUpperCase());
+                });
+
+                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                });
+
+                var modal_dialog = $(this).find('.modal-dialog');
+                var div = $(modal_dialog).find('.list_member');
+
+                $(this).find('.btn_pilih').click(function() { bayar.pilihMember( $(this) ); });
+            });
+        },'html');
+    }, // end - modalMemberSplitBill
 };
 
 bayar.startUp();

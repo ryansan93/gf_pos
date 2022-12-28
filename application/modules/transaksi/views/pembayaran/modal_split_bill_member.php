@@ -8,7 +8,7 @@
 			<input type="text" class="form-control member" placeholder="MEMBER">
 		</div>
 		<div class="col-xs-1 no-padding cb_right">
-			<button type="button" class="col-xs-12 btn btn-primary" onclick="bayar.modalMember()"><i class="fa fa-address-book-o"></i></button>
+			<button type="button" class="col-xs-12 btn btn-primary" onclick="bayar.modalMemberSplitBill()"><i class="fa fa-address-book-o"></i></button>
 		</div>
 	</div>
 	<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>

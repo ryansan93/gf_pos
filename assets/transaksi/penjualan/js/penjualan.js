@@ -54,7 +54,7 @@ var jual = {
         $('button.btn-kode-branch').attr('data-kode', kode);
         $('button.btn-kode-branch b').text(kode);
 
-        $('div.kategori').find('ul.kategori li:first').click();
+        $('div.jenis').find('ul.jenis li:first').click();
 
         $('.modal').modal('hide');
     }, // end - setBranch
@@ -102,7 +102,7 @@ var jual = {
                             jual.modalMeja();
                         }
                     } else {
-                        $('div.kategori').find('ul.kategori li[data-aktif=1]').click();
+                        $('div.jenis').find('ul.jenis li[data-aktif=1]').click();
 
                         $('.modal').modal('hide');
                     }
@@ -261,7 +261,7 @@ var jual = {
                     $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                     $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
-                    $('div.kategori').find('ul.kategori li:first').click();
+                    $('div.jenis').find('ul.jenis li:first').click();
                     // $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                     //     var kategori = $(li).text();
 
@@ -333,7 +333,7 @@ var jual = {
                     // $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                     // $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
-                    $('div.kategori').find('ul.kategori li:first').click();
+                    $('div.jenis').find('ul.jenis li:first').click();
                     // $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                     //     var kategori = $(li).text();
 
@@ -430,7 +430,7 @@ var jual = {
                                     $('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                                     $('.jenis_pesanan').text(nama_jenis_pesanan);
 
-                                    $('div.kategori').find('ul.kategori li:first').click();
+                                    $('div.jenis').find('ul.jenis li:first').click();
                                     // $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                                     //     var kategori = $(li).text();
 
@@ -455,13 +455,13 @@ var jual = {
     }, // end - saveMember
 
 	getMenu: function (elm) {
-        var id_kategori = $(elm).attr('data-id');
+        var id_jenis = $(elm).attr('data-id');
         var branch_kode = $('button.btn-kode-branch').attr('data-kode');
 
 		$.ajax({
             url: 'transaksi/Penjualan/getMenu',
             data: {
-                'id_kategori': id_kategori,
+                'id_jenis': id_jenis,
             	'jenis_pesanan': jenis_pesanan,
                 'branch_kode': branch_kode
             },
@@ -2112,7 +2112,7 @@ var jual = {
                     $('.list_menu').find('.meja').attr('data-kode', mejaId);
                     $('.list_menu').find('.meja').text(meja);
 
-                    $('div.kategori').find('ul.kategori li:first').click();
+                    $('div.jenis').find('ul.jenis li:first').click();
                     // $.map( $('div.kategori').find('ul.kategori li'), function(li) {
                     //     var kategori = $(li).text();
 

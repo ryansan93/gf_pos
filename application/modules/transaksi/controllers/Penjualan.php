@@ -66,6 +66,7 @@ class Penjualan extends Public_Controller
             $content['kode_branch'] = $this->kodebranch;
 
             $content['kategori'] = $this->getKategori();
+            $content['jenis'] = $this->getJenis();
 
             $data['view'] = $this->load->view($this->pathView . 'index', $content, TRUE);
 
@@ -321,15 +322,28 @@ class Penjualan extends Public_Controller
         return $data;
     }
 
+    public function getJenis()
+    {
+        $m_jm = new \Model\Storage\JenisMenu_model();
+        $d_jm = $m_jm->where('status', 1)->orderBy('nama', 'asc')->get();
+
+        $data = null;
+        if ( $d_jm->count() > 0 ) {
+            $data = $d_jm->toArray();
+        }
+
+        return $data;
+    }
+
     public function getMenu()
     {
-        $id_kategori = $this->input->get('id_kategori');
+        $id_jenis = $this->input->get('id_jenis');
         $jenis_pesanan = $this->input->get('jenis_pesanan');
         $branch_kode = $this->input->get('branch_kode');
 
         $m_menu = new \Model\Storage\Menu_model();
         $sql = "
-            select menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga as harga_jual, menu.kategori_menu_id, count(pm.kode_paket_menu) as jml_paket from menu menu
+            select menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga as harga_jual, menu.jenis_menu_id, count(pm.kode_paket_menu) as jml_paket from menu menu
                 left join
                     (
                     select * from harga_menu where id in (
@@ -342,10 +356,10 @@ class Penjualan extends Public_Controller
                     on
                         menu.kode_menu = pm.menu_kode
                 where
-                    menu.kategori_menu_id = ".$id_kategori." and
+                    menu.jenis_menu_id = ".$id_jenis." and
                     hm.jenis_pesanan_kode = '".$jenis_pesanan."' and
                     menu.branch_kode = '".trim($branch_kode)."'
-            group by menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga, menu.kategori_menu_id, hm.jenis_pesanan_kode
+            group by menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga, menu.jenis_menu_id, hm.jenis_pesanan_kode
             order by menu.nama asc
         ";
         $d_menu = $m_menu->hydrateRaw($sql);

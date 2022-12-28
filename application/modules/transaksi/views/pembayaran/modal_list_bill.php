@@ -53,7 +53,7 @@
 				<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $pesanan_kode; ?>" onclick="bayar.modalSplitBill(this)">Split Bill</button>
 			</div>
 			<div class="col-xs-4 no-padding cb_right">
-				<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $pesanan_kode; ?>" onclick="bayar.modalGabungBill(this)">Gabung Bill</button>
+				<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $kode_faktur; ?>" onclick="bayar.modalGabungBill(this)">Gabung Bill</button>
 			</div>
 		<?php else: ?>
 			<div class="col-xs-12 no-padding cb_left">

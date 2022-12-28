@@ -3,10 +3,10 @@
 		<button type="button" class="col-md-12 btn btn-primary btn-kode-branch" data-kode="<?php echo strtoupper($kode_branch); ?>" onclick="jual.modalPilihBranch()"><b><?php echo strtoupper($kode_branch); ?></b></button>
 	</div>
 	<div class="col-md-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
-	<div class="col-md-12 no-padding kategori">
-		<ul class="kategori">
-			<?php foreach ($kategori as $k_kategori => $v_kategori): ?>
-				<li class="cursor-p" onclick="jual.getMenu(this)" data-id="<?php echo $v_kategori['id']; ?>" data-aktif="0"><?php echo strtoupper($v_kategori['nama']); ?></li>
+	<div class="col-md-12 no-padding jenis">
+		<ul class="jenis">
+			<?php foreach ($jenis as $k_jenis => $v_jenis): ?>
+				<li class="cursor-p" onclick="jual.getMenu(this)" data-id="<?php echo $v_jenis['id']; ?>" data-aktif="0"><?php echo strtoupper($v_jenis['nama']); ?></li>
 			<?php endforeach ?>
 		</ul>
 	</div>
