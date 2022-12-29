@@ -77,7 +77,7 @@
 	<div class="col-xs-12 no-padding" style="height: 5%;">
 		<div class="col-xs-12 no-padding">
 			<div class="col-xs-6 no-padding" style="padding-right: 5px;">
-				<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.modalListBill(this)" data-kode="<?php echo $data_utama['kode_faktur']; ?>"><i class="fa fa-times"></i> Batal</button>
+				<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.modalListBill(this)" data-kode="<?php echo $data_utama['kode_pesanan']; ?>"><i class="fa fa-times"></i> Batal</button>
 			</div>
 			<div class="col-xs-6 no-padding" style="padding-left: 5px;">
 				<button type="button" class="col-xs-12 btn btn-success" onclick="bayar.saveBillGabung()"><i class="fa fa-usd"></i> Bayar</button>
