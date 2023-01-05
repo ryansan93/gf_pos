@@ -3,6 +3,8 @@ var dataHutangBayar = [];
 var nama_member = null;
 var kode_member = null;
 var tr_split = null;
+var dataDiskon = [];
+var dataDiskonSave = null;
 
 var bayar = {
 	startUp: function () {
@@ -621,7 +623,22 @@ var bayar = {
 
     hitungTotalBayar: function() {
         var kembalian = 0;
-        var total_tagihan = numeral.unformat( $('.total_tagihan').val() );
+        var total_belanja = numeral.unformat( $('.tot_belanja').find('label').text() );
+        var total_ppn = numeral.unformat( $('.ppn').find('label').text() );
+        var total_service_charge = numeral.unformat( $('.service_charge').find('label').text() );
+        var total_diskon = numeral.unformat( $('.diskon').val() );
+        var tagihan = (total_belanja + total_ppn + total_service_charge );
+        $('.tagihan').val( numeral.formatInt(tagihan) );
+        var total_tagihan = tagihan - total_diskon;
+        $('.total_tagihan').val( numeral.formatInt(total_tagihan) );
+
+        kembalian = total_bayar - total_tagihan;
+
+        $('.nota_diskon').attr('data-val', total_diskon);
+        $('.nota_diskon').text( '('+numeral.formatDec(total_diskon)+')' );
+        $('.nota_total_bayar').attr('data-val', total_tagihan);
+        $('.nota_total_bayar').text( numeral.formatDec(total_tagihan) );
+
         var total_bayar = 0;
         if ( dataMetodeBayar.length > 0 ) {
             for (var i = 0; i < dataMetodeBayar.length; i++) {
@@ -631,9 +648,8 @@ var bayar = {
             }
         }
 
-        kembalian = total_bayar - total_tagihan;
+        $('.total_bayar').val( numeral.formatInt(total_bayar) );
 
-        // $('.total_bayar').val( numeral.formatInt(total_bayar) );
         $('.jml_bayar').text( numeral.formatDec(total_bayar) );
         $('.jml_bayar').attr('data-val', total_bayar);
 
@@ -699,10 +715,12 @@ var bayar = {
             'kode_jenis_kartu': $(elm).data('kode'),
             'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val()),
             'member_kode': $('.kode_member').attr('data-val'),
-            'faktur_kode': $('.kode_faktur').attr('data-val')
+            'faktur_kode': $('.kode_faktur').attr('data-val'),
+            'data_diskon': dataDiskon
         };
 
         $.get('transaksi/Pembayaran/modalMetodePembayaran',{
+            'kode_faktur': $(elm).attr('data-kodefaktur'),
             'params': params
         },function(data){
             var _options = {
@@ -744,7 +762,7 @@ var bayar = {
 
         dataMetodeBayar.push( _dataMetodeBayar );
 
-        bayar.hitungTotalBayar();
+        bayar.getDataDiskon( $(elm).attr('data-kodefaktur') );
 
         $('.modal').modal('hide');
     }, // end - saveMetodePembayaran
@@ -754,6 +772,7 @@ var bayar = {
 
         var data = {
             'faktur_kode': $(elm).data('kode'),
+            'diskon': numeral.unformat($('.diskon').val()),
             'jml_tagihan': numeral.unformat($('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($('.total_bayar').val()),
             'kembalian': numeral.unformat($('.kembalian').val()),
@@ -795,7 +814,7 @@ var bayar = {
 
         dataMetodeBayar[id] = null;
 
-        bayar.hitungTotalBayar();
+        bayar.getDataDiskon( $(elm).attr('data-kode') );
     }, // end - hapusMetodePembayaran
 
     savePembayaran: function(elm) {
@@ -805,18 +824,14 @@ var bayar = {
         var jml_bayar = numeral.unformat($(modal).find('.total_bayar').val());
 
         var save = 0;
-        if ( jml_tagihan > 0 && jml_bayar > 0 ) {
-            if ( jml_tagihan > jml_bayar ) {
-                bootbox.confirm('Pembayaran kurang dari tagihan apakah anda tetap ingin melanjutkan pembayaran ?', function(result) {
-                    if ( result ) {
-                        bayar.execSavePembayaran(elm);
-                    }
-                });
-            } else {
-                bayar.execSavePembayaran(elm);
-            }
+        if ( jml_tagihan > jml_bayar ) {
+            bootbox.confirm('Pembayaran kurang dari tagihan apakah anda tetap ingin melanjutkan pembayaran ?', function(result) {
+                if ( result ) {
+                    bayar.execSavePembayaran(elm);
+                }
+            });
         } else {
-            bootbox.alert('Harap cek kembali data pembayaran anda.');
+            bayar.execSavePembayaran(elm);
         }
     }, // end - savePembayaran
 
@@ -833,7 +848,8 @@ var bayar = {
             'jml_bayar': numeral.unformat($(modal).find('.total_bayar').val()),
             'kembalian': numeral.unformat($(modal).find('.kembalian').val()),
             'dataMetodeBayar': dataMetodeBayar,
-            'dataHutangBayar': dataHutangBayar
+            'dataHutangBayar': dataHutangBayar,
+            'dataDiskon': dataDiskonSave
         };
 
         $.ajax({
@@ -950,6 +966,14 @@ var bayar = {
 
                             dataHutangBayar.push( _dataHutangBayar );
                         }
+                    }
+
+                    if ( !empty(data.content.dataDiskon) ) {
+                        for (var i = 0; i < data.content.dataDiskon.length; i++) {
+                            dataDiskon[ i ] = data.content.dataDiskon[i].diskon_kode;
+                        }
+
+                        dataDiskonSave = data.content.dataDiskon;
                     }
                 } else {
                     bootbox.alert(data.message);
@@ -1172,6 +1196,127 @@ var bayar = {
             });
         },'html');
     }, // end - modalMemberSplitBill
+
+    modalDiskon: function (elm) {
+        var kode_faktur = $(elm).attr('data-kode');
+
+        $.get('transaksi/Pembayaran/modalDiskon',{
+            'kode_faktur': kode_faktur
+        },function(data){
+            var _options = {
+                className : 'large',
+                message : data,
+                addClass : 'form',
+                onEscape: true,
+            };
+            bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                $(this).css({'height': '100%'});
+                $(this).find('.modal-header').css({'padding-top': '0px'});
+                $(this).find('.modal-dialog').css({'width': '70%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'height': '100%'});
+                $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+                $(this).find('.modal-content').css({'height': '90%'});
+                $(this).find('.modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body').css({'height': '100%'});
+                $(this).find('.bootbox-body .modal-body .row').css({'height': '100%'});
+
+                $('input').keyup(function(){
+                    $(this).val($(this).val().toUpperCase());
+                });
+
+                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                });
+
+                var modal_dialog = $(this).find('.modal-dialog');
+
+                $('.tbl_diskon').find('tr.data').attr('data-aktif', 0);
+            });
+        },'html');
+    }, // end - modalDiskon
+
+    pilihDiskon: function (elm) {
+        var aktif = $(elm).attr('data-aktif');
+
+        if ( aktif == 1 ) {
+            $(elm).attr('data-aktif', 0);
+        } else {
+            $(elm).attr('data-aktif', 1);
+        }
+    }, // end - pilihDiskon
+
+    applyDiskon: function (elm) {
+        var kodeFaktur = $(elm).attr('data-kode');
+
+        dataDiskon = [];
+        $('.diskon').val( 0 );
+        dataDiskonSave = null;
+
+        var idx = 0;
+        $.map( $('.tbl_diskon').find('tr.data[data-aktif=1]'), function (tr) {
+            dataDiskon[ idx ] = $(tr).attr('data-kode');
+
+            idx++;
+        });
+
+        if ( dataDiskon.length > 0 ) {
+            bayar.getDataDiskon( kodeFaktur );
+        } else {
+            bayar.hitungTotalBayar();
+        }
+
+        $('.modal').modal('hide');
+    }, // end - applyDiskon
+
+    getDataDiskon: function (kodeFaktur) {
+        // var metodeBayar = [];
+        // for (var i = 0; i < dataMetodeBayar.length; i++) {
+        //     metodeBayar[i] = {
+
+        //     }dataMetodeBayar[i].kode_jenis_kartu;
+        //     // if ( !empty(dataMetodeBayar[i].kode_jenis_kartu) ) {
+        //     // }
+        // }
+
+        var params = {
+            'kode_faktur': kodeFaktur,
+            'data_diskon': dataDiskon,
+            'data_metode_bayar': dataMetodeBayar
+        };
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/getDataDiskon',
+            data: {
+                'params': params
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading(); },
+            success: function(data) {
+                hideLoading();
+
+                if ( data.status == 1 ) {
+                    $('.diskon').val( numeral.formatInt( data.content.total_diskon ) );
+
+                    var ppn = $('.ppn').attr('data-real');
+                    var service_charge = $('.service_charge').attr('data-real');
+
+                    var ppn_new = parseFloat(data.content.total_ppn);
+                    var service_charge_new = parseFloat(data.content.total_service_charge);
+
+                    $('.ppn').find('label').text( numeral.formatDec(ppn_new) );
+                    $('.service_charge').find('label').text( numeral.formatDec(service_charge_new) );
+
+                    dataDiskonSave = data.content.data_diskon;
+
+                    bayar.hitungTotalBayar();
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end - getDataDiskon
 };
 
 bayar.startUp();

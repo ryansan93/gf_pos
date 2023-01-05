@@ -15,6 +15,11 @@ class Bayar_model extends Conf {
 		return $this->hasMany('\Model\Storage\BayarHutang_model', 'id_header', 'id');
 	}
 
+	public function bayar_diskon()
+	{
+		return $this->hasMany('\Model\Storage\BayarDiskon_model', 'id_header', 'id');
+	}
+
 	public function jenis_kartu()
 	{
 		return $this->hasOne('\Model\Storage\JenisKartu_model', 'kode_jenis_kartu', 'jenis_kartu_kode');

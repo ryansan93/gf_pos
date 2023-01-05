@@ -46,3 +46,10 @@ $config['nama_aplikasi'] = 'GRAHA FAMILY';
 
 $config['paper_size'] = '58';
 $config['print_jenis_bayar'] = 1;
+
+/*DISKON TIPE*/
+$config['diskon_tipe'] = array(
+	1 => 'Semua Produk (Diskon Nota)',
+	2 => 'Kategori / Produk Tertentu',
+	// 3 => 'Beli dan Dapatkan'
+);

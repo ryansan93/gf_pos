@@ -53,7 +53,7 @@
 							?>
 							<?php if ( $tampil == 1 ) { ?>
 								<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
-									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
+									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kodefaktur="<?php echo $data['kode_faktur']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
 								</div>
 							<?php } ?>
 						<?php endforeach ?>
@@ -184,6 +184,10 @@
 						<div class="col-xs-3"><label class="control-label">Kasir</label></div>
 						<div class="col-xs-9"><label class="control-label">: <?php echo $data_branch['nama_kasir']; ?></label></div>
 					</div>
+					<div class="col-xs-12 no-padding font10">
+						<div class="col-xs-3"><label class="control-label">Tanggal</label></div>
+						<div class="col-xs-9"><label class="control-label">: <?php echo $data_branch['waktu']; ?></label></div>
+					</div>
 					<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
 					<?php foreach ($data['detail'] as $k_det => $v_det): ?>						
 						<div class="col-xs-12 no-padding font10">
@@ -212,31 +216,21 @@
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Belanja. =</label></div>
 	        					<div class="col-xs-3 no-padding text-right tot_belanja"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
 	        				</div>
-	        				<?php if ( $data['ppn'] > 0 ): ?>
-	        					<?php
-	        						$persen_ppn = ($data['ppn'] / $data['total']) * 100;
-	        					?>
-		        				<div class="col-xs-12 no-padding">
-		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PB1 (<?php echo angkaDecimal($persen_ppn); ?> %). =</label></div>
-		        					<div class="col-xs-3 no-padding text-right ppn"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
-		        				</div>
-	        				<?php endif ?>
-	        				<?php if ( $data['service_charge'] > 0 ): ?>
-	        					<?php
-	        						$persen_service_charge = ($data['service_charge'] / $data['total']) * 100;
-	        					?>
-		        				<div class="col-xs-12 no-padding">
-		        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Service Charge (<?php echo angkaDecimal($persen_service_charge); ?> %). =</label></div>
-		        					<div class="col-xs-3 no-padding text-right service_charge"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
-		        				</div>
-	        				<?php endif ?>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Disc. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo '('.angkaDecimal($data['diskon']).')'; ?></label></div>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label nota_diskon" data-val="<?php echo '('.angkaDecimal($data['diskon']).')'; ?>"><?php echo $data['diskon']; ?></label></div>
+	        				</div>
+	        				<div class="col-xs-12 no-padding">
+	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Service Charge. =</label></div>
+	        					<div class="col-xs-3 no-padding text-right service_charge" data-real="<?php echo $data['service_charge']; ?>"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
+	        				</div>
+	        				<div class="col-xs-12 no-padding">
+	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PB1. =</label></div>
+	        					<div class="col-xs-3 no-padding text-right ppn" data-real="<?php echo $data['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Bayar. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label"><?php echo angkaDecimal($data['grand_total']); ?></label></div>
+	        					<div class="col-xs-3 no-padding text-right"><label class="control-label nota_total_bayar" data-val="<?php echo $data['grand_total']; ?>"><?php echo angkaDecimal($data['grand_total']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
 	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Jumlah Bayar. =</label></div>
@@ -250,7 +244,7 @@
 					<?php // } ?>
 					<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
 					<div class="col-xs-12 text-center no-padding font10"><label class="control-label">*** TERIMA KASIH ***</label></div>
-					<div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo $data_branch['waktu']; ?></label></div>
+					<!-- <div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo $data_branch['waktu']; ?></label></div> -->
 				</div>
 			</div>
 			<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
@@ -259,7 +253,7 @@
 					<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $data['kode_faktur']; ?>" onclick="bayar.saveHutang(this)"><i class="fa fa-save"></i> Hutang</button>
 				</div>
 				<div class="col-xs-6 no-padding cb_right">
-					<button type="button" class="col-xs-12 btn btn-primary">Diskon Bayar</button>
+					<button type="button" class="col-xs-12 btn btn-primary" onclick="bayar.modalDiskon(this)" data-kode="<?php echo $data['kode_faktur']; ?>">Diskon</button>
 				</div>
 			</div>
 			<div class="col-xs-12 no-padding">

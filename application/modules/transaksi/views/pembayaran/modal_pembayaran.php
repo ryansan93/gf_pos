@@ -29,7 +29,7 @@
 									</td>
 									<td class="text-right"><?php echo angkaRibuan($value['jumlah']); ?></td>
 									<td class="text-right">
-										<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.hapusMetodePembayaran(this)" data-id="<?php echo $key; ?>"><i class="fa fa-times"></i></button>
+										<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.hapusMetodePembayaran(this)" data-id="<?php echo $key; ?>" data-kode="<?php echo $data['faktur_kode']; ?>"><i class="fa fa-times"></i></button>
 									</td>
 								</tr>
 
@@ -50,7 +50,7 @@
 			<div class="col-md-6 no-padding cb_left">
 				<div class="col-md-12 no-padding"><label class="control-label">DISKON</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="0" readonly>
+					<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="<?php echo angkaRibuan($data['diskon']); ?>" readonly>
 				</div>
 			</div>
 			<div class="col-md-6 no-padding cb_right">

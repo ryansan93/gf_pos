@@ -22,7 +22,7 @@
 				        <span> @ <span class="hrg"><?php echo angkaRibuan($v_det['harga']); ?></span></span>
 				        </div>
 				        <div class="col-md-2 text-right no-padding"><span class="jumlah"><?php echo angkaRibuan($v_det['jumlah']); ?></span></div>
-				        <div class="col-md-3 text-right no-padding"><span class="total"><?php echo angkaRibuan($v_det['total']); ?></span></div>
+				        <div class="col-md-3 text-right no-padding"><span class="total" data-ppn="<?php echo $v_det['ppn']; ?>" data-sc="<?php echo $v_det['service_charge']; ?>"><?php echo angkaRibuan($v_det['total']); ?></span></div>
 			        </div>
 			        <div class="col-md-1 text-center no-padding">
 				        <span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)" data-proses="<?php echo $v_det['proses']; ?>">

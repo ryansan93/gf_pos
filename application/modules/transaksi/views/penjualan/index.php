@@ -75,20 +75,20 @@
 				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="subtotal">0,00</span></label>
 				<label class="control-label col-md-4 no-padding" style="height: 10%; margin-bottom: 0.5%;">Diskon</label>
 				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="diskon">0,00</span></label>
-				<label class="control-label col-md-4 no-padding" style="height: 10%; margin-bottom: 0.5%;">PB1 (<span class="persen_ppn"><?php echo angkaDecimal($persen_ppn); ?></span>%)</label>
-				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="ppn">0,00</span></label>
-				<label class="control-label col-md-5 no-padding" style="height: 10%; margin-bottom: 0.5%;">Service Charge (<span class="persen_service_charge"><?php echo angkaDecimal($service_charge); ?></span>%)</label>
+				<label class="control-label col-md-5 no-padding persen_service_charge" data-val="<?php echo $service_charge; ?>" style="height: 10%; margin-bottom: 0.5%;">Service Charge</label>
 				<label class="control-label col-md-7 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="service_charge">0,00</span></label>
+				<label class="control-label col-md-4 no-padding persen_ppn" data-val="<?php echo $persen_ppn; ?>" style="height: 10%; margin-bottom: 0.5%;">PB1</label>
+				<label class="control-label col-md-8 no-padding text-right" style="height: 10%; margin-bottom: 0.5%;">Rp. <span class="ppn">0,00</span></label>
 				<label class="control-label col-md-12 no-padding text-right" style="height: 2.5%; margin-bottom: 0.5%;"><hr style="margin: 0% 0%;"></label>
 				<label class="control-label col-md-4 no-padding" style="height: 12.5%; margin-bottom: 0.5%;">TOTAL</label>
 				<label class="control-label col-md-8 no-padding text-right" style="height: 12.5%; margin-bottom: 0.5%;">Rp. <span class="grandtotal">0,00</span></label>
 				<label class="control-label col-md-12 no-padding text-right" style="height: 2.5%; margin-bottom: 0.5%;"><hr style="margin: 0% 0%;"></label>
-				<div class="col-md-12 no-padding" style="padding-bottom: 2%; height: 20%;">
+				<!-- <div class="col-md-12 no-padding" style="padding-bottom: 2%; height: 20%;">
 					<div class="col-md-12 text-center cursor-p button" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="jual.modalDiskon()">
 						<span><b>DISKON</b></span>
 					</div>
-				</div>
-				<div class="col-md-12 no-padding" style="padding-bottom: 1%; height: 20%;">
+				</div> -->
+				<div class="col-md-12 no-padding" style="padding-bottom: 1%; height: 40%;">
 					<div class="col-md-12 no-padding simpan_pesanan" style="height: 100%;">
 						<?php 
 							$hide_div_submit = 'hide';

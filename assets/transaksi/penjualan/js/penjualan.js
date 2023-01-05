@@ -731,6 +731,10 @@ var jual = {
         var kode = $(elm).data('kode');
         var txt_nama = $(elm).find('div.nama_menu').text();
         var txt_harga = $(elm).find('div.harga_menu').text();
+        var status_ppn = $(elm).attr('data-ppn');
+        var status_service_charge = $(elm).attr('data-sc');
+        var persen_ppn = $('.persen_ppn').attr('data-val');
+        var persen_service_charge = $('.persen_service_charge').attr('data-val');
         var harga = numeral.unformat(txt_harga);
 
         if ( jenis == 'edit' ) {
@@ -748,14 +752,20 @@ var jual = {
             var jumlah = parseInt(_jumlah) + 1;
             var jumlah_detail = parseInt(_jumlah_detail) + 1;
             var _total = _harga * jumlah;
+            var _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (_total * (persen_service_charge / 100)) : 0;
+            var _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
             if ( jenis == 'edit' ) {
                 jumlah = jml_menu;
                 jumlah_detail = jml_menu;
                 _total = _harga * jumlah;
+                _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (_total * (persen_service_charge / 100)) : 0;
+                _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
             }
 
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').text(numeral.formatInt(jumlah_detail));
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').text(numeral.formatInt(_total));
+            $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-ppn', _total_ppn);
+            $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-sc', _total_service_charge);
 
             var _div = $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"]');
 
@@ -796,14 +806,16 @@ var jual = {
         } else {
             var _menu = '';
             _menu += '<div class="col-md-12 cursor-p no-padding menu" style="margin-bottom: 10px;" data-kode="'+kode+'" data-detail="'+detail+'">';
-            _menu += '<div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="'+kode+'">';
+            _menu += '<div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="'+kode+'" data-ppn="'+status_ppn+'" data-sc="'+status_service_charge+'">';
             _menu += '<div class="col-md-6 no-padding">';
             _menu += '<span class="nama_menu">'+txt_nama.toUpperCase()+'</span>';
             _menu += '<span> @ <span class="hrg">'+numeral.formatInt(harga)+'</span></span>';
             _menu += '</div>';
             _menu += '<div class="col-md-2 text-right no-padding"><span class="jumlah">'+jml_menu+'</span></div>';
             var total = jml_menu * harga;
-            _menu += '<div class="col-md-3 text-right no-padding"><span class="total">'+numeral.formatInt(total)+'</span></div>';
+            var total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (total * (persen_service_charge / 100)) : 0;
+            var total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((total + total_service_charge) * (persen_ppn / 100)) : 0;
+            _menu += '<div class="col-md-3 text-right no-padding"><span class="total" data-ppn="'+total_ppn+'" data-sc="'+total_service_charge+'">'+numeral.formatInt(total)+'</span></div>';
             _menu += '</div>';
             _menu += '<div class="col-md-1 text-center no-padding">';
             _menu += '<span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)">';
@@ -1103,21 +1115,21 @@ var jual = {
         var div = $('.list_pesanan');
 
         var sub_total = 0;
+        var sub_total_ppn = 0;
+        var sub_total_service_charge = 0;
         $.map( $(div).find('.menu'), function(div_menu) {
             var total = numeral.unformat($(div_menu).find('.total').text());
+            var ppn = $(div_menu).find('.total').attr('data-ppn');
+            var service_charge = $(div_menu).find('.total').attr('data-sc');
 
             sub_total += total;
+            sub_total_ppn += parseFloat(ppn);
+            sub_total_service_charge += parseFloat(service_charge);
         });
 
-        var persen_ppn = numeral.unformat($('.persen_ppn').text());
-        var total_ppn = (persen_ppn > 0) ? sub_total * (persen_ppn/100) : 0;
-        
-        var persen_service_charge = numeral.unformat($('.persen_service_charge').text());
-        var total_service_charge = (persen_service_charge > 0) ? sub_total * (persen_service_charge/100) : 0;
-
         $('.subtotal').text(numeral.formatDec(sub_total));
-        $('.ppn').text(numeral.formatDec(total_ppn));
-        $('.service_charge').text(numeral.formatDec(total_service_charge));
+        $('.ppn').text(numeral.formatDec(sub_total_ppn));
+        $('.service_charge').text(numeral.formatDec(sub_total_service_charge));
 
         jual.hitDiskon();
     }, // end - hitSubTotal
@@ -1251,6 +1263,8 @@ var jual = {
                 var harga = numeral.unformat($(div_menu_utama).find('.hrg').text());
                 var jumlah = numeral.unformat($(div_menu_utama).find('.jumlah').text());
                 var total = numeral.unformat($(div_menu_utama).find('.total').text());
+                var ppn = $(div_menu_utama).find('.total').attr('data-ppn');
+                var service_charge = $(div_menu_utama).find('.total').attr('data-sc');
                 var request = $(div_menu).find('span.request').text();
                 var proses = $(div_menu_utama).attr('data-proses');
 
@@ -1261,6 +1275,8 @@ var jual = {
                     'jumlah': jumlah,
                     'total': total,
                     'request': request,
+                    'service_charge': service_charge,
+                    'ppn': ppn,
                     'proses': proses,
                     'detail_menu': detail_menu
                 };
@@ -1761,89 +1777,89 @@ var jual = {
         });
     }, // end - printNota
 
-    modalListBayar: function () {
-        $('.modal').modal('hide');
+    // modalListBayar: function () {
+    //     $('.modal').modal('hide');
 
-        $.ajax({
-            url: 'transaksi/Penjualan/modalListBayar',
-            data: {},
-            type: 'POST',
-            dataType: 'JSON',
-            beforeSend: function() { showLoading(); },
-            success: function(data) {
-                hideLoading();
-                if ( data.status == 1 ) {
-                    var _options = {
-                        className : 'large',
-                        message : data.html,
-                        addClass : 'form',
-                        onEscape: true,
-                    };
-                    bootbox.dialog(_options).bind('shown.bs.modal', function(){
-                        $(this).find('.modal-header').css({'padding-top': '0px'});
-                        $(this).find('.modal-dialog').css({'width': '75%', 'max-width': '100%'});
+    //     $.ajax({
+    //         url: 'transaksi/Penjualan/modalListBayar',
+    //         data: {},
+    //         type: 'POST',
+    //         dataType: 'JSON',
+    //         beforeSend: function() { showLoading(); },
+    //         success: function(data) {
+    //             hideLoading();
+    //             if ( data.status == 1 ) {
+    //                 var _options = {
+    //                     className : 'large',
+    //                     message : data.html,
+    //                     addClass : 'form',
+    //                     onEscape: true,
+    //                 };
+    //                 bootbox.dialog(_options).bind('shown.bs.modal', function(){
+    //                     $(this).find('.modal-header').css({'padding-top': '0px'});
+    //                     $(this).find('.modal-dialog').css({'width': '75%', 'max-width': '100%'});
 
-                        $('input').keyup(function(){
-                            $(this).val($(this).val().toUpperCase());
-                        });
+    //                     $('input').keyup(function(){
+    //                         $(this).val($(this).val().toUpperCase());
+    //                     });
 
-                        $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                            $(this).priceFormat(Config[$(this).data('tipe')]);
-                        });
+    //                     $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+    //                         $(this).priceFormat(Config[$(this).data('tipe')]);
+    //                     });
 
-                        var modal_body = $(this).find('.modal-body');
-                        $.map( $(modal_body).find('li.nav-item'), function(li) {
-                            $(li).click(function() {
-                                var id = $(li).find('a').attr('href');
+    //                     var modal_body = $(this).find('.modal-body');
+    //                     $.map( $(modal_body).find('li.nav-item'), function(li) {
+    //                         $(li).click(function() {
+    //                             var id = $(li).find('a').attr('href');
 
-                                $(modal_body).find('.tab-pane').removeClass('show');
-                                $(modal_body).find('.tab-pane').removeClass('active');
+    //                             $(modal_body).find('.tab-pane').removeClass('show');
+    //                             $(modal_body).find('.tab-pane').removeClass('active');
 
-                                $(modal_body).find(id).addClass('show');
-                                $(modal_body).find(id).addClass('active');
-                            });
-                        });
+    //                             $(modal_body).find(id).addClass('show');
+    //                             $(modal_body).find(id).addClass('active');
+    //                         });
+    //                     });
 
-                        $(this).find('tr.belum_bayar td:not(.btn-delete)').click(function() {
-                            var tr = $(this).closest('tr.belum_bayar');
-                            kodeFaktur = $(tr).find('td.kode_faktur').html();
-                            gTotal = numeral.unformat($(tr).find('td.total').html());
-                            gKurangBayar = gTotal;
+    //                     $(this).find('tr.belum_bayar button:not(.btn-danger)').click(function() {
+    //                         var tr = $(this).closest('tr.belum_bayar');
+    //                         kodeFaktur = $(tr).find('td.kode_faktur').html();
+    //                         gTotal = numeral.unformat($(tr).find('td.total').html());
+    //                         gKurangBayar = gTotal;
 
-                            jual.modalPembayaran();
-                        });
+    //                         jual.modalPembayaran();
+    //                     });
 
-                        $(this).find('tr.belum_bayar .btn').click(function() {
-                            var tr = $(this).closest('tr.belum_bayar');
-                            var kode_faktur = $(tr).find('td.kode_faktur').html();
+    //                     $(this).find('tr.belum_bayar .btn-danger').click(function() {
+    //                         var tr = $(this).closest('tr.belum_bayar');
+    //                         var kode_pesanan = $(tr).find('td.kode_pesanan').html();
 
-                            // jual.deletePenjualan( kode_faktur ); 
-                            jual.verifikasiPinOtorisasi( kode_faktur ); 
-                        });
+    //                         // jual.deletePenjualan( kode_faktur ); 
+    //                         jual.verifikasiPinOtorisasi( kode_pesanan, null, null ); 
+    //                     });
 
-                        $(this).find('tr.bayar td:not(.btn-delete)').click(function() {
-                            var tr = $(this).closest('tr.bayar');
-                            var kode_faktur = $(tr).find('td.kode_faktur').html();
-                            jual.modalDetailFaktur( kode_faktur );
-                        });
+    //                     $(this).find('tr.bayar button:not(.btn-danger)').click(function() {
+    //                         var tr = $(this).closest('tr.bayar');
+    //                         var kode_faktur = $(tr).find('td.kode_faktur').html();
+    //                         jual.modalDetailFaktur( kode_faktur );
+    //                     });
 
-                        $(this).find('tr.bayar .btn').click(function() {
-                            var tr = $(this).closest('tr.bayar');
-                            var kode_faktur = $(tr).find('td.kode_faktur').html();
-                            // jual.deletePenjualan( kode_faktur ); 
-                            jual.verifikasiPinOtorisasi( kode_faktur ); 
-                        });
+    //                     $(this).find('tr.bayar .btn-danger').click(function() {
+    //                         var tr = $(this).closest('tr.bayar');
+    //                         var kode_faktur = $(tr).find('td.kode_faktur').html();
+    //                         // jual.deletePenjualan( kode_faktur ); 
+    //                         jual.verifikasiPinOtorisasi( null, kode_faktur, null ); 
+    //                     });
 
-                        $(this).find('.btn_print_closing_shift').click(function() {
-                            jual.printClosingShift(); 
-                        });
-                    });
-                } else {
-                    bootbox.alert(data.message);
-                }
-            }
-        });
-    }, // end - modalListBayar
+    //                     $(this).find('.btn_print_closing_shift').click(function() {
+    //                         jual.printClosingShift(); 
+    //                     });
+    //                 });
+    //             } else {
+    //                 bootbox.alert(data.message);
+    //             }
+    //         }
+    //     });
+    // }, // end - modalListBayar
 
     modalDetailFaktur: function (kode_faktur) {
         $('.modal').modal('hide');
@@ -1910,7 +1926,7 @@ var jual = {
         });
     }, // end - modalDetailFaktur
 
-    verifikasiPinOtorisasi: function(kode_faktur, id_pembayaran = null) {
+    verifikasiPinOtorisasi: function(kode_pesanan = null, kode_faktur = null, id_pembayaran = null) {
         bootbox.dialog({
             message: '<p>Masukkan PIN Otorisasi untuk menghapus data.</p><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
             buttons: {
@@ -1937,7 +1953,11 @@ var jual = {
                                 // hideLoading();
                                 if ( data.status == 1 ) {
                                     if ( empty(id_pembayaran) ) {
-                                        jual.deletePenjualan(kode_faktur);
+                                        if ( !empty(kode_pesanan) ) {
+                                            jual.deletePesanan(kode_pesanan);
+                                        } else if ( !empty(kode_faktur) ) {
+                                            jual.deletePenjualan(kode_faktur);
+                                        }
                                     } else {
                                         jual.deletePembayaran(kode_faktur, id_pembayaran);
                                     }
@@ -1953,6 +1973,36 @@ var jual = {
             }
         });
     }, // end - verifikasiPinOtorisasi
+
+    deletePesanan: function(kode_pesanan) {
+        // bootbox.confirm('Apakah anda yakin ingin meng-hapus data penjualan <b>'+kode_faktur+'</b> ?', function(result) {
+        //     if ( result ) {
+        $.ajax({
+            url: 'transaksi/Penjualan/deletePesanan',
+            data: {
+                'params': kode_pesanan
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { 
+                // showLoading();
+            },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    bootbox.alert(data.message, function() {
+                        $('.modal').modal('hide');
+
+                        bayar.modalListBayar();
+                    });
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+        //     }
+        // });
+    }, // end - deletePenjualan
 
     deletePenjualan: function(kode_faktur) {
         // bootbox.confirm('Apakah anda yakin ingin meng-hapus data penjualan <b>'+kode_faktur+'</b> ?', function(result) {
@@ -1973,7 +2023,7 @@ var jual = {
                     bootbox.alert(data.message, function() {
                         $('.modal').modal('hide');
 
-                        jual.modalListBayar();
+                        bayar.modalListBayar();
                     });
                 } else {
                     bootbox.alert(data.message);

@@ -4,7 +4,7 @@
 </div>
 <div class="modal-body body no-padding">
 	<?php if ( !empty($data['kode_jenis_kartu']) ): ?>
-		<?php if ( $data['kode_jenis_kartu'] == 'saldo_member' ): ?>
+		<?php if ( stristr($data['nama'], 'saldo member') !== false ): ?>
 			<div class="col-xs-12 no-padding saldo_member" style="padding-top: 10px;">
 				<div class="col-xs-6 no-padding cb_left">
 					<div class="col-xs-12 no-padding"><label class="label-control">SALDO MEMBER</label></div>
@@ -45,7 +45,7 @@
 		</div>
 	</div>
 	<?php if ( !empty($data['kode_jenis_kartu']) ): ?>
-		<?php if ( $data['kode_jenis_kartu'] != 'saldo_member' ): ?>
+		<?php if ( stristr($data['nama'], 'tunai') === false && stristr($data['nama'], 'saldo member') === false ): ?>
 			<div class="col-xs-12 no-padding" style="padding-top: 10px;">
 				<div class="col-xs-6 no-padding cb_left">
 					<div class="col-xs-12 no-padding"><label class="label-control">NO. KARTU</label></div>
@@ -68,7 +68,7 @@
 			<button type="button" class="col-xs-12 btn btn-danger" class="close" data-dismiss="modal"><i class="fa fa-times"></i> BATAL</button>
 		</div>
 		<div class="col-xs-6 no-padding cb_right">
-			<button type="button" class="col-xs-12 btn btn-primary" data-nama="<?php echo $data['nama']; ?>" data-kode="<?php echo $data['kode_jenis_kartu']; ?>" onclick="bayar.saveMetodePembayaran(this)"><i class="fa fa-save"></i> SIMPAN</button>
+			<button type="button" class="col-xs-12 btn btn-primary" data-nama="<?php echo $data['nama']; ?>" data-kode="<?php echo $data['kode_jenis_kartu']; ?>" data-kodefaktur="<?php echo $kode_faktur; ?>" onclick="bayar.saveMetodePembayaran(this)"><i class="fa fa-save"></i> APPLY</button>
 		</div>
 	</div>
 </div>

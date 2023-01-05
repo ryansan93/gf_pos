@@ -116,3 +116,8 @@ hr.dashed {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+.tbl_diskon tr.data[data-aktif="1"] td {
+	background-color: #ff8f26;
+	border: 1px solid #ff8f26;
+}

@@ -343,24 +343,43 @@ class Penjualan extends Public_Controller
 
         $m_menu = new \Model\Storage\Menu_model();
         $sql = "
-            select menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga as harga_jual, menu.jenis_menu_id, count(pm.kode_paket_menu) as jml_paket from menu menu
+            select 
+                m.id, 
+                m.kode_menu, 
+                m.nama, 
+                m.deskripsi, 
+                m.ppn, 
+                m.service_charge, 
+                hm.harga as harga_jual, 
+                m.jenis_menu_id, 
+                count(pm.kode_paket_menu) as jml_paket 
+            from menu m
                 left join
                     (
                     select * from harga_menu where id in (
                         select max(id) as id from harga_menu group by jenis_pesanan_kode, menu_kode
                     )) hm 
                     on
-                        menu.kode_menu = hm.menu_kode 
+                        m.kode_menu = hm.menu_kode 
                 left join
                     paket_menu pm
                     on
-                        menu.kode_menu = pm.menu_kode
+                        m.kode_menu = pm.menu_kode
                 where
-                    menu.jenis_menu_id = ".$id_jenis." and
+                    m.jenis_menu_id = ".$id_jenis." and
                     hm.jenis_pesanan_kode = '".$jenis_pesanan."' and
-                    menu.branch_kode = '".trim($branch_kode)."'
-            group by menu.id, menu.kode_menu, menu.nama, menu.deskripsi, hm.harga, menu.jenis_menu_id, hm.jenis_pesanan_kode
-            order by menu.nama asc
+                    m.branch_kode = '".trim($branch_kode)."'
+            group by 
+                m.id, 
+                m.kode_menu, 
+                m.nama, 
+                m.deskripsi, 
+                m.ppn, 
+                m.service_charge, 
+                hm.harga, 
+                m.jenis_menu_id, 
+                hm.jenis_pesanan_kode
+            order by m.nama asc
         ";
         $d_menu = $m_menu->hydrateRaw($sql);
 
@@ -486,6 +505,8 @@ class Penjualan extends Public_Controller
                     $m_pesanani->harga = $v_lm['harga'];
                     $m_pesanani->total = $v_lm['total'];
                     $m_pesanani->request = $v_lm['request'];
+                    $m_pesanani->ppn = $v_lm['ppn'];
+                    $m_pesanani->service_charge = $v_lm['service_charge'];
                     $m_pesanani->save();
 
                     if ( !empty($v_lm['detail_menu']) ) {
@@ -521,6 +542,51 @@ class Penjualan extends Public_Controller
         display_json( $this->result );
     }
 
+    public function deletePesanan()
+    {
+        $params = $this->input->post('params');
+
+        $result = $this->execDeletePesanan( $params );
+
+        display_json( $result );
+    }
+
+    public function execDeletePesanan($params)
+    {
+        try {
+            $m_jual = new \Model\Storage\Jual_model();
+            $m_jual->where('pesanan_kode', $params)->update(
+                array(
+                    'mstatus' => 0
+                )
+            );
+
+            $d_jual = $m_jual->where('pesanan_kode', $params)->first();
+            
+            $deskripsi_log = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/update', $d_jual, $deskripsi_log );
+
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $m_pesanan->where('kode_pesanan', $params)->update(
+                array(
+                    'mstatus' => 0
+                )
+            );
+
+            $d_pesanan = $m_pesanan->where('kode_pesanan', $params)->first();
+            
+            $deskripsi = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/update', $d_pesanan, $deskripsi );
+
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Data berhasil di hapus.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        return $this->result;
+    }
+
     public function savePenjualan()
     {
         $params = $this->input->post('params');
@@ -550,8 +616,8 @@ class Penjualan extends Public_Controller
             $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
             $m_jual->total = $d_pesanan['total'];
             $m_jual->diskon = $d_pesanan['diskon'];
-            $m_jual->ppn = $d_pesanan['ppn'];
             $m_jual->service_charge = $d_pesanan['service_charge'];
+            $m_jual->ppn = $d_pesanan['ppn'];
             $m_jual->grand_total = $d_pesanan['grand_total'];
             $m_jual->lunas = 0;
             $m_jual->mstatus = 1;
@@ -574,6 +640,8 @@ class Penjualan extends Public_Controller
                 $m_juali->total = $v_pi['total'];
                 $m_juali->request = $v_pi['request'];
                 $m_juali->pesanan_item_kode = $v_pi['kode_pesanan_item'];
+                $m_juali->ppn = $v_pi['ppn'];
+                $m_juali->service_charge = $v_pi['service_charge'];
                 $m_juali->save();
 
                 foreach ($v_pi['pesanan_item_detail'] as $k_pid => $v_pid) {
@@ -1966,6 +2034,8 @@ class Penjualan extends Public_Controller
                         'jumlah' => $v_ji['jumlah'],
                         'harga' => $v_ji['harga'],
                         'total' => $v_ji['total'],
+                        'service_charge' => $v_ji['service_charge'],
+                        'ppn' => $v_ji['ppn'],
                         'request' => $v_ji['request'],
                         'pesanan_item_detail' => $v_ji['pesanan_item_detail'],
                         'proses' => $v_ji['proses']
@@ -1989,6 +2059,7 @@ class Penjualan extends Public_Controller
                     'nama_user' => $d_pesanan['nama_user'],
                     'total' => $d_pesanan['total'],
                     'diskon' => $d_pesanan['diskon'],
+                    'service_charge' => $d_pesanan['service_charge'],
                     'ppn' => $d_pesanan['ppn'],
                     'grand_total' => $d_pesanan['grand_total'],
                     'status' => $d_pesanan['status'],
@@ -2043,8 +2114,8 @@ class Penjualan extends Public_Controller
                     'nama_user' => $this->userdata['detail_user']['nama_detuser'],
                     'total' => $params['sub_total'],
                     'diskon' => $params['diskon'],
-                    'ppn' => $params['ppn'],
                     'service_charge' => $params['service_charge'],
+                    'ppn' => $params['ppn'],
                     'grand_total' => $params['grand_total'],
                     'meja_id' => $params['meja_id'],
                     'mstatus' => 1,
@@ -2072,6 +2143,8 @@ class Penjualan extends Public_Controller
                     $m_pesanani->jumlah = $v_lm['jumlah'];
                     $m_pesanani->harga = $v_lm['harga'];
                     $m_pesanani->total = $v_lm['total'];
+                    $m_pesanani->service_charge = $v_lm['service_charge'];
+                    $m_pesanani->ppn = $v_lm['ppn'];
                     $m_pesanani->request = $v_lm['request'];
                     $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
                     $m_pesanani->save();

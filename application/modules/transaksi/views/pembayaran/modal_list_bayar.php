@@ -55,7 +55,7 @@
 												<tr class="search belum_bayar">
 													<td><?php echo $value['kasir']; ?></td>
 													<td><?php echo $value['lantai'].' - '.$value['meja']; ?></td>
-													<td><?php echo $value['kode_pesanan']; ?></td>
+													<td class="kode_pesanan"><?php echo $value['kode_pesanan']; ?></td>
 													<td><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
 													<?php if ( $akses_kasir['a_submit'] == 1 ): ?>
@@ -70,7 +70,7 @@
 													<?php endif ?>
 													<?php if ( $akses_waitress['a_delete'] == 1 ): ?>
 														<td class="col-lg-1 text-center">
-															<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.delete(this)"><i class="fa fa-trash"></i></button>
+															<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.verifikasiPinOtorisasi('<?php echo $value['kode_pesanan']; ?>', null, null)"><i class="fa fa-trash"></i></button>
 														</td>
 													<?php endif ?>
 												</tr>
