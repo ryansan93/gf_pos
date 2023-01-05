@@ -1185,9 +1185,6 @@ class Pembayaran extends Public_Controller
 
         $content['akses'] = $this->hakAkses;
         $content['data'] = $this->getDataPenjualan($kode_faktur);
-
-        cetak_r( $content['data'] );
-
         $content['data_bayar'] = $this->getDataPembayaran($kode_faktur);
         $content['data_hutang'] = $this->getDataHutangEdit($kode_faktur);
         $content['jenis_kartu'] = $this->getJenisKartu();
