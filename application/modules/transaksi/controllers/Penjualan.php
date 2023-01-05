@@ -546,7 +546,7 @@ class Penjualan extends Public_Controller
     {
         $params = $this->input->post('params');
 
-        $result = $this->execDeletePesanan( $params );
+        $result = $this->execDeletePesanan  ( $params );
 
         display_json( $result );
     }

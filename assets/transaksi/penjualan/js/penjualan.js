@@ -1953,9 +1953,11 @@ var jual = {
                                 // hideLoading();
                                 if ( data.status == 1 ) {
                                     if ( empty(id_pembayaran) ) {
-                                        if ( !empty(kode_pesanan) ) {
+                                        if ( !empty(kode_pesanan) && empty(kode_faktur) ) {
                                             jual.deletePesanan(kode_pesanan);
-                                        } else if ( !empty(kode_faktur) ) {
+                                        } 
+
+                                        if ( empty(kode_pesanan) && !empty(kode_faktur) ) {
                                             jual.deletePenjualan(kode_faktur);
                                         }
                                     } else {
@@ -1977,6 +1979,7 @@ var jual = {
     deletePesanan: function(kode_pesanan) {
         // bootbox.confirm('Apakah anda yakin ingin meng-hapus data penjualan <b>'+kode_faktur+'</b> ?', function(result) {
         //     if ( result ) {
+
         $.ajax({
             url: 'transaksi/Penjualan/deletePesanan',
             data: {
