@@ -713,6 +713,8 @@ var bayar = {
         var params = {
             'nama': $(elm).text(),
             'kode_jenis_kartu': $(elm).data('kode'),
+            'kategori_jenis_kartu_id': $(elm).data('kategori'),
+            'total_bayar': numeral.unformat($('input.total_bayar').val()),
             'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val()),
             'member_kode': $('.kode_member').attr('data-val'),
             'faktur_kode': $('.kode_faktur').attr('data-val'),
@@ -755,17 +757,37 @@ var bayar = {
         var _dataMetodeBayar = {
             'nama': $(elm).data('nama'),
             'kode_jenis_kartu': $(elm).data('kode'),
+            'kategori_jenis_kartu': $(elm).data('kategori'),
             'no_kartu': $(modal).find('.no_kartu').val(),
             'nama_kartu': $(modal).find('.nama_kartu').val(),
             'jumlah': numeral.unformat($(modal).find('.jml_bayar').val()),
         };
 
         dataMetodeBayar.push( _dataMetodeBayar );
-
+        
+        bayar.hitKategoriPembayaran();
         bayar.getDataDiskon( $(elm).attr('data-kodefaktur') );
 
         $('.modal').modal('hide');
     }, // end - saveMetodePembayaran
+
+    hitKategoriPembayaran: function() {
+        $('.kategori_jenis_kartu').attr('data-val', 0);
+        $('.kategori_jenis_kartu').text( numeral.formatDec(0) );
+
+        if ( !empty(dataMetodeBayar) ) {
+            for (var i = 0; i < dataMetodeBayar.length; i++) {
+                if ( !empty(dataMetodeBayar[i]) ) {
+                    var id = dataMetodeBayar[i].kategori_jenis_kartu;
+                    var val = $('.kategori_jenis_kartu'+id).attr('data-val');
+                    var total = dataMetodeBayar[i].jumlah;
+
+                    $('.kategori_jenis_kartu'+id).attr('data-val', total);
+                    $('.kategori_jenis_kartu'+id).text( numeral.formatDec(total) );
+                }
+            }
+        }
+    }, // end - hitKategoriPembayaran
 
     modalPembayaran: function(elm) {
         $('.modal').modal('hide');
@@ -814,6 +836,7 @@ var bayar = {
 
         dataMetodeBayar[id] = null;
 
+        bayar.hitKategoriPembayaran();
         bayar.getDataDiskon( $(elm).attr('data-kode') );
     }, // end - hapusMetodePembayaran
 

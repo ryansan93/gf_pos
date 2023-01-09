@@ -30,7 +30,7 @@
 					}
 				}
 
-				if ( $bayar == 1 ) {
+				if ( $value['bayar'] == 1 ) {
 					$click = 'onclick="bayar.pembayaranFormEdit(this);"';
 				}
 			?>
@@ -45,7 +45,7 @@
 	</div>
 	<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 	<div class="col-xs-12 no-padding">
-		<?php if ( $bayar == 0 ): ?>
+		<?php if ( $bayar_utama == 0 ): ?>
 			<div class="col-xs-4 no-padding cb_left">
 				<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.modalListBayar()"><i class="fa fa-times"></i> BATAL</button>
 			</div>

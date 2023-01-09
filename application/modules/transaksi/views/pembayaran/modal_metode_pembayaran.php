@@ -68,7 +68,7 @@
 			<button type="button" class="col-xs-12 btn btn-danger" class="close" data-dismiss="modal"><i class="fa fa-times"></i> BATAL</button>
 		</div>
 		<div class="col-xs-6 no-padding cb_right">
-			<button type="button" class="col-xs-12 btn btn-primary" data-nama="<?php echo $data['nama']; ?>" data-kode="<?php echo $data['kode_jenis_kartu']; ?>" data-kodefaktur="<?php echo $kode_faktur; ?>" onclick="bayar.saveMetodePembayaran(this)"><i class="fa fa-save"></i> APPLY</button>
+			<button type="button" class="col-xs-12 btn btn-primary" data-nama="<?php echo $data['nama']; ?>" data-kode="<?php echo $data['kode_jenis_kartu']; ?>" data-kategori="<?php echo $data['kategori_jenis_kartu_id']; ?>" data-kodefaktur="<?php echo $kode_faktur; ?>" onclick="bayar.saveMetodePembayaran(this)"><i class="fa fa-save"></i> APPLY</button>
 		</div>
 	</div>
 </div>

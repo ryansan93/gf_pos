@@ -53,7 +53,7 @@
 							?>
 							<?php if ( $tampil == 1 ) { ?>
 								<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
-									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kodefaktur="<?php echo $data['kode_faktur']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
+									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kategori="<?php echo $value['kategori_jenis_kartu_id']; ?>" data-kodefaktur="<?php echo $data['kode_faktur']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
 								</div>
 							<?php } ?>
 						<?php endforeach ?>
@@ -213,33 +213,43 @@
 						<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
 						<div class="col-xs-12 font10">
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Belanja. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right tot_belanja"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Total Belanja. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right tot_belanja"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Disc. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label nota_diskon" data-val="<?php echo '('.angkaDecimal($data['diskon']).')'; ?>"><?php echo $data['diskon']; ?></label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Disc. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right"><label class="control-label nota_diskon" data-val="<?php echo '('.angkaDecimal($data['diskon']).')'; ?>"><?php echo $data['diskon']; ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Service Charge. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right service_charge" data-real="<?php echo $data['service_charge']; ?>"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Service Charge. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right service_charge" data-real="<?php echo $data['service_charge']; ?>"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">PB1. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right ppn" data-real="<?php echo $data['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">PB1. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right ppn" data-real="<?php echo $data['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Total Bayar. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label nota_total_bayar" data-val="<?php echo $data['grand_total']; ?>"><?php echo angkaDecimal($data['grand_total']); ?></label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Total Bayar. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right"><label class="control-label nota_total_bayar" data-val="<?php echo $data['grand_total']; ?>"><?php echo angkaDecimal($data['grand_total']); ?></label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Jumlah Bayar. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label jml_bayar" data-val="0">0</label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Jumlah Bayar. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right"><label class="control-label jml_bayar" data-val="0">0</label></div>
 	        				</div>
 	        				<div class="col-xs-12 no-padding">
-	        					<div class="col-xs-9 text-right no-padding"><label class="control-label">Kembalian. =</label></div>
-	        					<div class="col-xs-3 no-padding text-right"><label class="control-label kembalian" data-val="0">0</label></div>
+	        					<div class="col-xs-8 text-right no-padding"><label class="control-label">Kembalian. =</label></div>
+	        					<div class="col-xs-4 no-padding text-right"><label class="control-label kembalian" data-val="0">0</label></div>
 	        				</div>
+	        				<div class="col-xs-12 no-padding">
+	        					<div class="col-xs-4 no-padding"></div>
+	        					<div class="col-xs-8 no-padding font10"><hr class="dashed" style="margin-left: 0px; margin-right: 0px;"></div>
+	        				</div>
+	        				<?php foreach ($kategori_pembayaran as $k_kp => $v_kp): ?>
+	        					<div class="col-xs-12 no-padding">
+		        					<div class="col-xs-8 text-right no-padding"><label class="control-label"><?php echo ucfirst($v_kp['nama']); ?>. =</label></div>
+		        					<div class="col-xs-4 no-padding text-right"><label class="control-label kategori_jenis_kartu kategori_jenis_kartu<?php echo $v_kp['id']; ?>" data-val="<?php echo $v_kp['nominal']; ?>"><?php echo angkaRibuan($v_kp['nominal']); ?></label></div>
+		        				</div>
+	        				<?php endforeach ?>
 						</div>
 					<?php // } ?>
 					<div class="col-xs-12 text-center no-padding font10"><hr class="double-dashed"></div>
