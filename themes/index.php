@@ -47,6 +47,14 @@
               </a>
             </li>
           <?php endif ?>
+          <?php // if ( hasAkses('transaksi/SaldoAkhirKasir') ): ?>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" onclick="co.modalSaldoAkhirKasir()">
+                <i class="fa fa-usd" style="width: 8%;"></i>
+                <span style="width: 92%;">Saldo Akhir Kasir</span>
+              </a>
+            </li>
+          <?php // endif ?>
           <li class="">
             <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
               <i class="fa fa-users" style="width: 8%;"></i>
@@ -84,6 +92,15 @@
               </a>
             </li>
           <?php endif ?>
+          <?php // if ( hasAkses('transaksi/SaldoAkhirKasir') ): ?>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/ClosingOrder">
+                <i class="fa fa-calendar-check-o" style="width: 8%;"></i>
+                <span style="width: 92%;">Closing Order</span>
+              </a>
+            </li>
+          <?php // endif ?>
+
           <!-- <?php $arr_fitur = $this->session->userdata()['Fitur']; ?>
           <?php foreach ($arr_fitur as $key => $v_fitur): ?>
             <li>
@@ -227,6 +244,12 @@
 
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
         defaultPage = baseurl + 'transaksi/MenuGagal';
+      }
+    <?php } ?>
+
+    <?php if ( hasAkses('transaksi/ClosingOrder') ) { ?>
+      if ( window.location.href.indexOf("ClosingOrder") >= 0 ) {
+        defaultPage = baseurl + 'transaksi/ClosingOrder';
       }
     <?php } ?>
     // var pagePembayaran = baseurl + 'transaksi/Pembayaran';

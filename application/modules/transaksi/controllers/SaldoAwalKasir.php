@@ -23,7 +23,12 @@ class SaldoAwalKasir extends Public_Controller
         try {
             if ( $this->hakAkses['a_submit'] == 1 ) {
                 $m_sak = new \Model\Storage\SaldoAwalKasir_model();
-                $d_sak = $m_sak->where('tanggal', date('Y-m-d'))->where('user_id', $this->userid)->where('branch_kode', $this->kodebranch)->first();
+                $now = $m_sak->getDate();
+
+                $start_date = $now['tanggal'].' 00:00:01';
+                $end_date = $now['tanggal'].' 23:59:59';
+
+                $d_sak = $m_sak->whereBetween('tanggal', [$start_date, $end_date])->where('user_id', $this->userid)->where('branch_kode', $this->kodebranch)->orderBy('id', 'desc')->first();
 
                 if ( $d_sak ) {
                     $status = 1;
@@ -73,7 +78,9 @@ class SaldoAwalKasir extends Public_Controller
 
         try {
             $m_sak = new \Model\Storage\SaldoAwalKasir_model();
-            $m_sak->tanggal = date('Y-m-d');
+            $now = $m_sak->getDate();
+
+            $m_sak->tanggal = $now['waktu'];
             $m_sak->user_id = $this->userid;
             $m_sak->nominal = $jmlUang;
             $m_sak->branch_kode = $this->kodebranch;

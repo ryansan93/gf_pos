@@ -16,13 +16,13 @@
 		    		}
 	    		?>
 		        <div class="col-md-12 cursor-p no-padding menu" style="margin-bottom: 10px;" data-kode="<?php echo $v_det['menu_kode']; ?>" data-detail="<?php echo $data_detail; ?>">
-			        <div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="<?php echo $v_det['menu_kode']; ?>" data-proses="<?php echo $v_det['proses']; ?>">
+			        <div class="col-md-11 no-padding menu_utama" onclick="jual.verifikasiPinOtorisasiHapusMenu(this, 'ubah')" data-kode="<?php echo $v_det['menu_kode']; ?>" data-proses="<?php echo $v_det['proses']; ?>">
 				        <div class="col-md-6 no-padding">
 				        <span class="nama_menu"><?php echo strtoupper($v_det['menu_nama']); ?></span>
-				        <span> @ <span class="hrg"><?php echo angkaRibuan($v_det['harga']); ?></span></span>
+				        <span> @ <span class="hrg" data-hrg="<?php echo $v_det['harga']; ?>"><?php echo angkaRibuan($v_det['harga_show']); ?></span></span>
 				        </div>
-				        <div class="col-md-2 text-right no-padding"><span class="jumlah"><?php echo angkaRibuan($v_det['jumlah']); ?></span></div>
-				        <div class="col-md-3 text-right no-padding"><span class="total" data-ppn="<?php echo $v_det['ppn']; ?>" data-sc="<?php echo $v_det['service_charge']; ?>"><?php echo angkaRibuan($v_det['total']); ?></span></div>
+				        <div class="col-md-2 text-right no-padding"><span class="jumlah" data-jmlawal="<?php echo $v_det['jumlah']; ?>"><?php echo angkaRibuan($v_det['jumlah']); ?></span></div>
+				        <div class="col-md-3 text-right no-padding"><span class="total" data-ppn="<?php echo $v_det['ppn']; ?>" data-sc="<?php echo $v_det['service_charge']; ?>" data-val="<?php echo $v_det['total']; ?>"><?php echo angkaRibuan($v_det['total_show']); ?></span></div>
 			        </div>
 			        <div class="col-md-1 text-center no-padding">
 				        <span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)" data-proses="1">

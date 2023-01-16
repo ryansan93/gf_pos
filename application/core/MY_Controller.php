@@ -141,6 +141,7 @@ class MY_Controller extends DB_Controller
           "assets/base/index.js",
           "assets/base/app.js",
           "assets/transaksi/saldo_awal_kasir/js/saldo-awal-kasir.js",
+          "assets/transaksi/saldo_akhir_kasir/js/saldo-akhir-kasir.js",
         ));
     $this->add_external_css(
         array(

@@ -4,6 +4,8 @@ var kode_member = null;
 var member = null;
 var member_group = null;
 var jenis_pesanan = null;
+var jenis_harga_exclude = 0;
+var jenis_harga_include = 0;
 var nama_jenis_pesanan = null;
 var detail_pesanan = null;
 var jenis_bayar = 'tunai';
@@ -85,15 +87,17 @@ var jual = {
                 });
 
                 $(this).find('.button:not(.btn-exit)').click(function() {
-                    var pilih_menu = $(this).data('pilihmenu');
-                    jenis_pesanan = $(this).data('kode');
+                    var pilih_meja = $(this).attr('data-pilihmeja');
+                    jenis_pesanan = $(this).attr('data-kode');
+                    jenis_harga_exclude = $(this).attr('data-exclude');
+                    jenis_harga_include = $(this).attr('data-include');
                     nama_jenis_pesanan = $(this).find('span b').text();
 
                     $('.list_menu').find('.jenis_pesanan').attr('data-kode', jenis_pesanan);
                     $('.list_menu').find('.jenis_pesanan').text(nama_jenis_pesanan);
 
                     if ( empty(member) ) {
-                        if ( pilih_menu == 0 ) {
+                        if ( pilih_meja == 0 ) {
                             jual.modalPilihMember();
                         } else {
                             mejaId = null;
@@ -523,6 +527,8 @@ var jual = {
                     $(this).priceFormat(Config[$(this).data('tipe')]);
                 });
 
+                var kode_menu = $(elm).data('kode');
+
                 var modal_body = $(this).find('.modal-body');
 
                 if ( jenis == 'edit' ) {
@@ -530,6 +536,7 @@ var jual = {
 
                     $.map( $(div_menu).find('.detail'), function(div) {
                         var kode = $(div).data('kode');
+
                         var jumlah_edit = numeral.unformat($(div).find('span.jumlah').text());
 
                         var td = $(modal_body).find('td[data-kode="'+kode+'"]');
@@ -678,6 +685,7 @@ var jual = {
                             var tbody = $(td).closest('tbody');
 
                             var kode = $(td).attr('data-kode');
+
                             var nama = $(td).find('span b').text();
                             var jumlah = numeral.unformat($(tbody).find('.jumlah span').text());
 
@@ -697,7 +705,7 @@ var jual = {
 
                         detail += !empty(request) ? request.toUpperCase() : request;
 
-                        jual.pilihMenu($(elm), detail, arr_detail, request, jml_menu, jenis);
+                        jual.pilihMenu($(elm), detail, arr_detail, request, jml_menu, jenis, kode_menu);
 
                         $('.modal').modal('hide');
                     } else {
@@ -708,7 +716,7 @@ var jual = {
         },'html');
     }, // end - modalPaketMenu
 
-    pilihMenu: function (elm, detail = 'kosong', arr_detail = null, request = null, jml_menu, jenis) {
+    pilihMenu: function (elm, detail = 'kosong', arr_detail = null, request = null, jml_menu, jenis, kode_menu) {
         var _div_list_pesanan = $('div.list_pesanan');
 
         var div_jenis_pesanan = null;
@@ -728,11 +736,11 @@ var jual = {
             div_jenis_pesanan = $(_div_list_pesanan).find('div.jenis_pesanan[data-kodejp='+jenis_pesanan+'] div.pesanan');
         }
 
-        var kode = $(elm).data('kode');
+        var kode = kode_menu;
         var txt_nama = $(elm).find('div.nama_menu').text();
         var txt_harga = $(elm).find('div.harga_menu').text();
-        var status_ppn = $(elm).attr('data-ppn');
-        var status_service_charge = $(elm).attr('data-sc');
+        var status_ppn = $('div.menu[data-kode="'+kode_menu+'"]').attr('data-ppn');
+        var status_service_charge = $('div.menu[data-kode="'+kode_menu+'"]').attr('data-sc');
         var persen_ppn = $('.persen_ppn').attr('data-val');
         var persen_service_charge = $('.persen_service_charge').attr('data-val');
         var harga = numeral.unformat(txt_harga);
@@ -751,19 +759,63 @@ var jual = {
 
             var jumlah = parseInt(_jumlah) + 1;
             var jumlah_detail = parseInt(_jumlah_detail) + 1;
-            var _total = _harga * jumlah;
-            var _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (_total * (persen_service_charge / 100)) : 0;
-            var _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
+            var _total = 0;
+            var _total_show = 0;
+            var _total_service_charge = 0;
+            var _total_ppn = 0;
+            if ( jenis_harga_exclude == 1 ) {
+                _total = _harga * jumlah;
+                _total_show = _total;
+                _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total * (persen_service_charge / 100)) : 0;
+                _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
+            } else if ( jenis_harga_include == 1 ) {
+                var _total_include = _harga * jumlah;
+                _total_show = _total_include;
+                _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
+                _total_include = _total_include - _total_ppn;
+                _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
+                _total = _total_include - _total_service_charge;
+            }
             if ( jenis == 'edit' ) {
+                var jml_awal = $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').attr('data-jmlawal');
+
+                var div_menu = $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"]');
+
+                var key = kode+' | '+detail+' | '+$(div_menu).find('span.request').text();
+
+                delete waste[key];
+
+                if ( jml_menu < jml_awal ) {
+                    var selisih = jml_awal - jml_menu;
+
+                    waste[key] = {'menu_kode': kode, 'jumlah': selisih};
+
+                    $.map( $(div_menu).find('.detail'), function (div) {
+                        var key = kode+' | '+detail+' | '+$(div_menu).find('span.request').text()+' | '+$(div).attr('data-kode');
+                        waste[key] = {'menu_kode': $(div).attr('data-kode'), 'jumlah': selisih};
+                    });
+                }
+
                 jumlah = jml_menu;
                 jumlah_detail = jml_menu;
-                _total = _harga * jumlah;
-                _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (_total * (persen_service_charge / 100)) : 0;
-                _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
+                if ( jenis_harga_exclude == 1 ) {
+                    _total = _harga * jumlah;
+                    _total_show = _total;
+                    _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total * (persen_service_charge / 100)) : 0;
+                    _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round((_total + _total_service_charge) * (persen_ppn / 100)) : 0;
+                } else if ( jenis_harga_include == 1 ) {
+                    var _total_include = _harga * jumlah;
+                    _total_show = _total_include;
+                    _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
+                    _total_include = _total_include - _total_ppn;
+                    _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
+                    _total = _total_include - _total_service_charge;
+                }
             }
 
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').text(numeral.formatInt(jumlah_detail));
-            $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').text(numeral.formatInt(_total));
+            $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').text(numeral.formatInt(_total_show));
+            $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-val', _total);
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-ppn', _total_ppn);
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-sc', _total_service_charge);
 
@@ -804,18 +856,39 @@ var jual = {
             }
 
         } else {
+            var total = 0;
+            var total_show = 0;
+            var total_service_charge = 0;
+            var total_ppn = 0;
+            var harga_show = 0;
+            if ( jenis_harga_exclude == 1 ) {
+                harga_show = harga;
+
+                total = jml_menu * harga;
+                total_show = total;
+                total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(total * (persen_service_charge / 100)) : 0;
+                total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round((total + total_service_charge) * (persen_ppn / 100)) : 0;
+            } else if ( jenis_harga_include == 1 ) {
+                harga_show = harga;
+
+                var total_include = harga * jml_menu;
+                total_show = total_include;
+                total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(total_include * (persen_ppn / 100)) : 0;
+                total_include = total_include - total_ppn;
+                total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(total_include * (persen_service_charge / 100)) : 0;
+                total = total_include - total_service_charge;
+                harga = total / jml_menu;
+            }
+
             var _menu = '';
             _menu += '<div class="col-md-12 cursor-p no-padding menu" style="margin-bottom: 10px;" data-kode="'+kode+'" data-detail="'+detail+'">';
             _menu += '<div class="col-md-11 no-padding menu_utama" onclick="jual.modalPaketMenu(this)" data-kode="'+kode+'" data-ppn="'+status_ppn+'" data-sc="'+status_service_charge+'">';
             _menu += '<div class="col-md-6 no-padding">';
             _menu += '<span class="nama_menu">'+txt_nama.toUpperCase()+'</span>';
-            _menu += '<span> @ <span class="hrg">'+numeral.formatInt(harga)+'</span></span>';
+            _menu += '<span> @ <span class="hrg" data-hrg="'+harga+'">'+numeral.formatInt(harga_show)+'</span></span>';
             _menu += '</div>';
             _menu += '<div class="col-md-2 text-right no-padding"><span class="jumlah">'+jml_menu+'</span></div>';
-            var total = jml_menu * harga;
-            var total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? (total * (persen_service_charge / 100)) : 0;
-            var total_ppn = (status_ppn == 1 && persen_ppn > 0) ? ((total + total_service_charge) * (persen_ppn / 100)) : 0;
-            _menu += '<div class="col-md-3 text-right no-padding"><span class="total" data-ppn="'+total_ppn+'" data-sc="'+total_service_charge+'">'+numeral.formatInt(total)+'</span></div>';
+            _menu += '<div class="col-md-3 text-right no-padding"><span class="total" data-ppn="'+total_ppn+'" data-sc="'+total_service_charge+'" data-val="'+total+'">'+numeral.formatInt(total_show)+'</span></div>';
             _menu += '</div>';
             _menu += '<div class="col-md-1 text-center no-padding">';
             _menu += '<span class="col-md-12" style="background-color: #a94442; border-radius: 3px; color: #ffffff; padding-left: 0px; padding-right: 0px;" onclick="jual.hapusMenu(this)">';
@@ -867,7 +940,9 @@ var jual = {
         jual.hitSubTotal();
     }, // end- hapusMenu
 
-    verifikasiPinOtorisasiHapusMenu: function(elm) {
+    verifikasiPinOtorisasiHapusMenu: function(elm, jenis = null) {
+        var pin = null;
+
         bootbox.dialog({
             message: '<p>Masukkan PIN Otorisasi untuk menghapus data.</p><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
             buttons: {
@@ -880,7 +955,7 @@ var jual = {
                     label: '<i class="fa fa-check"></i> Lanjut',
                     className: 'btn-primary',
                     callback: function(){
-                        var pin = $('.pin').val();
+                        pin = $('.pin:last').val();
 
                         $.ajax({
                             url: 'transaksi/Penjualan/cekPinOtorisasi',
@@ -893,22 +968,37 @@ var jual = {
                             success: function(data) {
                                 hideLoading();
                                 if ( data.status == 1 ) {
-                                    var pesanan_kode = $('div.button.edit').attr('data-kode');
-                                    var menu_kode = $(elm).closest('div.menu').attr('data-kode');
-                                    var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
 
-                                    waste.push({'pesanan_kode': pesanan_kode, 'menu_kode': menu_kode, 'jumlah': jumlah});
 
-                                    var div_jenis_pesanan = $(elm).closest('div.jenis_pesanan');
+                                    if ( empty(jenis) ) {
+                                        var pesanan_kode = $('div.button.edit').attr('data-kode');
+                                        var div_menu = $(elm).closest('div.menu');
+                                        var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
 
-                                    $(elm).closest('div.menu').remove();
+                                        // waste.push({'pesanan_kode': pesanan_kode, 'menu_kode': menu_kode, 'jumlah': jumlah});
+                                        var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text();
+                                        waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div_menu).attr('data-kode'), 'jumlah': jumlah};
 
-                                    if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
-                                        $(div_jenis_pesanan).remove();
+                                        $.map( $(div_menu).find('.detail'), function (div) {
+                                            var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text()+' | '+$(div).attr('data-kode');
+                                            waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div).attr('data-kode'), 'jumlah': jumlah};
+                                        });
+
+                                        var div_jenis_pesanan = $(elm).closest('div.jenis_pesanan');
+
+                                        $(elm).closest('div.menu').remove();
+
+                                        if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
+                                            $(div_jenis_pesanan).remove();
+                                        }
+                                    } else {
+                                        jual.modalPaketMenu( $(elm) );
                                     }
                                 } else {
                                     bootbox.alert(data.message, function() {
-                                        jual.verifikasiPinOtorisasiHapusMenu(kode_faktur);
+                                        $('.pin').val('');
+
+                                        jual.verifikasiPinOtorisasiHapusMenu( $(elm), jenis );
                                     });
                                 }
                             }
@@ -1115,21 +1205,32 @@ var jual = {
         var div = $('.list_pesanan');
 
         var sub_total = 0;
+        var sub_total_real = 0;
         var sub_total_ppn = 0;
         var sub_total_service_charge = 0;
         $.map( $(div).find('.menu'), function(div_menu) {
             var total = numeral.unformat($(div_menu).find('.total').text());
+            var total_real = $(div_menu).find('.total').attr('data-val');
             var ppn = $(div_menu).find('.total').attr('data-ppn');
             var service_charge = $(div_menu).find('.total').attr('data-sc');
 
             sub_total += total;
+            sub_total_real += total_real;
             sub_total_ppn += parseFloat(ppn);
             sub_total_service_charge += parseFloat(service_charge);
         });
 
+        if ( jenis_harga_exclude == 1 ) {
+            $('.ppn').text(numeral.formatDec(sub_total_ppn));
+            $('.service_charge').text(numeral.formatDec(sub_total_service_charge));
+            $('.ppn').attr('data-val', sub_total_ppn);
+            $('.service_charge').attr('data-val', sub_total_service_charge);
+        } else if ( jenis_harga_include == 1 ) {
+            $('.ppn').attr('data-val', sub_total_ppn);
+            $('.service_charge').attr('data-val', sub_total_service_charge);
+        }
         $('.subtotal').text(numeral.formatDec(sub_total));
-        $('.ppn').text(numeral.formatDec(sub_total_ppn));
-        $('.service_charge').text(numeral.formatDec(sub_total_service_charge));
+        $('.subtotal').attr('data-val', sub_total_real);
 
         jual.hitDiskon();
     }, // end - hitSubTotal
@@ -1260,9 +1361,9 @@ var jual = {
                 var kode_detail_menu = $(div_menu).attr('data-detail');
 
                 var nama_menu = $(div_menu_utama).find('.nama_menu').text();
-                var harga = numeral.unformat($(div_menu_utama).find('.hrg').text());
+                var harga = $(div_menu_utama).find('.hrg').attr('data-hrg');
                 var jumlah = numeral.unformat($(div_menu_utama).find('.jumlah').text());
-                var total = numeral.unformat($(div_menu_utama).find('.total').text());
+                var total = $(div_menu_utama).find('.total').attr('data-val');
                 var ppn = $(div_menu_utama).find('.total').attr('data-ppn');
                 var service_charge = $(div_menu_utama).find('.total').attr('data-sc');
                 var request = $(div_menu).find('span.request').text();
@@ -1307,13 +1408,18 @@ var jual = {
             return _data;
         });
 
-        var sub_total = numeral.unformat($('.subtotal').text());
+        var sub_total = $('.subtotal').attr('data-val');
         var diskon = numeral.unformat($('span.diskon').text());
-        var ppn = numeral.unformat($('.ppn').text());
-        var service_charge = numeral.unformat($('.service_charge').text());
+        var ppn = $('.ppn').attr('data-val');
+        var service_charge = $('.service_charge').attr('data-val');
         var grand_total = numeral.unformat($('.grandtotal').text());
 
         var _member = !empty(member_group) ? member_group+' - '+member : member;
+
+        var _waste = [];
+        for (const [key, value] of Object.entries(waste)) {
+            _waste.push( value );
+        }
 
         dataPenjualan = {
             'meja_id': mejaId,
@@ -1326,7 +1432,8 @@ var jual = {
             'grand_total': grand_total,
             'list_pesanan': list_pesanan,
             'list_diskon': list_diskon,
-            'privilege': privilege
+            'privilege': privilege,
+            'waste': _waste
         };
 
         action(dataPenjualan);
@@ -2145,6 +2252,8 @@ var jual = {
 
                     kodePesanan = data.content.pesanan_kode;
                     jenis_pesanan = data.content.jenis_pesanan;
+                    jenis_harga_exclude = data.content.jenis_harga_exclude;
+                    jenis_harga_include = data.content.jenis_harga_include;
                     nama_jenis_pesanan = data.content.nama_jenis_pesanan;
                     kode_member = data.content.kode_member;
                     member = data.content.member;

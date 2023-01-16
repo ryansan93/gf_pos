@@ -574,6 +574,43 @@ class Penjualan extends Public_Controller
             );
 
             $d_pesanan = $m_pesanan->where('kode_pesanan', $params)->first();
+
+            $m_pi = new \Model\Storage\PesananItem_model();
+            $d_pi = $m_pi->where('pesanan_kode', $params)->with(['pesanan_item_detail'])->get();
+
+            $m_wm = new \Model\Storage\WasteMenu_model();
+            $now = $m_wm->getDate();
+
+            $m_wm->tanggal = $now['tanggal'];
+            $m_wm->branch_kode = $this->kodebranch;
+            $m_wm->save();
+
+            if ( $d_pi->count() > 0 ) {
+                $d_pi = $d_pi->toArray();
+
+                foreach ($d_pi as $k_pi => $v_pi) {
+                    $m_wmi = new \Model\Storage\WasteMenuItem_model();
+                    $m_wmi->id_header = $m_wm->id;
+                    $m_wmi->menu_kode = $v_pi['menu_kode'];
+                    $m_wmi->jumlah = $v_pi['jumlah'];
+                    $m_wmi->pesanan_kode = $params;
+                    $m_wmi->user_id = $this->userid;
+                    $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
+                    $m_wmi->save();
+                    if ( !empty($v_pi['pesanan_item_detail']) ) {
+                        foreach ($v_pi['pesanan_item_detail'] as $k_pid => $v_pid) {
+                            $m_wmi = new \Model\Storage\WasteMenuItem_model();
+                            $m_wmi->id_header = $m_wm->id;
+                            $m_wmi->menu_kode = $v_pid['menu_kode'];
+                            $m_wmi->jumlah = $v_pi['jumlah'];
+                            $m_wmi->pesanan_kode = $params;
+                            $m_wmi->user_id = $this->userid;
+                            $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
+                            $m_wmi->save();
+                        }
+                    }
+                }
+            }
             
             $deskripsi = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/update', $d_pesanan, $deskripsi );
@@ -2020,9 +2057,15 @@ class Penjualan extends Public_Controller
                     $jenis_pesanan = $v_ji['kode_jenis_pesanan'];
                     $nama_jenis_pesanan = $v_ji['jenis_pesanan'][0]['nama'];
 
+                    $m_jp = new \Model\Storage\JenisPesanan_model();
+                    $d_jp = $m_jp->where('kode', $jenis_pesanan)->first();
+
                     $key_jp = $v_ji['kode_jenis_pesanan'];
                     $pesanan_item[$key_jp]['kode'] = $v_ji['kode_jenis_pesanan'];
                     $pesanan_item[$key_jp]['nama'] = $v_ji['jenis_pesanan'][0]['nama'];
+
+                    $m_hm = new \Model\Storage\HargaMenu_model();
+                    $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
 
                     $key_ji = $k_ji;
                     $pesanan_item[$key_jp]['detail'][$key_ji] = array(
@@ -2032,10 +2075,12 @@ class Penjualan extends Public_Controller
                         'menu_nama' => $v_ji['menu_nama'],
                         'menu_kode' => $v_ji['menu_kode'],
                         'jumlah' => $v_ji['jumlah'],
+                        'harga_show' => $d_hm->harga,
                         'harga' => $v_ji['harga'],
                         'total' => $v_ji['total'],
                         'service_charge' => $v_ji['service_charge'],
                         'ppn' => $v_ji['ppn'],
+                        'total_show' => ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']),
                         'request' => $v_ji['request'],
                         'pesanan_item_detail' => $v_ji['pesanan_item_detail'],
                         'proses' => $v_ji['proses']
@@ -2073,11 +2118,16 @@ class Penjualan extends Public_Controller
 
             $html = $this->load->view($this->pathView . 'detail_pesanan', $content, TRUE);
 
+            $m_jp = new \Model\Storage\JenisPesanan_model();
+            $d_jp = $m_jp->where('kode', $jenis_pesanan)->first();
+
             $content = array(
                 'html' => $html,
                 'pesanan_kode' => $data['kode_pesanan'],
                 'jenis_pesanan' => $jenis_pesanan,
                 'nama_jenis_pesanan' => $nama_jenis_pesanan,
+                'jenis_harga_exclude' => $d_jp->exclude,
+                'jenis_harga_include' => $d_jp->include,
                 'kode_member' => $kode_member,
                 'member' => $member,
                 'meja_id' => $meja_id,
@@ -2175,14 +2225,21 @@ class Penjualan extends Public_Controller
                 }
             }
 
-            if ( !empty($params['waste']) ) {
-                $m_waste = new \Model\Storage\Waste_model();
+            if ( isset($params['waste']) && !empty($params['waste']) ) {
+                $m_wm = new \Model\Storage\WasteMenu_model();
+                $m_wm->tanggal = $now['tanggal'];
+                $m_wm->branch_kode = $this->kodebranch;
+                $m_wm->save();
+
                 foreach ($params['waste'] as $k_waste => $v_waste) {
-                    $m_waste = new \Model\Storage\PesananDiskon_model();
-                    $m_waste->pesanan_kode = $kode_pesanan;
-                    $m_waste->menu_kode = $v_ld['menu_kode'];
-                    $m_waste->jumlah = $v_ld['jumlah'];
-                    $m_waste->save();
+                    $m_wmi = new \Model\Storage\WasteMenuItem_model();
+                    $m_wmi->id_header = $m_wm->id;
+                    $m_wmi->menu_kode = $v_waste['menu_kode'];
+                    $m_wmi->jumlah = $v_waste['jumlah'];
+                    $m_wmi->pesanan_kode = $kode_pesanan;
+                    $m_wmi->user_id = $this->userid;
+                    $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
+                    $m_wmi->save();
                 }
             }
 
