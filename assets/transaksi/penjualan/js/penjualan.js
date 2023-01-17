@@ -1214,8 +1214,8 @@ var jual = {
             var ppn = $(div_menu).find('.total').attr('data-ppn');
             var service_charge = $(div_menu).find('.total').attr('data-sc');
 
-            sub_total += total;
-            sub_total_real += total_real;
+            sub_total += parseFloat(total);
+            sub_total_real += parseFloat(total_real);
             sub_total_ppn += parseFloat(ppn);
             sub_total_service_charge += parseFloat(service_charge);
         });
