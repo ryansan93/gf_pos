@@ -622,6 +622,18 @@ var bayar = {
     }, // end - hitungTotalTagihan
 
     hitungTotalBayar: function() {
+        var hutang = 0;
+
+        $.map( $('.tbl_hutang').find('input[type=checkbox]'), function (ipt) {
+            if ( $(ipt).is(':checked') ) {
+                var tr = $(ipt).closest('tr');
+
+                var nominal = numeral.unformat( $(tr).find('.nominal_bayar_hutang').val() );
+
+                hutang += nominal;
+            }
+        });
+
         var kembalian = 0;
         var total_belanja = numeral.unformat( $('.tot_belanja').find('label').text() );
         var total_ppn = numeral.unformat( $('.ppn').find('label').text() );
@@ -632,6 +644,7 @@ var bayar = {
         var total_tagihan = tagihan - total_diskon;
 
         total_tagihan = (total_tagihan > 0 ) ? total_tagihan : 0;
+        total_tagihan += hutang;
 
         $('.total_tagihan').val( numeral.formatInt(total_tagihan) );
 
@@ -713,6 +726,18 @@ var bayar = {
     modalMetodePembayaran: function (elm) {
         $('.modal').modal('hide');
 
+        var hutang = 0;
+
+        $.map( $('.tbl_hutang').find('input[type=checkbox]'), function (ipt) {
+            if ( $(ipt).is(':checked') ) {
+                var tr = $(ipt).closest('tr');
+
+                var nominal = numeral.unformat( $(tr).find('.nominal_bayar_hutang').val() );
+
+                hutang += nominal;
+            }
+        });
+
         var params = {
             'nama': $(elm).text(),
             'kode_jenis_kartu': $(elm).data('kode'),
@@ -721,6 +746,7 @@ var bayar = {
             'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val()),
             'member_kode': $('.kode_member').attr('data-val'),
             'faktur_kode': $('.kode_faktur').attr('data-val'),
+            'hutang': hutang,
             'data_diskon': dataDiskon
         };
 

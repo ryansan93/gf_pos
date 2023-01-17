@@ -980,6 +980,8 @@ class Pembayaran extends Public_Controller
             }
         }
 
+        $hutang = $params['hutang'];
+
         $data_metode_bayar[] = array(
             'nama' => $params['nama'],
             'kode_jenis_kartu' => $params['kode_jenis_kartu'],
@@ -997,7 +999,7 @@ class Pembayaran extends Public_Controller
 
         $sisa_tagihan = ($data_diskon['total_belanja'] + $data_diskon['total_ppn'] + $data_diskon['total_service_charge']) - $params['total_bayar'];
 
-        $params['sisa_tagihan'] = ($sisa_tagihan > 0) ? $sisa_tagihan : 0;
+        $params['sisa_tagihan'] = ($sisa_tagihan > 0) ? $sisa_tagihan + $hutang : 0;
         $content['kode_faktur'] = $kode_faktur;
         $content['saldo_member'] = $saldo_member;
         $content['data'] = $params;
@@ -2078,8 +2080,10 @@ class Pembayaran extends Public_Controller
                         }
                     }
                 } else {
-                    $tot_ppn = $v_jual['nilai_ppn'];
-                    $tot_sc = $v_jual['nilai_service_charge'];
+                    if ( $jenis_harga_exclude == 1 ) {
+                        $tot_ppn = $v_jual['nilai_ppn'];
+                        $tot_sc = $v_jual['nilai_service_charge'];
+                    }
                 }
             }
         }
