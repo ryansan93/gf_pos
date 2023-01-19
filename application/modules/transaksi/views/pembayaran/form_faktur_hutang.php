@@ -1,0 +1,71 @@
+<div class="col-xs-12 no-padding data faktur_hutang" data-faktur="<?php echo $data['kode_faktur']; ?>" style="margin-top: 10px;">
+	<div class="col-xs-12 text-center no-padding"><label class="control-label"><?php echo $data_branch['nama']; ?></label></div>
+	<div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo $data_branch['alamat']; ?></label></div>
+	<div class="col-xs-12 text-center no-padding font10"><label class="control-label"><?php echo 'Telp. '.$data_branch['telp']; ?></label></div>
+	<div class="col-xs-12 text-center no-padding font10"><br></div>
+	<div class="col-xs-12 font10">
+		<table class="table table-nobordered" style="margin-bottom: 0px;">
+			<tbody>
+				<tr>
+					<td class="col-xs-3"><label class="control-label">No. Bill</label></td>
+					<td class="col-xs-9"><label class="control-label">: <?php echo $data['kode_faktur'].' (CL)'; ?></label></td>
+				</tr>
+				<tr>
+					<td class="col-xs-3"><label class="control-label">Kasir</label></td>
+					<td class="col-xs-9"><label class="control-label">: <?php echo $data['nama_kasir']; ?></label></td>
+				</tr>
+				<tr>
+					<td class="col-xs-3"><label class="control-label">Tanggal</label></td>
+					<td class="col-xs-9"><label class="control-label">: <?php echo $data_branch['waktu']; ?></label></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="col-xs-12 text-center font10"><hr class="double-dashed"></div>
+	<div class="col-xs-12 font10">
+		<?php foreach ($data['detail'] as $k_det => $v_det): ?>
+			<table class="table table-nobordered" style="margin-bottom: 0px;">
+				<tbody>
+					<tr>
+						<td class="col-xs-3"><label class="control-label">Member</label></td>
+						<td class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="col-xs-12 text-center no-padding font10"><hr class="dashed"></div>
+			<?php foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp): ?>
+				<table class="table table-nobordered" style="margin-bottom: 0px;">
+					<tbody>
+						<tr>
+							<td class="col-xs-12"><label class="control-label"><?php echo $v_jp['nama']; ?></label></td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="table table-nobordered" style="margin-bottom: 0px;">
+					<tbody>
+						<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji): ?>
+							<tr>
+								<td class="col-xs-1"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
+								<td class="col-xs-7"><label class="control-label"><?php echo $v_ji['nama']; ?></label></td>
+								<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
+							</tr>
+						<?php endforeach ?>
+					</tbody>
+				</table>
+			<?php endforeach ?>
+		<?php endforeach ?>
+	</div>
+	<div class="col-xs-12 text-center font10"><hr class="double-dashed"></div>
+	<div class="col-xs-12 font10">
+		<table class="table table-nobordered" style="margin-bottom: 0px;">
+			<tbody>
+				<tr>
+					<td class="col-xs-8 text-right"><label class="control-label">Total Belanja. =</label></td>
+					<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="col-xs-12 text-left font10"><hr class="dashed"></div>
+	<div class="col-xs-12 text-center font10"><label class="control-label">*** TERIMA KASIH ***</label></div>
+</div>

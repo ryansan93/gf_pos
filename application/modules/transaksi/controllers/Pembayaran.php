@@ -160,7 +160,7 @@ class Pembayaran extends Public_Controller
         foreach ($_data as $k_data => $v_data) {
             if ( !isset($data[ $v_data['kode_pesanan'] ]) ) {
                 $m_jual = new \Model\Storage\Jual_model();
-                $d_jual = $m_jual->where('pesanan_kode', $v_data['kode_pesanan'])->where('mstatus', 1)->get();
+                $d_jual = $m_jual->where('pesanan_kode', $v_data['kode_pesanan'])->where('lunas', 0)->where('mstatus', 1)->get();
 
                 $sudah_bayar = 0;
                 if ( $d_jual->count() > 0 ) {
@@ -203,7 +203,7 @@ class Pembayaran extends Public_Controller
                                     'kode_pesanan' => $v_data['kode_pesanan'],
                                     'member_group' => $member_group,
                                     'pelanggan' => $v_jual['member'],
-                                    'kasir' => $v_jual['nama_kasir'],
+                                    'kasir' => $v_data['nama_user'],
                                     'total' => $v_jual['grand_total']
                                 );
                             }
@@ -359,7 +359,8 @@ class Pembayaran extends Public_Controller
                         'nama_kasir' => $this->userdata['detail_user']['nama_detuser'],
                         'total' => $data_main['grand_total'],
                         'diskon' => 0,
-                        'ppn' => 0,
+                        'ppn' => $data_main['grand_total_ppn'],
+                        'service_charge' => $data_main['grand_total_sc'],
                         'grand_total' => $data_main['grand_total'],
                         'lunas' => 0,
                         'mstatus' => 1,
@@ -393,6 +394,8 @@ class Pembayaran extends Public_Controller
                     $m_juali->jumlah = $v_ji['jumlah'];
                     $m_juali->harga = $v_ji['harga'];
                     $m_juali->total = $v_ji['total'];
+                    $m_juali->ppn = $v_ji['ppn'];
+                    $m_juali->service_charge = $v_ji['sc'];
                     $m_juali->request = $v_ji['request'];
                     $m_juali->pesanan_item_kode = $v_ji['pesanan_item_kode'];
                     $m_juali->save();
@@ -432,7 +435,8 @@ class Pembayaran extends Public_Controller
                     $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
                     $m_jual->total = $v_ds['grand_total'];
                     $m_jual->diskon = 0;
-                    $m_jual->ppn = 0;
+                    $m_jual->ppn = $v_ds['grand_total_ppn'];
+                    $m_jual->service_charge = $v_ds['grand_total_sc'];
                     $m_jual->grand_total = $v_ds['grand_total'];
                     $m_jual->lunas = 0;
                     $m_jual->mstatus = 1;
@@ -453,6 +457,8 @@ class Pembayaran extends Public_Controller
                         $m_juali->jumlah = $v_ji['jumlah'];
                         $m_juali->harga = $v_ji['harga'];
                         $m_juali->total = $v_ji['total'];
+                        $m_juali->ppn = $v_ji['ppn'];
+                        $m_juali->service_charge = $v_ji['sc'];
                         $m_juali->request = $v_ji['request'];
                         $m_juali->pesanan_item_kode = $v_ji['pesanan_item_kode'];
                         $m_juali->save();
@@ -621,6 +627,12 @@ class Pembayaran extends Public_Controller
             select 
                 j.kode_faktur,
                 j.tgl_trans,
+                j.branch as kode_branch,
+                brc.nama as nama_branch,
+                brc.alamat as alamat_branch,
+                brc.telp as telp_branch,
+                j.kasir,
+                j.nama_kasir,
                 j.member,
                 j.kode_member,
                 j.total,
@@ -634,8 +646,12 @@ class Pembayaran extends Public_Controller
                 (select * from bayar where mstatus = 1) b
                 on
                     j.kode_faktur = b.faktur_kode
+            right join
+                branch brc
+                on
+                    j.branch = brc.kode_branch
             where
-                j.kode_faktur = '".$kode_faktur."' and
+                j.kode_faktur = '".trim($kode_faktur)."' and
                 j.mstatus = 1
         ";
         $d_jual = $m_jual->hydrateRaw( $sql );
@@ -689,12 +705,12 @@ class Pembayaran extends Public_Controller
                             'nama' => $v_ji['menu_nama'],
                             'jumlah' => $v_ji['jumlah'],
                             'total' => $v_ji['total'],
-                            'total_show' => ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn'])
+                            'total_show' => $v_ji['total']
                         );
 
-                        $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
-                        $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
-                        $total += ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']);
+                        $service_charge += ($exclude == 1) ? $v_ji['service_charge'] : 0;
+                        $ppn += ($exclude == 1) ? $v_ji['ppn'] : 0;
+                        $total += $v_ji['total'];
                         $service_charge_include += $v_ji['service_charge'];
                         $ppn_include += $v_ji['ppn'];
 
@@ -708,22 +724,22 @@ class Pembayaran extends Public_Controller
                                 'nama' => $v_ji['menu_nama'],
                                 'jumlah' => $v_ji['jumlah'],
                                 'total' => $v_ji['total'],
-                                'total_show' => ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn'])
+                                'total_show' => $v_ji['total']
                             );
 
-                            $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
-                            $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
-                            $total += ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']);
+                            $service_charge += ($exclude == 1) ? $v_ji['service_charge'] : 0;
+                            $ppn += ($exclude == 1) ? $v_ji['ppn'] : 0;
+                            $total += $v_ji['total'];
                             $service_charge_include += $v_ji['service_charge'];
                             $ppn_include += $v_ji['ppn'];
                         } else {
                             $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['jumlah'] += $v_ji['jumlah'];
                             $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total'] += $v_ji['total'];
-                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']);
+                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += $v_ji['total'];
 
-                            $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
-                            $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
-                            $total += ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']);
+                            $service_charge += ($exclude == 1) ? $v_ji['service_charge'] : 0;
+                            $ppn += ($exclude == 1) ? $v_ji['ppn'] : 0;
+                            $total += $v_ji['total'];
                             $service_charge_include += $v_ji['service_charge'];
                             $ppn_include += $v_ji['ppn'];
                         }
@@ -786,12 +802,12 @@ class Pembayaran extends Public_Controller
                                     'nama' => $v_jig['menu_nama'],
                                     'jumlah' => $v_jig['jumlah'],
                                     'total' => $v_jig['total'],
-                                    'total_show' => ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn'])
+                                    'total_show' => $v_jig['total']
                                 );
 
-                                $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
-                                $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
-                                $total += ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn']);
+                                $service_charge += ($exclude == 1) ? $v_jig['service_charge'] : 0;
+                                $ppn += ($exclude == 1) ? $v_jig['ppn'] : 0;
+                                $total += $v_jig['total'];
                                 $service_charge_include += $v_jig['service_charge'];
                                 $ppn_include += $v_jig['ppn'];
 
@@ -805,22 +821,22 @@ class Pembayaran extends Public_Controller
                                         'nama' => $v_jig['menu_nama'],
                                         'jumlah' => $v_jig['jumlah'],
                                         'total' => $v_jig['total'],
-                                        'total_show' => ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn'])
+                                        'total_show' => $v_jig['total']
                                     );
 
-                                    $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
-                                    $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
-                                    $total += ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn']);
+                                    $service_charge += ($exclude == 1) ? $v_jig['service_charge'] : 0;
+                                    $ppn += ($exclude == 1) ? $v_jig['ppn'] : 0;
+                                    $total += $v_jig['total'];
                                     $service_charge_include += $v_jig['service_charge'];
                                     $ppn_include += $v_jig['ppn'];
                                 } else {
                                     $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['jumlah'] += $v_jig['jumlah'];
                                     $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total'] += $v_jig['total'];
-                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn']);
+                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += $v_jig['total'];
 
-                                    $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
-                                    $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
-                                    $total += ($d_jp->exclude == 1) ? $v_jig['total'] : ($v_jig['total'] + $v_jig['service_charge'] + $v_jig['ppn']);
+                                    $service_charge += ($d_jp->include == 1) ? $v_jig['service_charge'] : 0;
+                                    $ppn += ($d_jp->include == 1) ? $v_jig['ppn'] : 0;
+                                    $total += $v_jig['total'];
                                     $service_charge_include += $v_jig['service_charge'];
                                     $ppn_include += $v_jig['ppn'];
                                 }
@@ -830,18 +846,34 @@ class Pembayaran extends Public_Controller
                 }
             }
 
+            $grand_total = 0;
+            if ( $include == 1 ) {
+                $grand_total = $total-$diskon;
+            }
+
+            if ( $exclude == 1 ) {
+                $grand_total = ($total + $ppn + $service_charge)-$diskon;
+            }
+
+
             $data = array(
                 'kode_faktur' => $d_jual[0]['kode_faktur'],
                 'tgl_trans' => $d_jual[0]['tgl_trans'],
                 'member' => $d_jual[0]['member'],
                 'kode_member' => $d_jual[0]['kode_member'],
+                'kode_branch' => $d_jual[0]['kode_branch'],
+                'nama_branch' => $d_jual[0]['nama_branch'],
+                'alamat_branch' => $d_jual[0]['alamat_branch'],
+                'telp_branch' => $d_jual[0]['telp_branch'],
+                'kasir' => $d_jual[0]['kasir'],
+                'nama_kasir' => $d_jual[0]['nama_kasir'],
                 'total' => $total,
                 'diskon' => $diskon,
                 'ppn' => $ppn,
                 'service_charge' => $service_charge,
                 'ppn_include' => $ppn_include,
                 'service_charge_include' => $service_charge_include,
-                'grand_total' => ($total + $ppn + $service_charge)-$diskon,
+                'grand_total' => $grand_total,
                 'lunas' => $d_jual[0]['lunas'],
                 'jenis_bayar_include' => $include,
                 'jenis_bayar_exclude' => $exclude,
@@ -901,31 +933,22 @@ class Pembayaran extends Public_Controller
         $m_jual = new \Model\Storage\Jual_model();
         $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->first()->toArray();
 
+        $date = '2023-01-19 00:00:01';
+
         $data = null;
         if ( !empty($d_jual['kode_member']) ) {
             $m_jual = new \Model\Storage\Jual_model();
-            $d_jual_hutang = $m_jual->where('kode_member', $d_jual['kode_member'])->where('kode_faktur', '<>', $kode_faktur)->where('lunas', 0)->with(['pesanan'])->get();
+            $d_jual_hutang = $m_jual->where('tgl_trans', '>=', $date)->where('kode_member', $d_jual['kode_member'])->where('kode_faktur', '<>', $kode_faktur)->where('hutang', 1)->where('mstatus', 1)->with(['pesanan'])->get();
 
             if ( $d_jual_hutang->count() > 0 ) {
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
-                    // $m_bayar = new \Model\Storage\Bayar_model();
-                    // $d_bayar_non_aktif = $m_bayar->select('id')->where('faktur_kode', $value['kode_faktur'])->where('mstatus', 0)->get();
-
-                    // if ( $d_bayar_non_aktif->count() > 0 ) {
-                    //     $d_bayar_non_aktif = $d_bayar_non_aktif->toArray();
-
-                    //     cetak_r($d_jual_hutang, 1);
-
-                    //     $d_bayar_hutang = $m_bayar_hutang->whereNotIn('id_header', $d_bayar_non_aktif)->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
-                    // } else {
-                    //     $d_bayar_hutang = $m_bayar_hutang->where('faktur_kode', $value['kode_faktur'])->sum('bayar');
-                    // }
-
                     $sql = "select sum(bayar) as total_bayar from bayar_hutang bh 
                         left join
-                            bayar b 
+                            (
+                                select * from bayar where mstatus = 1
+                            ) b 
                             on
                                 bh.id_header = b.id
                         where
@@ -997,7 +1020,12 @@ class Pembayaran extends Public_Controller
 
         $data_diskon = $this->hitDiskon($kode_faktur, $data_metode_bayar, $_data_diskon);
 
-        $sisa_tagihan = ($data_diskon['total_belanja'] + $data_diskon['total_ppn'] + $data_diskon['total_service_charge']) - $params['total_bayar'];
+        if ( $data_diskon['jenis_harga_exclude'] == 1 ) {
+            $sisa_tagihan = ($data_diskon['total_belanja'] + $data_diskon['total_ppn'] + $data_diskon['total_service_charge']) - $params['total_bayar'];
+        } 
+        if ( $data_diskon['jenis_harga_include'] == 1 ) {
+            $sisa_tagihan = $data_diskon['total_belanja'] - $params['total_bayar'];
+        }
 
         $params['sisa_tagihan'] = ($sisa_tagihan > 0) ? $sisa_tagihan + $hutang : 0;
         $content['kode_faktur'] = $kode_faktur;
@@ -1223,6 +1251,495 @@ class Pembayaran extends Public_Controller
         display_json( $this->result );
     }
 
+    public function getDataPenjualanAfterSave($kode_faktur)
+    {
+        $data = null;
+        $detail = null;
+
+        $m_jual = new \Model\Storage\Jual_model();
+        $sql = "
+            select 
+                j.kode_faktur,
+                j.tgl_trans,
+                j.branch as kode_branch,
+                brc.nama as nama_branch,
+                brc.alamat as alamat_branch,
+                brc.telp as telp_branch,
+                j.nama_kasir,
+                j.member,
+                j.kode_member,
+                j.total,
+                b.diskon,
+                b.tgl_trans as tgl_bayar,
+                b.jml_bayar,
+                b.hutang,
+                j.grand_total,
+                j.lunas,
+                j.ppn,
+                j.service_charge
+            from jual j
+            left join
+                (
+                    select 
+                        b1.*, sum(bh.hutang) as hutang
+                    from bayar b1
+                    left join
+                        bayar_hutang bh
+                        on
+                            b1.id = bh.id_header
+                    where 
+                        b1.mstatus = 1
+                    group by
+                        b1.id, 
+                        b1.tgl_trans,
+                        b1.faktur_kode,
+                        b1.jml_tagihan,
+                        b1.jml_bayar,
+                        b1.jenis_bayar,
+                        b1.jenis_kartu_kode,
+                        b1.no_bukti,
+                        b1.kode_bayar_non_kasir,
+                        b1.mstatus,
+                        b1.ppn,
+                        b1.service_charge,
+                        b1.diskon,
+                        b1.total
+                ) b
+                on
+                    j.kode_faktur = b.faktur_kode
+            right join
+                branch brc
+                on
+                    j.branch = j.branch
+            where
+                j.kode_faktur = '".trim($kode_faktur)."' and
+                j.mstatus = 1
+        ";
+        $d_jual = $m_jual->hydrateRaw( $sql );
+
+        if ( $d_jual->count() > 0 ) {
+            $d_jual = $d_jual->toArray();
+
+            $total = 0;
+            $diskon = !empty($d_jual[0]['diskon']) ? $d_jual[0]['diskon'] : 0;
+            $grand_total = 0;
+            $service_charge = 0;
+            $ppn = 0;
+            $service_charge_include = 0;
+            $ppn_include = 0;
+            $include = 0;
+            $exclude = 0;
+
+            $m_juali = new \Model\Storage\JualItem_model();
+            $sql_juali = "
+                select ji.*, jp.nama as jp_nama, jp.kode as jp_kode from jual_item ji
+                right join
+                    jenis_pesanan jp
+                    on
+                        ji.kode_jenis_pesanan = jp.kode
+                where
+                    ji.faktur_kode = '".$d_jual[0]['kode_faktur']."'
+            ";
+            $d_juali = $m_juali->hydrateRaw( $sql_juali );
+            if ( $d_juali->count() > 0 ) {
+                $d_juali = $d_juali->toArray();
+
+                $detail[ $d_jual[0]['kode_faktur'] ]['kode'] = $d_jual[0]['kode_faktur'];
+                $detail[ $d_jual[0]['kode_faktur'] ]['member'] = $d_jual[0]['member'];
+                $detail[ $d_jual[0]['kode_faktur'] ]['kode_member'] = $d_jual[0]['kode_member'];
+                foreach ($d_juali as $k_ji => $v_ji) {
+                    $key = $v_ji['jp_nama'].' | '.$v_ji['jp_kode'];
+                    $key_item = $v_ji['menu_nama'].' | '.$v_ji['menu_kode'];
+
+                    $m_jp = new \Model\Storage\JenisPesanan_model();
+                    $d_jp = $m_jp->where('kode', $v_ji['jp_kode'])->first();
+
+                    $include = $d_jp->include;
+                    $exclude = $d_jp->exclude;
+
+                    $m_hm = new \Model\Storage\HargaMenu_model();
+                    $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
+
+                    if ( !isset($detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]) ) {
+                        $jual_item = null;
+                        $jual_item[ $key_item ] = array(
+                            'nama' => $v_ji['menu_nama'],
+                            'jumlah' => $v_ji['jumlah'],
+                            'total' => $v_ji['total'],
+                            'total_show' => $v_ji['total']
+                        );
+
+                        $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
+                        $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
+                        $total += $v_ji['total'];
+                        $service_charge_include += $v_ji['service_charge'];
+                        $ppn_include += $v_ji['ppn'];
+
+                        $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key] = array(
+                            'nama' => $v_ji['jp_nama'],
+                            'jual_item' => $jual_item
+                        );
+                    } else {
+                        if ( !isset($detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]) ) {
+                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item] = array(
+                                'nama' => $v_ji['menu_nama'],
+                                'jumlah' => $v_ji['jumlah'],
+                                'total' => $v_ji['total'],
+                                'total_show' => $v_ji['total']
+                            );
+
+                            $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
+                            $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
+                            $total += $v_ji['total'];
+                            $service_charge_include += $v_ji['service_charge'];
+                            $ppn_include += $v_ji['ppn'];
+                        } else {
+                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['jumlah'] += $v_ji['jumlah'];
+                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total'] += $v_ji['total'];
+                            $detail[ $d_jual[0]['kode_faktur'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += $v_ji['total'];
+
+                            $service_charge += ($d_jp->exclude == 1) ? $v_ji['service_charge'] : 0;
+                            $ppn += ($d_jp->exclude == 1) ? $v_ji['ppn'] : 0;
+                            $total += $v_ji['total'];
+                            $service_charge_include += $v_ji['service_charge'];
+                            $ppn_include += $v_ji['ppn'];
+                        }
+                    }
+                }
+            }
+
+            $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+            $sql_jg = "
+                select jg.faktur_kode_gabungan, j.member, j.kode_member, j.total, j.diskon, j.grand_total, j.ppn, j.service_charge from jual_gabungan jg
+                right join
+                    (select * from jual where mstatus = 1) j
+                    on
+                        jg.faktur_kode_gabungan = j.kode_faktur
+                where
+                    jg.faktur_kode = '".$d_jual[0]['kode_faktur']."'
+            ";
+            $d_jual_gabungan = $m_jual->hydrateRaw( $sql_jg );
+
+            if ( $d_jual_gabungan->count() > 0 ) {
+                $d_jual_gabungan = $d_jual_gabungan->toArray();
+
+
+                foreach ($d_jual_gabungan as $k_jg => $v_jg) {
+                    $diskon += $v_jg['diskon'];
+
+                    $m_jualig = new \Model\Storage\JualItem_model();
+                    $sql_jualig = "
+                        select ji.*, jp.nama as jp_nama, jp.kode as jp_kode from jual_item ji
+                        right join
+                            jenis_pesanan jp
+                            on
+                                ji.kode_jenis_pesanan = jp.kode
+                        where
+                            ji.faktur_kode = '".$v_jg['faktur_kode_gabungan']."'
+                    ";
+                    $d_jualig = $m_jualig->hydrateRaw( $sql_jualig );
+                    if ( $d_jualig->count() > 0 ) {
+                        $d_jualig = $d_jualig->toArray();
+
+                        $detail[ $v_jg['faktur_kode_gabungan'] ]['kode'] = $v_jg['faktur_kode_gabungan'];
+                        $detail[ $v_jg['faktur_kode_gabungan'] ]['member'] = $v_jg['member'];
+                        $detail[ $v_jg['faktur_kode_gabungan'] ]['kode_member'] = $v_jg['kode_member'];
+                        foreach ($d_jualig as $k_jig => $v_jig) {
+                            $key = $v_jig['jp_nama'].' | '.$v_jig['jp_kode'];
+                            $key_item = $v_jig['menu_nama'].' | '.$v_jig['menu_kode'];
+
+                            $m_jp = new \Model\Storage\JenisPesanan_model();
+                            $d_jp = $m_jp->where('kode', $v_ji['jp_kode'])->first();
+
+                            $include = $d_jp->include;
+                            $exclude = $d_jp->exclude;
+
+                            $m_hm = new \Model\Storage\HargaMenu_model();
+                            $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
+
+                            if ( !isset($detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]) ) {
+                                $jual_item = null;
+                                $jual_item[ $key_item ] = array(
+                                    'nama' => $v_jig['menu_nama'],
+                                    'jumlah' => $v_jig['jumlah'],
+                                    'total' => $v_jig['total'],
+                                    'total_show' => $v_jig['total']
+                                );
+
+                                $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
+                                $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
+                                $total += $v_jig['total'];
+                                $service_charge_include += $v_jig['service_charge'];
+                                $ppn_include += $v_jig['ppn'];
+
+                                $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key] = array(
+                                    'nama' => $v_jig['jp_nama'],
+                                    'jual_item' => $jual_item
+                                );
+                            } else {
+                                if ( !isset($detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]) ) {
+                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item] = array(
+                                        'nama' => $v_jig['menu_nama'],
+                                        'jumlah' => $v_jig['jumlah'],
+                                        'total' => $v_jig['total'],
+                                        'total_show' => $v_jig['total']
+                                    );
+
+                                    $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
+                                    $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
+                                    $total += $v_jig['total'];
+                                    $service_charge_include += $v_jig['service_charge'];
+                                    $ppn_include += $v_jig['ppn'];
+                                } else {
+                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['jumlah'] += $v_jig['jumlah'];
+                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total'] += $v_jig['total'];
+                                    $detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]['jual_item'][$key_item]['total_show'] += $v_jig['total'];
+
+                                    $service_charge += ($d_jp->exclude == 1) ? $v_jig['service_charge'] : 0;
+                                    $ppn += ($d_jp->exclude == 1) ? $v_jig['ppn'] : 0;
+                                    $total += $v_jig['total'];
+                                    $service_charge_include += $v_jig['service_charge'];
+                                    $ppn_include += $v_jig['ppn'];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $m_bayar = new \Model\Storage\Bayar_model();
+            $sql = "
+                select
+                    kjk.id,
+                    kjk.nama,
+                    data.jumlah
+                from
+                    kategori_jenis_kartu kjk 
+                left join
+                    (
+                        select 
+                            jk.kategori_jenis_kartu_id,
+                            sum(bd.nominal) as jumlah
+                        from bayar b 
+                        right join
+                            bayar_det bd 
+                            on
+                                b.id = bd.id_header 
+                        right join  
+                            jenis_kartu jk 
+                            on
+                                jk.kode_jenis_kartu = bd.kode_jenis_kartu 
+                        where
+                            b.faktur_kode = '".trim($kode_faktur)."' and
+                            b.mstatus = 1
+                        group by
+                            jk.kategori_jenis_kartu_id
+                    ) data
+                    on
+                        kjk.id = data.kategori_jenis_kartu_id
+            ";
+            $d_kjk = $m_bayar->hydrateRaw( $sql );
+            if ( $d_kjk->count() > 0 ) {
+                $d_kjk = $d_kjk->toArray();
+            }
+
+            $data = array(
+                'kode_faktur' => $d_jual[0]['kode_faktur'],
+                'tgl_trans' => $d_jual[0]['tgl_trans'],
+                'tgl_bayar' => $d_jual[0]['tgl_bayar'],
+                'nama_kasir' => $d_jual[0]['nama_kasir'],
+                'member' => $d_jual[0]['member'],
+                'kode_member' => $d_jual[0]['kode_member'],
+                'kode_branch' => $d_jual[0]['kode_branch'],
+                'nama_branch' => $d_jual[0]['nama_branch'],
+                'alamat_branch' => $d_jual[0]['alamat_branch'],
+                'telp_branch' => $d_jual[0]['telp_branch'],
+                'total' => $total,
+                'diskon' => $diskon,
+                'ppn' => $ppn,
+                'service_charge' => $service_charge,
+                'ppn_include' => $ppn_include,
+                'service_charge_include' => $service_charge_include,
+                'grand_total' => ($total + $ppn + $service_charge + $d_jual[0]['hutang'])-$diskon,
+                'jml_bayar' => $d_jual[0]['jml_bayar'],
+                'hutang' => $d_jual[0]['hutang'],
+                'lunas' => $d_jual[0]['lunas'],
+                'kategori_jenis_kartu' => $d_kjk,
+                'jenis_bayar_include' => $include,
+                'jenis_bayar_exclude' => $exclude,
+                'detail' => $detail
+            );
+        }
+
+        return $data;
+    }
+
+    public function printNota()
+    {
+        $params = $this->input->post('params');
+
+        try {
+            $jenis = isset($params['jenis']) ? $params['jenis'] : null;
+            $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'] );
+
+            function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                // Mengatur lebar setiap kolom (dalam satuan karakter)
+                if ( $jenis == 'header' ) {
+                    $lebar_kolom_1 = 10;
+                    $lebar_kolom_2 = 3;
+                    $lebar_kolom_3 = 33;
+                }
+                if ( $jenis == 'center' ) {
+                    $lebar_kolom_1 = 6;
+                    $lebar_kolom_2 = 30;
+                    $lebar_kolom_3 = 10;
+                }
+                if ( $jenis == 'footer' ) {
+                    $lebar_kolom_1 = 33;
+                    $lebar_kolom_2 = 3;
+                    $lebar_kolom_3 = 10;
+                }
+     
+                // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+                $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+                $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+                $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+     
+                // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+                $kolom1Array = explode("\n", $kolom1);
+                $kolom2Array = explode("\n", $kolom2);
+                $kolom3Array = explode("\n", $kolom3);
+     
+                // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+                $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+     
+                // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+                $hasilBaris = array();
+     
+                // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+                for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+                    if ( $jenis == 'header' ) {
+                        // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                        $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                        $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                        $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+                    }
+                    if ( $jenis == 'center' ) {
+                        // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                        $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                        $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                        $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                    }
+                    if ( $jenis == 'footer' ) {
+                        // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                        $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ", STR_PAD_LEFT);
+                        $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                        $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                    }
+     
+                    // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                    $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+                }
+     
+                // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+                return implode($hasilBaris, "\n") . "\n";
+            }
+
+            // Enter the share name for your USB printer here
+            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+            // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+
+            /* Print a receipt */
+            $printer = new Mike42\Escpos\Printer($connector);
+            $printer -> initialize();
+
+            // $printer -> text('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+
+            $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            // $printer -> selectPrintMode(32);
+            // $printer -> setTextSize(2, 1);
+            $printer -> text($data['nama_branch']."\n");
+
+            $printer -> initialize();
+            $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer -> text($data['alamat_branch']."\n");
+            $printer -> text('Telp.'. $data['telp_branch']."\n");
+            $printer -> text("\n");
+
+            $printer = new Mike42\Escpos\Printer($connector);
+            $printer -> initialize();
+
+            $kode_faktur = $data['kode_faktur'];
+            if ( stristr($jenis, 'hutang') !== false ) {
+                $kode_faktur = $data['kode_faktur'].' (CL)';
+            }
+
+            $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
+            $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
+            $printer -> text(buatBaris3Kolom('Tanggal', ':', $data['tgl_trans'], 'header'));
+
+            $printer -> text('------------------------------------------------'."\n");
+
+            $jml_member = 1;
+            foreach ($data['detail'] as $k_det => $v_det) {
+                if ( $jml_member > 1 ) {
+                    $printer -> text("\n");
+                }
+
+                $printer -> text(buatBaris3Kolom('Member', ':', $v_det['member'], 'header'));
+                $printer -> text('------------------------------------------------'."\n");
+
+                $printer -> initialize();
+                foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp) {
+                    $printer -> text($v_jp['nama']."\n");
+                    foreach ($v_jp['jual_item'] as $k_ji => $v_ji) {
+                        $printer -> text(buatBaris3Kolom($v_ji['jumlah'].'X', $v_ji['nama'], angkaRibuan($v_ji['total_show']), 'center'));
+                    }
+                }
+
+                $jml_member++;
+            }
+
+            $printer -> text('------------------------------------------------'."\n");
+            $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
+            if ( stristr($jenis, 'hutang') === false ) {
+                $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
+                $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
+                $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+                $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
+                $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
+                $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
+                $kembalian = (($data['jml_bayar'] - $data['grand_total']) > 0) ? $data['jml_bayar'] - $data['grand_total'] : 0;
+                $printer -> text(buatBaris3Kolom('Kembalian.', '=', angkaRibuan($kembalian), 'footer'));
+                $printer -> text(buatBaris3Kolom('', '', '----------', 'footer'));
+                foreach ($data['kategori_jenis_kartu'] as $k_kjk => $v_kjk) {
+                    $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($v_kjk['jumlah']), 'footer'));
+                }
+
+                if ( $data['jenis_bayar_include'] == 1 ) {
+                    $printer -> initialize();
+                    $printer -> text("\n\n");
+                    $printer -> text(buatBaris3Kolom('Price Include of Service Charge.', '=', angkaRibuan($data['service_charge_include']), 'footer'));
+                    $printer -> text(buatBaris3Kolom('Price Include of PB1.', '=', angkaRibuan($data['ppn_include']), 'footer'));
+                }
+            }
+            $printer -> text('------------------------------------------------'."\n");
+            $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer -> text("*** TERIMA KASIH ***");
+
+            $printer -> feed(3);
+            $printer -> cut();
+            $printer -> close();
+
+            $this->result['status'] = 1;
+        } catch (Exception $e) {
+            $this->result['message'] = "Couldn't print to this printer: " . $e -> getMessage() . "\n";
+        }
+
+        display_json( $this->result );
+    }
+
     public function saveHutang()
     {
         $params = $this->input->post('params');
@@ -1277,6 +1794,7 @@ class Pembayaran extends Public_Controller
         $this->add_external_js(
             array(
                 "assets/select2/js/select2.min.js",
+                "assets/html2canvas/html2canvas.min.js",
                 "assets/transaksi/pembayaran/js/pembayaran.js",
             )
         );
@@ -1292,7 +1810,7 @@ class Pembayaran extends Public_Controller
         $now = $m_jual->getDate();
 
         $content['akses'] = $this->hakAkses;
-        $content['data'] = $this->getDataPenjualan($kode_faktur);
+        $content['data'] = $this->getDataPenjualanAfterSave($kode_faktur);
         $content['data_bayar'] = $this->getDataPembayaran($kode_faktur);
         $content['data_hutang'] = $this->getDataHutangEdit($kode_faktur);
         $content['jenis_kartu'] = $this->getJenisKartu();
@@ -1304,6 +1822,8 @@ class Pembayaran extends Public_Controller
             'nama_kasir' => $this->userdata['detail_user']['nama_detuser'],
             'waktu' => $now['waktu']
         );
+
+        // cetak_r($content['data_hutang']);
 
         $data['view'] = $this->load->view($this->pathView . 'pembayaran_form_edit', $content, TRUE);
 
@@ -1318,6 +1838,8 @@ class Pembayaran extends Public_Controller
         $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
         $d_bayar_hutang = $m_bayar_hutang->where('id_header', $d_bayar['id'])->get();
 
+        // cetak_r($d_bayar);
+        // cetak_r($d_bayar_hutang);
         
         $data = null;
         if ( $d_bayar_hutang->count() > 0 ) {
@@ -1325,14 +1847,17 @@ class Pembayaran extends Public_Controller
 
             foreach ($d_bayar_hutang as $key => $value) {
                 $m_jual = new \Model\Storage\Jual_model();
-                $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->with(['pesanan'])->first()->toArray();
+                $d_jual = $m_jual->where('kode_faktur', $value['faktur_kode'])->with(['pesanan'])->first()->toArray();
+
+                $data_hutang = $this->getDataPenjualan($value['faktur_kode']);
 
                 $data[] = array(
                     'tgl_pesan' => !empty($d_jual['pesanan']) ? $d_jual['pesanan']['tgl_pesan'] : $d_jual['tgl_trans'],
                     'faktur_kode' => $value['faktur_kode'],
                     'hutang' => $value['hutang'],
                     'sudah_bayar' => $value['sudah_bayar'],
-                    'bayar' => $value['bayar']
+                    'bayar' => $value['bayar'],
+                    'data' => $data_hutang
                 );
             }
         }
@@ -1649,14 +2174,16 @@ class Pembayaran extends Public_Controller
 
         try {
             $data_utama = $params['data_utama'];
-            $data = $params['data'];
+            $data = isset($params['data']) ? $params['data'] : null;
 
-            foreach ($data as $key => $value) {
-                $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
-                $m_jual_gabungan->faktur_kode = $data_utama['kode_faktur'];
-                $m_jual_gabungan->faktur_kode_gabungan = $value['kode_faktur'];
-                $m_jual_gabungan->jml_tagihan = $value['total'];
-                $m_jual_gabungan->save();
+            if ( !empty($data) ) {
+                foreach ($data as $key => $value) {
+                    $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+                    $m_jual_gabungan->faktur_kode = $data_utama['kode_faktur'];
+                    $m_jual_gabungan->faktur_kode_gabungan = $value['kode_faktur'];
+                    $m_jual_gabungan->jml_tagihan = $value['total'];
+                    $m_jual_gabungan->save();
+                }
             }
 
             $this->result['status'] = 1;
@@ -1815,14 +2342,15 @@ class Pembayaran extends Public_Controller
                 jp.exclude,
                 jp.include,
                 sum(ji.jumlah) as jumlah, 
-                case 
+                sum(ji.total) as total,
+                /* case 
                     when jp.exclude = 1 then
                         sum(ji.total)
                     when jp.include = 1 then
-                        sum(ji.total) + sum(ji.ppn) + sum(ji.service_charge)
-                end as total, 
-                sum(ji.ppn) as nilai_ppn, 
-                sum(ji.service_charge) as nilai_service_charge, 
+                        sum(ji.total) + ISNULL(sum(ji.ppn), 0) + ISNULL(sum(ji.service_charge), 0)
+                end as total, */
+                ISNULL(sum(ji.ppn), 0) as nilai_ppn, 
+                ISNULL(sum(ji.service_charge), 0) as nilai_service_charge, 
                 max(m.ppn) as ppn, 
                 max(m.service_charge) as service_charge
             from jual_item ji
@@ -2080,10 +2608,8 @@ class Pembayaran extends Public_Controller
                         }
                     }
                 } else {
-                    if ( $jenis_harga_exclude == 1 ) {
-                        $tot_ppn = $v_jual['nilai_ppn'];
-                        $tot_sc = $v_jual['nilai_service_charge'];
-                    }
+                    $tot_ppn = $v_jual['nilai_ppn'];
+                    $tot_sc = $v_jual['nilai_service_charge'];
                 }
             }
         }
@@ -2099,5 +2625,63 @@ class Pembayaran extends Public_Controller
         );
 
         return $_data_diskon;
+    }
+
+    public function formFakturHutang()
+    {
+        $params = $this->input->get('params');
+
+        $m_conf = new \Model\Storage\Conf();
+        $now = $m_conf->getDate();
+
+        $content['data'] = $this->getDataPenjualan($params);
+        $content['jenis_kartu'] = $this->getJenisKartu();
+        $content['kategori_pembayaran'] = $this->getDataKategoriPembayaran($params);
+        $content['data_branch'] = array(
+            'kode' => $content['data']['kode_branch'],
+            'nama' => $content['data']['nama_branch'],
+            'alamat' => $content['data']['alamat_branch'],
+            'telp' => $content['data']['telp_branch'],
+            'nama_kasir' => $this->userdata['detail_user']['nama_detuser'],
+            'waktu' => $content['data']['tgl_trans']
+        );
+
+        $html = $this->load->view($this->pathView . 'form_faktur_hutang', $content, TRUE);
+
+        echo $html;
+    }
+
+    public function exportPdf($kode_faktur, $html)
+    {
+        $this->load->library('PDFGenerator');
+
+        $res_view_html = '<html>';
+            $res_view_html .= '<head>';
+                $res_view_html .= '<style type="text/css">';
+                    $res_view_html .= '.col-xs-12{width:100%}.col-xs-11{width:91.66666667%}.col-xs-10{width:83.33333333%}.col-xs-9{width:75%}.col-xs-8{width:66.66666667%}.col-xs-7{width:58.33333333%}.col-xs-6{width:50%}.col-xs-5{width:41.66666667%}.col-xs-4{width:33.33333333%}.col-xs-3{width:25%}.col-xs-2{width:16.66666667%}.col-xs-1{width:8.33333333%}';
+                    $res_view_html .= ".text-center {text-align:center}";
+                    $res_view_html .= ".text-right {text-align:right}";
+                    $res_view_html .= ".font10 {font-size:10px}";
+                    $res_view_html .= ".table {width: 100%}";
+                    $res_view_html .= ".body {width:100%;display: flex;justify-content: center;}";
+                $res_view_html .= '</style>';
+                $res_view_html .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+            $res_view_html .= '</head>';
+            $res_view_html .= '<body>';
+            $res_view_html .= $html;
+            $res_view_html .= '</body>';
+        $res_view_html .= '</html>';
+
+        $this->pdfgenerator->generate($res_view_html, $kode_faktur);
+    }
+
+    public function tes()
+    {
+        cetak_r( $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'] ) );
+        // phpinfo();
+
+        // if (!extension_loaded('imagick')){
+        //     echo 'imagick not installed';
+        // }
     }
 }

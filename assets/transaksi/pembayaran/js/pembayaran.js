@@ -5,6 +5,8 @@ var kode_member = null;
 var tr_split = null;
 var dataDiskon = [];
 var dataDiskonSave = null;
+var fakturPrint = [];
+var idxFaktur = 0;
 
 var bayar = {
 	startUp: function () {
@@ -388,11 +390,18 @@ var bayar = {
 
                 var harga = numeral.unformat($(tr_split).find('.harga').text());
 
+                var ppn = ($(tr_split).find('.total').attr('data-ppn') > 0) ? $(tr_split).find('.total').attr('data-ppn') / jumlah : 0;
+                var sc = ($(tr_split).find('.total').attr('data-sc') > 0) ? $(tr_split).find('.total').attr('data-sc') / jumlah : 0;
+
                 var sisa = jumlah - jumlah_pindah;
 
                 $(tr_split).find('td.jumlah').text( numeral.formatInt(sisa) );
                 var total = harga * sisa;
+                var total_ppn = ppn * sisa;
+                var total_sc = sc * sisa;
                 $(tr_split).find('.total').text( numeral.formatInt(total) );
+                $(tr_split).find('.total').attr( 'data-ppn', total_ppn);
+                $(tr_split).find('.total').attr( 'data-sc', total_sc);
                 if ( sisa == 0 ) {
                     $(tr_split).addClass('hide');
                 }
@@ -411,7 +420,11 @@ var bayar = {
                 $(tr_split_clone).find('button i').addClass('fa-minus');
 
                 var total_split = harga * jumlah_pindah;
+                var total_split_ppn = ppn * jumlah_pindah;
+                var total_split_sc = sc * jumlah_pindah;
                 $(tr_split_clone).find('.total').text( numeral.formatInt(total_split) );
+                $(tr_split_clone).find('.total').attr( 'data-ppn', total_split_ppn);
+                $(tr_split_clone).find('.total').attr( 'data-sc', total_split_sc);
 
                 $('div.active').find('table tbody').append( $(tr_split_clone) );
             }
@@ -432,16 +445,23 @@ var bayar = {
         var tr_main = $(div).find('tr[data-kode="'+pesanan_item_kode+'"]');
         var jumlah = numeral.unformat($(tr_main).find('.jumlah').text());
 
-        var sisa = jumlah + jumlah_remove;
+        var ppn = ($(tr_split).find('.total').attr('data-ppn') > 0) ? $(tr_split).find('.total').attr('data-ppn') / jumlah : 0;
+        var sc = ($(tr_split).find('.total').attr('data-sc') > 0) ? $(tr_split).find('.total').attr('data-sc') / jumlah : 0;
 
-        if ( sisa > 0 ) {
+        var total_jumlah = jumlah + jumlah_remove;
+
+        if ( total_jumlah > 0 ) {
             $(tr_main).removeClass('hide');
 
             var harga = numeral.unformat($(tr_main).find('.harga').text());
-            var total = harga * sisa;
+            var total = harga * total_jumlah;
+            var total_ppn = ppn * total_jumlah;
+            var total_sc = sc * total_jumlah;
 
-            $(tr_main).find('.jumlah').text(numeral.formatInt(sisa));
+            $(tr_main).find('.jumlah').text(numeral.formatInt(total_jumlah));
             $(tr_main).find('.total').text(numeral.formatInt(total));
+            $(tr_main).find('.total').attr( 'data-ppn', total_ppn);
+            $(tr_main).find('.total').attr( 'data-sc', total_sc);
 
             $(tr).remove();
         }
@@ -458,6 +478,8 @@ var bayar = {
         var data_split = $.map( $(div_split).find('.tab-pane'), function(div_tab_pane) {
             if ( $(div_tab_pane).find('tr').length > 0 ) {
                 var grand_total = 0;
+                var grand_total_ppn = 0;
+                var grand_total_sc = 0;
                 var jual_item = $.map( $(div_tab_pane).find('tr'), function(tr) {
                     var jual_item_detail = null;
                     if ( $(tr).find('div.detail').length > 0 ) {
@@ -478,11 +500,15 @@ var bayar = {
                         'jumlah': numeral.unformat($(tr).find('.jumlah').text()),
                         'harga': numeral.unformat($(tr).find('.harga').text()),
                         'total': numeral.unformat($(tr).find('.total').text()),
+                        'ppn': $(tr).find('.total').attr('data-ppn'),
+                        'sc': $(tr).find('.total').attr('data-sc'),
                         'request': $(tr).find('span.request').text(),
                         'jual_item_detail': jual_item_detail
                     };
 
                     grand_total += numeral.unformat($(tr).find('.total').text());
+                    grand_total_ppn += parseFloat($(tr).find('.total').attr('data-ppn'));
+                    grand_total_sc += parseFloat($(tr).find('.total').attr('data-sc'));
 
                     return _jual_item;
                 });
@@ -491,7 +517,9 @@ var bayar = {
                     'member': $(div_tab_pane).data('member'),
                     'kode_member': $(div_tab_pane).data('kodemember'),
                     'jual_item': jual_item,
-                    'grand_total': grand_total
+                    'grand_total': grand_total,
+                    'grand_total_ppn': grand_total_ppn,
+                    'grand_total_sc': grand_total_sc
                 };
 
                 return _data_split;
@@ -501,6 +529,8 @@ var bayar = {
         var data_main = null;
         if ( $(div_main).find('tr:not(.hide)').length > 0 ) {
             var grand_total = 0;
+            var grand_total_ppn = 0;
+            var grand_total_sc = 0;
             var jual_item = $.map( $(div_main).find('tr'), function(tr) {
                 var jual_item_detail = null;
                 if ( $(tr).find('div.detail').length > 0 ) {
@@ -521,11 +551,15 @@ var bayar = {
                     'jumlah': numeral.unformat($(tr).find('.jumlah').text()),
                     'harga': numeral.unformat($(tr).find('.harga').text()),
                     'total': numeral.unformat($(tr).find('.total').text()),
+                    'ppn': $(tr).find('.total').attr('data-ppn'),
+                    'sc': $(tr).find('.total').attr('data-sc'),
                     'request': $(tr).find('span.request').text(),
                     'jual_item_detail': jual_item_detail
                 };
 
                 grand_total += numeral.unformat($(tr).find('.total').text());
+                grand_total_ppn += parseFloat($(tr).find('.total').attr('data-ppn'));
+                grand_total_sc += parseFloat($(tr).find('.total').attr('data-sc'));
 
                 return _jual_item;
             });
@@ -533,7 +567,9 @@ var bayar = {
             var data_main = {
                 'faktur_kode': $(div_main).data('kode'),
                 'jual_item': jual_item,
-                'grand_total': grand_total
+                'grand_total': grand_total,
+                'grand_total_ppn': grand_total_ppn,
+                'grand_total_sc': grand_total_sc
             };
         }
 
@@ -577,6 +613,32 @@ var bayar = {
 
         window.location.href = pagePembayaran;
     }, // end - pembayaranForm
+
+    formFakturHutang: function(elm) {
+        var tr = $(elm).closest('tr');
+        var kode_faktur = $(tr).find('td.faktur').attr('data-val');
+
+        if ( $(elm).is(':checked') ) {
+            $.ajax({
+                url: 'transaksi/Pembayaran/formFakturHutang',
+                data: {
+                    'params': kode_faktur
+                },
+                type: 'GET',
+                dataType: 'HTML',
+                beforeSend: function() { showLoading(); },
+                success: function(html) {
+                    hideLoading();
+
+                    $('div.detail_faktur').append( html );
+
+                    bayar.hitungTotalTagihan();
+                }
+            });
+        } else {
+            $('div.data[data-faktur="'+kode_faktur+'"]').remove();
+        }
+    }, // end - formFakturHutang
 
     hitungTotalTagihan: function() {
         dataHutangBayar = [];
@@ -644,11 +706,12 @@ var bayar = {
         var total_tagihan = tagihan - total_diskon;
 
         total_tagihan = (total_tagihan > 0 ) ? total_tagihan : 0;
+
         total_tagihan += hutang;
 
+        $('.data .hutang').attr('data-val', hutang);
+        $('.data .hutang').text( numeral.formatDec(hutang) );
         $('.total_tagihan').val( numeral.formatInt(total_tagihan) );
-
-        kembalian = total_bayar - total_tagihan;
 
         $('.nota_diskon').attr('data-val', total_diskon);
         $('.nota_diskon').text( '('+numeral.formatDec(total_diskon)+')' );
@@ -664,19 +727,22 @@ var bayar = {
             }
         }
 
-        $('.total_bayar').val( numeral.formatInt(total_bayar) );
+        kembalian = total_bayar - total_tagihan;
 
+        $('.total_bayar').val( numeral.formatInt(total_bayar) );
         $('.jml_bayar').text( numeral.formatDec(total_bayar) );
         $('.jml_bayar').attr('data-val', total_bayar);
 
         if ( kembalian > 0 ) {
             // $('.kembalian').val( numeral.formatInt(kembalian) );
-            $('.kembalian').text( numeral.formatDec(kembalian) );
-            $('.kembalian').attr('data-val', kembalian);
+            $('input.kembalian').val( numeral.formatInt(kembalian) );
+            $('.data .kembalian').text( numeral.formatDec(kembalian) );
+            $('.data .kembalian').attr('data-val', kembalian);
         } else {
             // $('.kembalian').val( numeral.formatInt(0) );
-            $('.kembalian').text( numeral.formatDec(0) );
-            $('.kembalian').attr('data-val', 0);
+            $('input.kembalian').val( numeral.formatInt(0) );
+            $('.data .kembalian').text( numeral.formatDec(0) );
+            $('.data .kembalian').attr('data-val', 0);
         }
 
         bayar.hitungSisaTagihan();
@@ -713,13 +779,13 @@ var bayar = {
                 $(div_saldo_member).find('input.sisa_saldo').val( numeral.formatInt(sisa_saldo) );
             }
         } else {
-            if ( !empty(jenis_kartu) ) {
-                if ( nominal_bayar_hutang > hutang ) {
-                    bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
-                        $(elm).val( numeral.formatInt(hutang) );
-                    });
-                }
-            }
+            // if ( !empty(jenis_kartu) ) {
+            //     if ( nominal_bayar_hutang > hutang ) {
+            //         bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
+            //             $(elm).val( numeral.formatInt(hutang) );
+            //         });
+            //     }
+            // }
         }
     }, // end - cekNominalBayarHutang
 
@@ -904,6 +970,18 @@ var bayar = {
             'dataDiskon': dataDiskonSave
         };
 
+        var idx = 0;
+        if ( $('.data').length > 0 ) {
+            $.map( $('.data'), function (div) {
+                fakturPrint[idx] = {
+                    'kode_faktur': $(div).attr('data-faktur'),
+                    'jenis': ($(div).hasClass('faktur_hutang')) ? 'hutang' : ''
+                };
+
+                idx++;
+            });
+        }
+
         $.ajax({
             url: 'transaksi/Pembayaran/savePembayaran',
             data: {
@@ -915,7 +993,7 @@ var bayar = {
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
-                    bayar.penjualanForm();
+                    bayar.printNota();
                 } else {
                     bootbox.alert(data.message);
                 }
@@ -923,8 +1001,39 @@ var bayar = {
         });
     }, // end - execSavePembayaran
 
+    printNota: function () {
+        var data = {
+            'faktur_kode': fakturPrint[idxFaktur]['kode_faktur'],
+            'jenis': fakturPrint[idxFaktur]['jenis'],
+        };
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/printNota',
+            data: {
+                'params': data
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading(); },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    idxFaktur++;
+                    if ( typeof fakturPrint[idxFaktur] !== 'undefined' ) {
+                        bayar.printNota();
+                    } else {
+                        bayar.penjualanForm();
+                    }
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end  - printNota
+
     penjualanForm: function () {
         var baseurl = $('head base').attr('href');
+        console.log( baseurl );
         var pagePenjualan = baseurl + 'transaksi/Penjualan';
 
         window.location.href = pagePenjualan;
@@ -1356,6 +1465,9 @@ var bayar = {
 
                     var ppn_new = parseFloat(data.content.total_ppn);
                     var service_charge_new = parseFloat(data.content.total_service_charge);
+
+                    console.log( ppn_new );
+                    console.log( service_charge_new );
 
                     if ( data.content.jenis_harga_exclude == 1 ) {
                         $('.include').addClass('hide');

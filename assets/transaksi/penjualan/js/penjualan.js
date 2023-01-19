@@ -1361,9 +1361,11 @@ var jual = {
                 var kode_detail_menu = $(div_menu).attr('data-detail');
 
                 var nama_menu = $(div_menu_utama).find('.nama_menu').text();
-                var harga = $(div_menu_utama).find('.hrg').attr('data-hrg');
+                // var harga = $(div_menu_utama).find('.hrg').attr('data-hrg');
+                var harga = numeral.unformat($(div_menu_utama).find('.hrg').text());
                 var jumlah = numeral.unformat($(div_menu_utama).find('.jumlah').text());
-                var total = $(div_menu_utama).find('.total').attr('data-val');
+                // var total = $(div_menu_utama).find('.total').attr('data-val');
+                var total = numeral.unformat($(div_menu_utama).find('.total').text());
                 var ppn = $(div_menu_utama).find('.total').attr('data-ppn');
                 var service_charge = $(div_menu_utama).find('.total').attr('data-sc');
                 var request = $(div_menu).find('span.request').text();

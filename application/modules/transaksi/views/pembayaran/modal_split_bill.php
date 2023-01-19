@@ -15,7 +15,7 @@
 									<td class="col-xs-10">
 										<span class="menu_nama" data-kode="<?php echo $v_ji['menu_kode']; ?>"><?php echo $v_ji['menu_nama']; ?></span>
 										<br>
-										<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
+										<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
 										<br>
 										<?php if ( !empty($v_ji['jual_item_detail']) ): ?>
 											<?php foreach ($v_ji['jual_item_detail'] as $k_jid => $v_jid): ?>
@@ -73,7 +73,7 @@
 															<td class="col-xs-10">
 																<span class="menu_nama" data-kode="<?php echo $v_ji['menu_kode']; ?>"><?php echo $v_ji['menu_nama']; ?></span>
 																<br>
-																<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
+																<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
 																<br>
 																<?php if ( !empty($v_ji['jual_item_detail']) ): ?>
 																	<?php foreach ($v_ji['jual_item_detail'] as $k_jid => $v_jid): ?>

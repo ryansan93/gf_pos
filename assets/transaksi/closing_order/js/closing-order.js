@@ -2,6 +2,30 @@ var clo = {
 	startUp: function () {
 	}, // end - startUp
 
+	saveEndShift: function () {
+		bootbox.confirm('Apakah anda yakin ingin mengakhiri shift hari ini ?', function (result) {
+			if ( result ) {
+				$.ajax({
+		            url: 'transaksi/ClosingOrder/saveEndShift',
+		            data: {},
+		            type: 'POST',
+		            dataType: 'json',
+		            beforeSend: function() {
+		                showLoading();
+		            },
+		            success: function(data) {
+		            	hideLoading();
+		                if ( data.status == 1 ) {
+		                	bootbox.alert( data.message );
+		                } else {
+		                    bootbox.alert( data.message );
+		                }
+		            }
+		        });
+			}
+		});
+	}, // end - saveEndShift
+
 	saveClosingOrder: function () {
 		bootbox.confirm('Apakah anda yakin ingin mengakhiri transaksi hari ini ?', function (result) {
 			if ( result ) {

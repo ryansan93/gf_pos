@@ -41,7 +41,7 @@ use Mike42\Escpos\NativeEscposImage;
  *    also not complex to add, and is a likely future feature.
  *  - Support for native use of the BMP format is a goal, for maximum compatibility with target environments.
  */
-abstract class EscposImage
+class EscposImage
 {
     /**
      * @var int $imgHeight

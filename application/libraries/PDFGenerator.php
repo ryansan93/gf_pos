@@ -11,8 +11,14 @@ class PDFGenerator
     $dompdf = new DOMPDF();
 
     $dompdf->load_html($html);
-    $dompdf->set_paper($kertas, $type);
+    // $dompdf->set_paper($kertas, $type);
     $dompdf->render();
-    $dompdf->stream($filename.'.pdf',array("Attachment"=>0));
+    // $dompdf->stream($filename.'.pdf',array("Attachment"=>0));
+    $output = $dompdf->output();
+    if ( !is_dir( './uploads/'.$filename ) ) {
+        mkdir('./uploads/'.$filename);
+    }
+    file_put_contents('./uploads/'.$filename.'/' . $filename.'.pdf', $output);
+    // $pdf->save('./uploads/'.$filename.'/' . $filename.'.pdf');
   }
 }

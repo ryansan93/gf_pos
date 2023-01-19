@@ -41,7 +41,7 @@
 								<table class="table table-bordered tbl_belum_bayar" style="margin-bottom: 0px;">
 									<thead>
 										<tr>
-											<th class="col-lg-1">Kasir</th>
+											<th class="col-lg-1">Waitress</th>
 											<th class="col-lg-2">No. Meja</th>
 											<th class="col-lg-2">No. Pesanan</th>
 											<th class="col-lg-2">Pelanggan</th>

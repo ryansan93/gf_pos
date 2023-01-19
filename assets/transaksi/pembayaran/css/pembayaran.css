@@ -103,16 +103,12 @@ hr.double-dashed {
 	border-top: dashed 1px #000000!important;
 	border-bottom: dashed 1px #000000!important;
 	height: 3px!important;
-	margin-right: 15px;
-    margin-left: 15px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
 hr.dashed {
 	border-top: dashed 1px #000000!important;
-	margin-right: 15px;
-    margin-left: 15px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -120,4 +116,16 @@ hr.dashed {
 .tbl_diskon tr.data[data-aktif="1"] td {
 	background-color: #ff8f26;
 	border: 1px solid #ff8f26;
+}
+
+div.data .table tbody tr td {
+	padding: 0px!important;
+}
+
+div.detail_faktur {
+	background-color: #ffffff;
+}
+
+canvas {
+	height: 100%;
 }

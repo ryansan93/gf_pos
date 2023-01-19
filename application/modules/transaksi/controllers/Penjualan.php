@@ -1575,6 +1575,15 @@ class Penjualan extends Public_Controller
     public function printTes()
     {
         try {
+            // $this->load->library('PDFGenerator');
+
+            // // $m_rs = new \Model\Storage\RdimSubmit_model();
+            // // $res_view_html = $this->load->view('transaksi/rdim/cetak_kontrak', $content, true);
+            // $content = null;
+            // $res_view_html = $this->load->view($this->pathView . 'print_tes', $content, TRUE);;
+
+            // $this->pdfgenerator->generate($res_view_html, "TES PRINT");
+
             $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
             // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
@@ -1583,11 +1592,19 @@ class Penjualan extends Public_Controller
             $printer = new Mike42\Escpos\Printer($connector);
             $printer -> initialize();
 
-            $printer -> setJustification(1);
-            $printer -> selectPrintMode(32);
-            $printer -> setTextSize(2, 1);
-            $printer -> text("\n\nPRINT TEST\n\n");
+            // $printer -> setJustification(1);
+            // $printer -> selectPrintMode(32);
+            // $printer -> setTextSize(2, 1);
+            // $printer -> text("\n\nPRINT TEST\n\n");
+            $printer -> text("-----------------------------------------------");
 
+            /* NOTE : UKURAN KARAKTER PER KERTAS */
+            /*
+                56mm : 35 karakter
+                80mm : 47 karakter
+            */
+
+            $printer -> feed(3);
             $printer -> cut();
             $printer -> close();
 
@@ -2080,7 +2097,7 @@ class Penjualan extends Public_Controller
                         'total' => $v_ji['total'],
                         'service_charge' => $v_ji['service_charge'],
                         'ppn' => $v_ji['ppn'],
-                        'total_show' => ($d_jp->exclude == 1) ? $v_ji['total'] : ($v_ji['total'] + $v_ji['service_charge'] + $v_ji['ppn']),
+                        'total_show' => $v_ji['total'],
                         'request' => $v_ji['request'],
                         'pesanan_item_detail' => $v_ji['pesanan_item_detail'],
                         'proses' => $v_ji['proses']
@@ -2160,8 +2177,8 @@ class Penjualan extends Public_Controller
                     'branch' => $this->kodebranch,
                     'member' => $params['member'],
                     'kode_member' => $params['kode_member'],
-                    'user_id' => $this->userid,
-                    'nama_user' => $this->userdata['detail_user']['nama_detuser'],
+                    // 'user_id' => $this->userid,
+                    // 'nama_user' => $this->userdata['detail_user']['nama_detuser'],
                     'total' => $params['sub_total'],
                     'diskon' => $params['diskon'],
                     'service_charge' => $params['service_charge'],

@@ -42,9 +42,18 @@ class ClosingOrder extends Public_Controller
             );
             $data = $this->includes;
 
+            $m_clo = new \Model\Storage\ClosingOrder_model();
+            $now = $m_clo->getDate();
+
+            $start_date = $now['tanggal'].' 00:00:01';
+            $end_date = $now['tanggal'].' 23:59:59';
+
+            $d_clo = $m_clo->whereBetween('tanggal', [$start_date, $end_date])->first();
+
             $content['akses'] = $this->hakAkses;
             $content['persen_ppn'] = $this->persen_ppn;
             $content['kode_branch'] = $this->kodebranch;
+            $content['closing_order'] = !empty($d_clo) ? 1 : 0;
 
             $data['view'] = $this->load->view($this->pathView . 'index', $content, TRUE);
 
@@ -53,6 +62,79 @@ class ClosingOrder extends Public_Controller
         //     showErrorAkses();
         // }
     }
+
+    // public function salesRecapitulation()
+    // {
+    //     $m_conf = new \Model\Storage\Conf();
+    //     $sql = "
+    //         select 
+    //             dm.menu_kode,
+    //             case
+    //                 when ji.total > 0 and dm.diskon > 0 then
+    //                     case
+    //                         when dm.diskon_jenis = 'persen' then
+    //                             ji.total * (dm.diskon / 100)
+    //                         else
+    //                             ji.total - dm.diskon
+    //                     end
+    //                 else
+    //                     0
+    //             end as diskon
+    //         from diskon_menu dm
+    //         right join
+    //             (
+    //                 select 
+    //                     ji.menu_kode, 
+    //                     ji.menu_nama, 
+    //                     ji.kode_jenis_pesanan,
+    //                     jp.exclude,
+    //                     jp.include,
+    //                     sum(ji.jumlah) as jumlah, 
+    //                     case 
+    //                         when jp.exclude = 1 then
+    //                             sum(ji.total)
+    //                         when jp.include = 1 then
+    //                             sum(ji.total) + sum(ji.ppn) + sum(ji.service_charge)
+    //                     end as total
+    //                 from jual_item ji
+    //                 right join
+    //                     (
+    //                         select j.kode_faktur as kode_faktur from jual j where j.kode_faktur = '".$kode_faktur."'
+    //                         UNION ALL
+    //                         select jg.faktur_kode_gabungan as kode_faktur from jual_gabungan jg where jg.faktur_kode = '".$kode_faktur."'
+    //                     ) jual
+    //                     on
+    //                         jual.kode_faktur = ji.faktur_kode 
+    //                 right join
+    //                     menu m
+    //                     on
+    //                         m.kode_menu = ji.menu_kode
+    //                 right join
+    //                     jenis_pesanan jp
+    //                     on
+    //                         jp.kode = ji.kode_jenis_pesanan
+    //                 where
+    //                     ji.jumlah > 0
+    //                 group by
+    //                     ji.kode_jenis_pesanan,
+    //                     jp.exclude,
+    //                     jp.include,
+    //                     ji.menu_kode, 
+    //                     ji.menu_nama
+    //             ) ji
+    //             on
+    //                 dm.menu_kode = ji.menu_kode
+    //         where
+    //             dm.diskon_kode = '".$v_dd."'
+    //     ";
+
+    //     $pending_sales = null;
+
+    //     $d_sql = $m_conf->hydrateRaw( $sql );
+    //     if ( $d_sql->count() > 0 ) {
+    //         $data = $d_sql->toArray();
+    //     }
+    // }
 
     public function getDataPenjualan()
     {
@@ -170,10 +252,34 @@ class ClosingOrder extends Public_Controller
         return $data;
     }
 
+    public function saveEndShift()
+    {
+        try {
+            $m_sak = new \Model\Storage\SaldoAkhirKasir_model();
+            $now = $m_sak->getDate();
+
+            $m_sak->tanggal = $now['waktu'];
+            $m_sak->user_id = $this->userid;
+            $m_sak->nominal = 0;
+            $m_sak->branch_kode = $this->kodebranch;
+            $m_sak->save();
+
+            $deskripsi = 'di-simpan oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/save', $m_sak, $deskripsi );
+
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Shift anda berhasil di akhiri.';
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
     public function saveClosingOrder()
     {
         try {
-            $data_penjualan = $this->getDataPenjualan();
+            $data_penjualan =    $this->getDataPenjualan();
             $data_void_menu = $this->getDataVoidMenu();
 
             $m_clo = new \Model\Storage\ClosingOrder_model();
