@@ -1189,7 +1189,12 @@ class Penjualan extends Public_Controller
 
                     if ( !empty($d_data) ) {
                         // Enter the share name for your USB printer here
-                        $printer_name = $data_jual['kode_branch'].'_'.$v_km['nama'];
+                        $printer_name = '';
+                        if ( $v_km['nama'] == 'BAVERAGE' ) {
+                            $printer_name = 'GTR_BAVERAGE';
+                        } else {
+                            $printer_name = 'GTR_FOOD';
+                        }
 
                         // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
                         $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
