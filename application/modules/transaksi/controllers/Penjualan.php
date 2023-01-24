@@ -1020,8 +1020,6 @@ class Penjualan extends Public_Controller
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
 
-        cetak_r( $kode_pesanan.' | '.$kategori_menu_id );
-
         $sql = "
             select * from 
             (
