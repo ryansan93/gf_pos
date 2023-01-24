@@ -9,7 +9,7 @@
 			<div class="col-md-12 no-padding">
 				<div class="col-md-8 no-padding">
 					<?php if ( !empty($data) && count($data) > 0 ): ?>
-						<div class="col-md-12 no-padding" style="padding: 5px; height: 450px;">
+						<div class="col-md-12 no-padding" style="padding: 5px; height: 400px;">
 							<div class="col-md-12 text-center no-padding" style="height: 100%;">
 								<table class="table table-bordered" style="margin-bottom: 0px; border: 1px solid #dddddd; height: 100%;">
 									<tbody>
