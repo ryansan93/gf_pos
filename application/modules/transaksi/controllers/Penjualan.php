@@ -1020,63 +1020,68 @@ class Penjualan extends Public_Controller
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
 
-        $sql = "
-            select ji.menu_kode, m.nama as nama_menu, km.id as kategori_menu_id, km.nama as kategori_menu_nama, ji.jumlah, ji.request, jp.kode as kode_jenis_pesanan, jp.nama as nama_jenis_pesanan
-            from jual_item ji
-            right join
-                jenis_pesanan jp
-                on
-                    ji.kode_jenis_pesanan = jp.kode
-            right join
-                menu m 
-                on
-                    ji.menu_kode = m.kode_menu 
-            right join
-                (
-                    select * from kategori_menu where print_cl = 1
-                ) km
-                on
-                    km.id = m.kategori_menu_id 
-            right join
-                jual j
-                on
-                    ji.faktur_kode = j.kode_faktur 
-            where
-                j.pesanan_kode = '".$kode_pesanan."' and
-                j.mstatus = 1 and
-                km.id = '".$kategori_menu_id."'
+        cetak_r( $kode_pesanan.' | '.$kategori_menu_id );
 
-            union all
-                
-            select jid.menu_kode, m.nama as nama_menu, km.id as kategori_menu_id, km.nama as kategori_menu_nama, ji.jumlah, '' as request, jp.kode as kode_jenis_pesanan, jp.nama as nama_jenis_pesanan
-            from jual_item_detail jid
-            right join
-                menu m 
-                on
-                    jid.menu_kode = m.kode_menu 
-            right join
-                (
-                    select * from kategori_menu where print_cl = 1
-                ) km
-                on
-                    km.id = m.kategori_menu_id 
-            right join
-                jual_item ji
-                on
-                    jid.faktur_item_kode = ji.kode_faktur_item
-            right join
-                jual j 
-                on
-                    j.kode_faktur = ji.faktur_kode 
-            right join
-                jenis_pesanan jp
-                on
-                    ji.kode_jenis_pesanan = jp.kode
-            where
-                j.pesanan_kode = '".$kode_pesanan."' and
-                j.mstatus = 1 and
-                jid.menu_kode is not null and
-                km.id = '".$kategori_menu_id."'
+        $sql = "
+            select * from 
+            (
+                select ji.menu_kode, m.nama as nama_menu, km.id as kategori_menu_id, km.nama as kategori_menu_nama, ji.jumlah, ji.request, jp.kode as kode_jenis_pesanan, jp.nama as nama_jenis_pesanan
+                from jual_item ji
+                right join
+                    jenis_pesanan jp
+                    on
+                        ji.kode_jenis_pesanan = jp.kode
+                right join
+                    menu m 
+                    on
+                        ji.menu_kode = m.kode_menu 
+                right join
+                    (
+                        select * from kategori_menu where print_cl = 1
+                    ) km
+                    on
+                        km.id = m.kategori_menu_id 
+                right join
+                    jual j
+                    on
+                        ji.faktur_kode = j.kode_faktur 
+                where
+                    j.pesanan_kode = '".$kode_pesanan."' and
+                    j.mstatus = 1 and
+                    km.id = '".$kategori_menu_id."'
+
+                union all
+                    
+                select jid.menu_kode, m.nama as nama_menu, km.id as kategori_menu_id, km.nama as kategori_menu_nama, ji.jumlah, '' as request, jp.kode as kode_jenis_pesanan, jp.nama as nama_jenis_pesanan
+                from jual_item_detail jid
+                right join
+                    menu m 
+                    on
+                        jid.menu_kode = m.kode_menu 
+                right join
+                    (
+                        select * from kategori_menu where print_cl = 1
+                    ) km
+                    on
+                        km.id = m.kategori_menu_id 
+                right join
+                    jual_item ji
+                    on
+                        jid.faktur_item_kode = ji.kode_faktur_item
+                right join
+                    jual j 
+                    on
+                        j.kode_faktur = ji.faktur_kode 
+                right join
+                    jenis_pesanan jp
+                    on
+                        ji.kode_jenis_pesanan = jp.kode
+                where
+                    j.pesanan_kode = '".$kode_pesanan."' and
+                    j.mstatus = 1 and
+                    jid.menu_kode is not null and
+                    km.id = '".$kategori_menu_id."'
+            ) data
         ";
         $d_data = $m_conf->hydrateRaw( $sql );
 
