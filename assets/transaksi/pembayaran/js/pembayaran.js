@@ -75,6 +75,8 @@ var bayar = {
                         onEscape: true,
                     };
                     bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                        $(this).css({'overflow-y': 'auto'});
+
                         $(this).find('.modal-header').css({'padding-top': '0px'});
                         $(this).find('.modal-dialog').css({'width': '90%', 'max-width': '100%'});
 

@@ -60,8 +60,8 @@
 		<table class="table table-nobordered" style="margin-bottom: 0px;">
 			<tbody>
 				<tr>
-					<td class="col-xs-8 text-right"><label class="control-label">Total Belanja. =</label></td>
-					<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($data['total']); ?></label></td>
+					<td class="col-xs-8 text-right"><label class="control-label">Total. =</label></td>
+					<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($data['grand_total']); ?></label></td>
 				</tr>
 			</tbody>
 		</table>

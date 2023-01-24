@@ -14,9 +14,9 @@ var clo = {
 		                showLoading();
 		            },
 		            success: function(data) {
-		            	hideLoading();
+		            	// hideLoading();
 		                if ( data.status == 1 ) {
-		                	bootbox.alert( data.message );
+		                	clo.printEndShift();
 		                } else {
 		                    bootbox.alert( data.message );
 		                }
@@ -25,6 +25,26 @@ var clo = {
 			}
 		});
 	}, // end - saveEndShift
+
+	printEndShift: function () {
+        $.ajax({
+            url: 'transaksi/ClosingOrder/printEndShift',
+            data: {},
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { 
+                // showLoading(); 
+            },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    bootbox.alert( data.message );
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end  - printEndShift
 
 	saveClosingOrder: function () {
 		bootbox.confirm('Apakah anda yakin ingin mengakhiri transaksi hari ini ?', function (result) {

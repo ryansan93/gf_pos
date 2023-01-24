@@ -268,9 +268,399 @@ class ClosingOrder extends Public_Controller
             Modules::run( 'base/event/save', $m_sak, $deskripsi );
 
             $this->result['status'] = 1;
-            $this->result['message'] = 'Shift anda berhasil di akhiri.';
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function mappingDataSales()
+    {
+        $m_conf = new \Model\Storage\Conf();
+        $now = $m_conf->getDate();
+
+        // $start_date = $now['tanggal'].' 00:00:01';
+        // $end_date = $now['tanggal'].' 23:59:59';
+        $start_date = '2023-01-23 00:00:01';
+        $end_date = '2023-01-23 23:59:59';
+
+        $sql = "
+            select
+                p.user_id,
+                p.nama_user,
+                km.id as id_kategori_menu,
+                km.nama as nama_kategori_menu,
+                ji.menu_nama,
+                ji.menu_kode,
+                sum(ji.jumlah) as jumlah,
+                sum(ji.total) as total
+            from jual_item ji
+            right join
+                menu m 
+                on
+                    ji.menu_kode = m.kode_menu 
+            right join
+                (
+                    select * from kategori_menu where print_cl = 1
+                ) km
+                on
+                    km.id = m.kategori_menu_id 
+            right join
+                jual j
+                on
+                    j.kode_faktur = ji.faktur_kode
+            right join
+                pesanan p
+                on
+                    p.kode_pesanan = j.pesanan_kode
+            where
+                j.tgl_trans between '".$start_date."' and '".$end_date."' and
+                j.mstatus = 1 and
+                p.user_id = '".$this->userid."'
+            group by
+                p.user_id,
+                p.nama_user,
+                km.id,
+                km.nama,
+                ji.menu_nama,
+                ji.menu_kode
+        ";
+        $d_data = $m_conf->hydrateRaw( $sql );
+
+        $data_sales = null;
+        if ( $d_data->count() > 0 ) {
+            $d_data = $d_data->toArray();
+
+            foreach ($d_data as $k_data => $v_data) {
+                $data_sales[ $v_data['user_id'] ]['user_id'] = $v_data['user_id'];
+                $data_sales[ $v_data['user_id'] ]['nama'] = $v_data['nama_user'];
+                $data_sales[ $v_data['user_id'] ]['kategori_menu'][ $v_data['id_kategori_menu'] ]['id'] = $v_data['id_kategori_menu'];
+                $data_sales[ $v_data['user_id'] ]['kategori_menu'][ $v_data['id_kategori_menu'] ]['nama'] = $v_data['nama_kategori_menu'];
+                $data_sales[ $v_data['user_id'] ]['kategori_menu'][ $v_data['id_kategori_menu'] ]['detail'][] = $v_data;
+            }
+        }
+
+        $sql = "
+            select
+                j.branch as kode_branch,
+                brc.nama as nama_branch,
+                j.kasir,
+                j.nama_kasir,
+                j.kode_faktur,
+                bd.kode_jenis_kartu,
+                bd.jenis_bayar,
+                sum(bd.nominal) as total
+            from bayar_det bd
+            right join
+                bayar b
+                on
+                    bd.id_header = b.id
+            right join
+                jual j
+                on
+                    b.faktur_kode = j.kode_faktur
+            right join
+                branch brc
+                on
+                    brc.kode_branch = j.branch
+            where
+                j.tgl_trans between '".$start_date."' and '".$end_date."' and
+                j.mstatus = 1 and
+                j.kasir = '".$this->userid."'
+            group by
+                j.branch,
+                brc.nama,
+                j.kasir,
+                j.nama_kasir,
+                j.kode_faktur,
+                bd.kode_jenis_kartu,
+                bd.jenis_bayar
+        ";
+        $d_data = $m_conf->hydrateRaw( $sql );
+
+        $data_cashier = null;
+        if ( $d_data->count() > 0 ) {
+            $d_data = $d_data->toArray();
+
+            foreach ($d_data as $k_data => $v_data) {
+                $data_cashier[ $v_data['kasir'] ]['user_id'] = $v_data['kasir'];
+                $data_cashier[ $v_data['kasir'] ]['nama'] = $v_data['nama_kasir'];
+                $data_cashier[ $v_data['kasir'] ]['nama_branch'] = $v_data['nama_branch'];
+                $data_cashier[ $v_data['kasir'] ]['jenis_kartu'][ $v_data['kode_jenis_kartu'] ]['id'] = $v_data['kode_jenis_kartu'];
+                $data_cashier[ $v_data['kasir'] ]['jenis_kartu'][ $v_data['kode_jenis_kartu'] ]['nama'] = $v_data['jenis_bayar'];
+                $data_cashier[ $v_data['kasir'] ]['jenis_kartu'][ $v_data['kode_jenis_kartu'] ]['detail'][] = $v_data;
+            }
+        }
+
+        $data = null;
+        $data = array(
+            'data_sales' => $data_sales,
+            'data_cashier' => $data_cashier
+        );
+
+        return $data;
+    }
+
+    public function printEndShift()
+    {
+        try {
+            $m_conf = new \Model\Storage\Conf();
+            $now = $m_conf->getDate();
+
+            $data = $this->mappingDataSales();
+
+            if ( !empty($data['data_sales']) ) {
+                $data_sales = $data['data_sales'];
+
+                function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                    // Mengatur lebar setiap kolom (dalam satuan karakter)
+                    if ( $jenis == 'header' ) {
+                        $lebar_kolom_1 = 10;
+                        $lebar_kolom_2 = 3;
+                        $lebar_kolom_3 = 33;
+                    }
+                    if ( $jenis == 'center' ) {
+                        $lebar_kolom_1 = 33;
+                        $lebar_kolom_2 = 3;
+                        $lebar_kolom_3 = 10;
+                    }
+         
+                    // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+                    $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+                    $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+                    $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+         
+                    // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+                    $kolom1Array = explode("\n", $kolom1);
+                    $kolom2Array = explode("\n", $kolom2);
+                    $kolom3Array = explode("\n", $kolom3);
+         
+                    // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+                    $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+         
+                    // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+                    $hasilBaris = array();
+         
+                    // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+                    for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+                        if ( $jenis == 'header' ) {
+                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+                        }
+                        if ( $jenis == 'center' ) {
+                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                        }
+         
+                        // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                        $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+                    }
+         
+                    // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+                    return implode($hasilBaris, "\n") . "\n";
+                }
+
+                // Enter the share name for your USB printer here
+                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+
+                /* Print a receipt */
+                $printer = new Mike42\Escpos\Printer($connector);
+
+                $printer -> initialize();
+                $printer -> text('******************** START *********************'."\n");
+                $printer -> text('------------------------------------------------'."\n");
+                $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                $printer -> text('Sales By Menu Qty & Value | '.$now['tanggal']."\n");
+                $printer -> text('------------------------------------------------'."\n");
+
+                $printer -> initialize();
+                foreach ($data_sales as $k_ds => $v_ds) {
+                    $idx = 0;
+                    foreach ($v_ds['kategori_menu'] as $k_km => $v_km) {
+                        if ( $idx > 0 ) {
+                            $printer -> text("\n");
+                        }
+                        $printer -> text($v_ds['nama'].' - '.$v_km['nama']."\n");
+
+                        $tot_jumlah = 0;
+                        $tot_value = 0;
+                        foreach ($v_km['detail'] as $k_det => $v_det) {
+                            $printer -> text(buatBaris3Kolom('   - '.$v_det['menu_nama'], '', '', 'center'));
+                            $printer -> text(buatBaris3Kolom('      - Qty', ':', angkaRibuan($v_det['jumlah']), 'center'));
+                            $printer -> text(buatBaris3Kolom('      - Value', ':', angkaRibuan($v_det['total']), 'center'));
+
+                            $tot_jumlah += $v_det['jumlah'];
+                            $tot_value += $v_det['total'];
+                        }
+
+                        $printer -> text($v_ds['nama'].' - '.$v_km['nama'].' Summary Total'."\n");
+                        $printer -> text(buatBaris3Kolom('   - Qty', ':', angkaRibuan($tot_jumlah), 'center'));
+                        $printer -> text(buatBaris3Kolom('   - Value', ':', angkaRibuan($tot_value), 'center'));
+
+                        $idx++;
+                    }
+                }
+                $printer -> text('================================================'."\n");
+                $printer -> text('********************** END *********************'."\n");
+
+                $printer -> initialize();
+                $printer -> text("\n");
+
+                $printer -> initialize();
+                $printer -> text('******************** START *********************'."\n");
+                $printer -> text('------------------------------------------------'."\n");
+                $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                $printer -> text('Sales By Menu Qty | '.$now['tanggal']."\n");
+                $printer -> text('------------------------------------------------'."\n");
+
+                $printer -> initialize();
+                foreach ($data_sales as $k_ds => $v_ds) {
+                    $idx = 0;
+                    foreach ($v_ds['kategori_menu'] as $k_km => $v_km) {
+                        if ( $idx > 0 ) {
+                            $printer -> text("\n");
+                        }
+                        $printer -> text($v_ds['nama'].' - '.$v_km['nama']."\n");
+
+                        $tot_jumlah = 0;
+                        foreach ($v_km['detail'] as $k_det => $v_det) {
+                            $printer -> text(buatBaris3Kolom('   - '.$v_det['menu_nama'], ':', angkaRibuan($v_det['jumlah']), 'center'));
+
+                            $tot_jumlah += $v_det['jumlah'];
+                        }
+
+                        $printer -> text(buatBaris3Kolom($v_ds['nama'].' - '.$v_km['nama'].' Summary Total', ':', angkaRibuan($tot_jumlah), 'center'));
+
+                        $idx++;
+                    }
+                }
+                $printer -> text('================================================'."\n");
+                $printer -> text('********************** END *********************'."\n");
+
+                $printer -> feed(1);
+                $printer -> cut();
+                $printer -> close();
+            }
+
+            if ( !empty($data['data_cashier']) ) {
+                $data_cashier = $data['data_cashier'];
+
+                function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                    // Mengatur lebar setiap kolom (dalam satuan karakter)
+                    if ( $jenis == 'header' ) {
+                        $lebar_kolom_1 = 15;
+                        $lebar_kolom_2 = 3;
+                        $lebar_kolom_3 = 27;
+                    }
+                    if ( $jenis == 'center' ) {
+                        $lebar_kolom_1 = 26;
+                        $lebar_kolom_2 = 3;
+                        $lebar_kolom_3 = 17;
+                    }
+         
+                    // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+                    $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+                    $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+                    $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+         
+                    // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+                    $kolom1Array = explode("\n", $kolom1);
+                    $kolom2Array = explode("\n", $kolom2);
+                    $kolom3Array = explode("\n", $kolom3);
+         
+                    // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+                    $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+         
+                    // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+                    $hasilBaris = array();
+         
+                    // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+                    for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+                        if ( $jenis == 'header' ) {
+                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+                        }
+                        if ( $jenis == 'center' ) {
+                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                        }
+         
+                        // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                        $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+                    }
+         
+                    // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+                    return implode($hasilBaris, "\n") . "\n";
+                }
+
+                // Enter the share name for your USB printer here
+                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+
+                /* Print a receipt */
+                $printer = new Mike42\Escpos\Printer($connector);
+
+                $printer -> initialize();
+                $printer -> text('******************** START *********************'."\n");
+                $printer -> text('REPORT SHIFT KASIR'."\n\n");
+
+                $tot_value_all = 0;
+
+                $printer -> initialize();
+                foreach ($data_cashier as $k_dc => $v_dc) {
+                    $printer -> text(buatBaris3Kolom('Branch', ':', $v_dc['nama_branch'], 'header'));
+                    $printer -> text(buatBaris3Kolom('Kasir', ':', $v_dc['nama'], 'header'));
+                    $printer -> text(buatBaris3Kolom('Tanggal Print', ':', $now['waktu'], 'header'));
+                    $printer -> text('================================================'."\n");
+
+                    $idx = 0;
+                    foreach ($v_dc['jenis_kartu'] as $k_jk => $v_jk) {
+                        $printer -> text('------------------------------------------------'."\n");
+                        $printer -> text($v_jk['nama']."\n");
+                        $printer -> text('------------------------------------------------'."\n");
+
+                        $tot_value = 0;
+                        foreach ($v_jk['detail'] as $k_det => $v_det) {
+                            $printer -> text(buatBaris3Kolom($v_det['kode_faktur'], ':', angkaRibuan($v_det['total']), 'center'));
+
+                            $tot_value += $v_det['total'];
+                            $tot_value_all += $v_det['total'];
+                        }
+
+                        $printer -> text('------------------------------------------------'."\n");
+                        $printer -> text(buatBaris3Kolom('Total '.$v_jk['nama'], ':', angkaRibuan($tot_value), 'center'));
+
+                        $idx++;
+                    }
+                }
+                $printer -> text('================================================'."\n");
+                $printer -> text('************************************************'."\n");
+                $printer -> text(buatBaris3Kolom('Total All', ':', angkaRibuan($tot_value_all), 'center'));
+                $printer -> text('************************************************'."\n");
+                $printer -> text("\n");
+                $printer -> text('********************** END *********************'."\n");
+
+                $printer -> feed(1);
+                $printer -> cut();
+                $printer -> close();
+            }
+
+            $this->result['status'] = 1;
+            $this->result['message'] = 'Shift anda berhasil di akhiri.';
+        } catch (Exception $e) {
+            $this->result['message'] = "Couldn't print to this printer: " . $e -> getMessage() . "\n";
         }
 
         display_json( $this->result );

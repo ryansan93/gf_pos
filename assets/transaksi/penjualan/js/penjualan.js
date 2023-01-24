@@ -1489,6 +1489,32 @@ var jual = {
             dataType: 'JSON',
             beforeSend: function() {},
             success: function(data) {
+                // hideLoading();
+                if ( data.status == 1 ) {
+                    // jual.modalJenisPesanan();
+                    // jual.resetPesanan();
+                    // jual.resetDiskon();
+
+                    jual.printCheckList(kode_pesanan);
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end - savePenjualan
+
+    printCheckList: function ( kode_pesanan ) {
+        $.ajax({
+            url: 'transaksi/Penjualan/printCheckList',
+            data: {
+                'params': kode_pesanan
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { 
+                // showLoading(); 
+            },
+            success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
                     jual.modalJenisPesanan();
@@ -1499,7 +1525,7 @@ var jual = {
                 }
             }
         });
-    }, // end - savePenjualan
+    }, // end  - printCheckList
 
     modalPilihBayar: function () {
         $('.modal').modal('hide');
@@ -1817,74 +1843,74 @@ var jual = {
         // }
     }, // end - savePembayaran
 
-    modalPrint: function(kode_faktur) {
-        $('.modal').modal('hide');
+    // modalPrint: function(kode_faktur) {
+    //     $('.modal').modal('hide');
 
-        bootbox.dialog({
-            message: "Transaksi berhasil.",
-            buttons: {
-                done: {
-                    label: '<i class="fa fa-check"></i> SELESAI',
-                    className: 'btn-success',
-                    callback: function() {
-                        location.reload();
-                    }
-                },
-                print: {
-                    label: '<i class="fa fa-print"></i> PRINT NOTA',
-                    className: 'btn-primary',
-                    callback: function() {
-                        jual.printNota(kode_faktur);
+    //     bootbox.dialog({
+    //         message: "Transaksi berhasil.",
+    //         buttons: {
+    //             done: {
+    //                 label: '<i class="fa fa-check"></i> SELESAI',
+    //                 className: 'btn-success',
+    //                 callback: function() {
+    //                     location.reload();
+    //                 }
+    //             },
+    //             print: {
+    //                 label: '<i class="fa fa-print"></i> PRINT NOTA',
+    //                 className: 'btn-primary',
+    //                 callback: function() {
+    //                     jual.printNota(kode_faktur);
 
-                        return false;
-                    }
-                },
-                print_check_list: {
-                    label: '<i class="fa fa-print"></i> PRINT CHECK LIST',
-                    className: 'btn-primary',
-                    callback: function() {
-                        jual.printCheckList(kode_faktur);
+    //                     return false;
+    //                 }
+    //             },
+    //             print_check_list: {
+    //                 label: '<i class="fa fa-print"></i> PRINT CHECK LIST',
+    //                 className: 'btn-primary',
+    //                 callback: function() {
+    //                     jual.printCheckList(kode_faktur);
 
-                        return false;
-                    }
-                }
-            }
-        });
-    }, // end - modalPrint
+    //                     return false;
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }, // end - modalPrint
 
-    printNota: function(kode_faktur) {
-        $.ajax({
-            url: 'transaksi/Penjualan/printNota',
-            data: {
-                'params': kode_faktur
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(data) {
-                if ( data.status != 1 ) {
-                    bootbox.alert(data.message);
-                }
-            }
-        });
-    }, // end - printNota
+    // printNota: function(kode_faktur) {
+    //     $.ajax({
+    //         url: 'transaksi/Penjualan/printNota',
+    //         data: {
+    //             'params': kode_faktur
+    //         },
+    //         type: 'POST',
+    //         dataType: 'JSON',
+    //         beforeSend: function() {},
+    //         success: function(data) {
+    //             if ( data.status != 1 ) {
+    //                 bootbox.alert(data.message);
+    //             }
+    //         }
+    //     });
+    // }, // end - printNota
 
-    printCheckList: function(kode_faktur) {
-        $.ajax({
-            url: 'transaksi/Penjualan/printCheckList',
-            data: {
-                'params': kode_faktur
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(data) {
-                if ( data.status != 1 ) {
-                    bootbox.alert(data.message);
-                }
-            }
-        });
-    }, // end - printNota
+    // printCheckList: function(kode_faktur) {
+    //     $.ajax({
+    //         url: 'transaksi/Penjualan/printCheckList',
+    //         data: {
+    //             'params': kode_faktur
+    //         },
+    //         type: 'POST',
+    //         dataType: 'JSON',
+    //         beforeSend: function() {},
+    //         success: function(data) {
+    //             if ( data.status != 1 ) {
+    //                 bootbox.alert(data.message);
+    //             }
+    //         }
+    //     });
+    // }, // end - printNota
 
     // modalListBayar: function () {
     //     $('.modal').modal('hide');
@@ -2320,14 +2346,16 @@ var jual = {
                         dataType: 'JSON',
                         beforeSend: function() { showLoading(); },
                         success: function(data) {
-                            hideLoading();
+                            // hideLoading();
                             if ( data.status == 1 ) {
                                 ws.send(JSON.stringify("pesan"));
+
+                                jual.printCheckList(kodePesanan);
                                 
+                                // sak.cekSaldoAwalKasir();
                                 // jual.modalJenisPesanan();
-                                sak.cekSaldoAwalKasir();
-                                jual.resetPesanan();
-                                jual.resetDiskon();
+                                // jual.resetPesanan();
+                                // jual.resetDiskon();
 
                                 $('.simpan_pesanan').removeClass('hide');
                                 $('.edit_pesanan').addClass('hide');

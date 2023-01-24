@@ -1645,8 +1645,11 @@ class Pembayaran extends Public_Controller
                 return implode($hasilBaris, "\n") . "\n";
             }
 
+            // $printer_name = $data['kode_branch'].'_KASIR';
+
             // Enter the share name for your USB printer here
-            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
             // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
@@ -1701,9 +1704,9 @@ class Pembayaran extends Public_Controller
                 $jml_member++;
             }
 
-            $printer -> text('------------------------------------------------'."\n");
-            $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
             if ( stristr($jenis, 'hutang') === false ) {
+                $printer -> text('------------------------------------------------'."\n");
+                $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
                 $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
                 $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
                 $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
@@ -1723,6 +1726,9 @@ class Pembayaran extends Public_Controller
                     $printer -> text(buatBaris3Kolom('Price Include of Service Charge.', '=', angkaRibuan($data['service_charge_include']), 'footer'));
                     $printer -> text(buatBaris3Kolom('Price Include of PB1.', '=', angkaRibuan($data['ppn_include']), 'footer'));
                 }
+            } else {
+                $printer -> text('------------------------------------------------'."\n");
+                $printer -> text(buatBaris3Kolom('Total.', '=', angkaRibuan($data['grand_total']), 'footer'));
             }
             $printer -> text('------------------------------------------------'."\n");
             $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
