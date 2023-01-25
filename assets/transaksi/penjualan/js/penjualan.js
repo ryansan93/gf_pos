@@ -1456,7 +1456,7 @@ var jual = {
                             },
                             type: 'POST',
                             dataType: 'JSON',
-                            beforeSend: function() { showLoading(); },
+                            beforeSend: function() { showLoading('Simpan Transaksi ...'); },
                             success: function(data) {
                                 if ( data.status == 1 ) {
                                     ws.send(JSON.stringify("pesan"));
@@ -1489,7 +1489,7 @@ var jual = {
             dataType: 'JSON',
             beforeSend: function() {},
             success: function(data) {
-                // hideLoading();
+                hideLoading();
                 if ( data.status == 1 ) {
                     // jual.modalJenisPesanan();
                     // jual.resetPesanan();
@@ -1511,15 +1511,15 @@ var jual = {
             },
             type: 'POST',
             dataType: 'JSON',
-            beforeSend: function() { 
-                // showLoading(); 
-            },
+            beforeSend: function() { showLoading('Print Check List Dapur ...'); },
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
                     jual.modalJenisPesanan();
                     jual.resetPesanan();
                     jual.resetDiskon();
+
+                    location.href = 'user/Login/logout';
                 } else {
                     bootbox.alert(data.message);
                 }

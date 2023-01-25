@@ -1,7 +1,16 @@
 var login = {
+    startUp: function() {
+        login.settingUp();
+    }, // end - startUp
+
+    settingUp: function () {
+        $('#username').select2();
+    }, // end - settingUp
+
     login: function() {
         var baseurl = $('head base').attr('href');
-        var username = $('input#username').val().toUpperCase();
+        // var username = $('input#username').val().toUpperCase();
+        var username = $('#username').select2('val');
         var password = $('input#password').val();
         var pin_branch = $('input#pin_branch').val();
 
@@ -60,3 +69,5 @@ var login = {
         };
     }, // end - enterToTab
 };
+
+login.startUp();

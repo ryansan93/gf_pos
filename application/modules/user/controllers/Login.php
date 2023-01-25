@@ -15,11 +15,31 @@ class Login extends MY_Controller
 
 	public function index()
 	{
-		$this->add_external_js(array('assets/login/js/login.js'));
-		$this->add_external_css(array('assets/login/css/login.css'));
-		
+		$this->add_external_js(
+			array(
+				"assets/select2/js/select2.min.js",
+				"assets/login/js/login.js"
+			)
+		);
+		$this->add_external_css(
+			array(
+				"assets/select2/css/select2.min.css",
+				"assets/login/css/login.css"
+			)
+		);
+
 		$data = $this->includes;
+
+        $data['username'] = $this->getUsername();
 		$this->load->view('user/login', $data);
+	}
+
+	public function getUsername()
+	{
+		$m_user = new \Model\Storage\User_model();
+		$d_user = $m_user->where('status_user', 1)->get()->toArray();
+
+		return $d_user;
 	}
 
 	public function checkLogin()

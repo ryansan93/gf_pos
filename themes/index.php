@@ -139,7 +139,8 @@
           </div> -->
           <div class="col-md-11" style="padding-left: 0px; height: 100%;">
             <div class="col-md-12 p-0" style="height: 100%; display: flex; justify-content: left; align-items: center;">
-              <span style="font-size: 18px;"><b><?php echo $this->config->item('nama_aplikasi'); ?></b></span>
+              <!-- <span style="font-size: 18px;"><b><?php echo $this->config->item('nama_aplikasi'); ?></b></span> -->
+              <span style="font-size: 18px;"><b><?php echo $this->session->userdata()['namaBranch']; ?></b></span>
               <!-- <br>
               <span><?php echo $this->session->userdata()['namaBranch']; ?></span> -->
             </div>

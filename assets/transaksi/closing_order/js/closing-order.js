@@ -93,6 +93,26 @@ var clo = {
             }
         });
     }, // end - hitungStok
+
+    printClosingOrder: function () {
+        $.ajax({
+            url: 'transaksi/ClosingOrder/printClosingOrder',
+            data: {},
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { 
+                showLoading('Print Closing Order ...'); 
+            },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    bootbox.alert(data.message);
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end  - printClosingOrder
 };
 
 clo.startUp();

@@ -45,9 +45,15 @@
         </div>
         <!-- <div class="dropdown-divider no-padding"></div> -->
         <div class="login-contain">
-          <form onsubmit="return login.login()">
-            <input id="username" type="text" class="form-control uppercase" placeholder="User ID" autofocus>
-            <br>
+          <form onsubmit="// return login.login()">
+            <!-- <input id="username" type="text" class="form-control uppercase" placeholder="User ID" autofocus> -->
+            <select class="form-control" id="username">
+              <option value="">-- Username --</option>
+              <?php foreach ($username as $k_val => $v_val): ?>
+                <option value="<?php echo $v_val['username_user']; ?>"><?php echo $v_val['username_user']; ?></option>
+              <?php endforeach ?>
+            </select>
+            <div><br></div>
             <input id="password" type="password" class="form-control" placeholder="PASSWORD">
             <br>
             <input id="pin_branch" type="text" data-tipe="angka" class="form-control text-center" placeholder="PIN CABANG" maxlength="4">
@@ -61,7 +67,7 @@
             </div>
             <span class="pull-right"><br></span> -->
             <br>
-            <button class="btn btn-theme btn-block" type="submit"><i class="fa fa-lock"></i> SIGN IN</button>
+            <button type="button" class="btn btn-theme btn-block" type="submit" onclick="return login.login()"><i class="fa fa-lock"></i> SIGN IN</button>
             <div id="divinfo"></div>
             <hr>
             <div class="registration">
