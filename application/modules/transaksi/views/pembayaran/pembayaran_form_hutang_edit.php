@@ -46,9 +46,9 @@
 								<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kategori="<?php echo $value['kategori_jenis_kartu_id']; ?>" data-id="<?php echo $data['id']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
 							</div>
 						<?php endforeach ?>
-					</div>
-					<div class="col-xs-4 no-padding cb_left">
-						<button type="button" class="col-xs-12 btn btn-primary" data-id="<?php echo $data['id']; ?>" onclick="bayar.saveHutang(this)">CL</button>
+						<div class="col-xs-4 no-padding cb_left">
+							<button type="button" class="col-xs-12 btn btn-primary" data-id="<?php echo $data['id']; ?>" onclick="bayar.saveHutang(this)">CL</button>
+						</div>
 					</div>
 				</div>
 			</div>

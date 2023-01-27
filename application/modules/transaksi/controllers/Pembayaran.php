@@ -192,10 +192,12 @@ class Pembayaran extends Public_Controller
 
                                 if ( !empty($v_jual['kode_member']) ) {
                                     $m_member = new \Model\Storage\Member_model();
-                                    $d_member = $m_member->where('kode_member', $v_jual['kode_member'])->with(['member_group'])->first()->toArray();
+                                    $d_member = $m_member->where('kode_member', $v_jual['kode_member'])->with(['member_group'])->first()
 
-                                    if ( !empty($d_member['member_group']) ) {
-                                        $member_group = $d_member['member_group']['nama'];
+                                    if ( !empty($d_member) ) {
+                                        if ( !empty($d_member['member_group']) ) {
+                                            $member_group = $d_member['member_group']['nama'];
+                                        }
                                     }
                                 }
 

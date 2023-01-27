@@ -54,9 +54,9 @@
 								</div>
 							<?php } ?>
 						<?php endforeach ?>
-					</div>
-					<div class="col-xs-4 no-padding cb_left">
-						<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php // echo $data['kode_faktur']; ?>" onclick="bayar.saveHutang(this)">CL</button>
+						<div class="col-xs-4 no-padding cb_left">
+							<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php // echo $data['kode_faktur']; ?>" onclick="bayar.saveHutang(this)">CL</button>
+						</div>
 					</div>
 				</div>
 			</div>
