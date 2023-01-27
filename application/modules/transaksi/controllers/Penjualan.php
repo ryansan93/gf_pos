@@ -1218,58 +1218,65 @@ class Penjualan extends Public_Controller
                             $printer_name = 'GTR_FOOD';
                         }
 
-                        // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-                        $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
-                        // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-                        // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
-
-
-                        /* Print a receipt */
-                        $printer = new Mike42\Escpos\Printer($connector);
-
-                        $a = $printer -> getPrinterStatus(Escpos::STATUS_PRINTER);
-                        cetak_r( $a );
-
-                        $printer -> initialize();
-                        $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                        $printer -> text($data_jual['nama_branch']."\n");
-
-                        $printer = new Mike42\Escpos\Printer($connector);
-                        $printer -> initialize();
-
-                        $printer -> text("\n");
-                        $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
-                        $printer -> text(buatBaris3Kolom('No. Meja', ':', $data_jual['nama_meja'], 'header'));
-                        $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
-                        $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
-
-                        $printer -> initialize();
-                        $printer -> text('================================================'."\n");
-
-                        $printer -> initialize();
-
-                        $jml_member = 1;
-                        foreach ($d_data as $k_data => $v_data) {
-                            $printer -> text($v_data['nama']);
-                            $printer -> text("\n");
-                            foreach ($v_data['detail'] as $k_det => $v_det) {
-                                $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
-                            }
+                        $jml_print = 1;
+                        if ( stristr($printer_name, 'gtr') && stristr($printer_name, 'food') ) {
+                            $jml_print = 2;
                         }
 
-                        $printer -> initialize();
-                        $printer -> text('================================================'."\n");
+                        for ($i=0; $i < $jml_print; $i++) { 
+                            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+                            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
+                            // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
-                        if ( $data_jual['privilege'] == 1 ) {
+
+                            /* Print a receipt */
+                            $printer = new Mike42\Escpos\Printer($connector);
+
+                            $a = $printer -> getPrinterStatus(Escpos::STATUS_PRINTER);
+                            cetak_r( $a );
+
                             $printer -> initialize();
-                            $printer -> selectPrintMode(32);
-                            $printer -> setTextSize(2, 1);
-                            $printer -> text("PRIVILEGE");
-                        }
+                            $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                            $printer -> text($data_jual['nama_branch']."\n");
 
-                        $printer -> feed(3);
-                        $printer -> cut();
-                        $printer -> close();
+                            $printer = new Mike42\Escpos\Printer($connector);
+                            $printer -> initialize();
+
+                            $printer -> text("\n");
+                            $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
+                            $printer -> text(buatBaris3Kolom('No. Meja', ':', $data_jual['nama_meja'], 'header'));
+                            $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
+                            $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
+
+                            $printer -> initialize();
+                            $printer -> text('================================================'."\n");
+
+                            $printer -> initialize();
+
+                            $jml_member = 1;
+                            foreach ($d_data as $k_data => $v_data) {
+                                $printer -> text($v_data['nama']);
+                                $printer -> text("\n");
+                                foreach ($v_data['detail'] as $k_det => $v_det) {
+                                    $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                                }
+                            }
+
+                            $printer -> initialize();
+                            $printer -> text('================================================'."\n");
+
+                            if ( $data_jual['privilege'] == 1 ) {
+                                $printer -> initialize();
+                                $printer -> selectPrintMode(32);
+                                $printer -> setTextSize(2, 1);
+                                $printer -> text("PRIVILEGE");
+                            }
+
+                            $printer -> feed(3);
+                            $printer -> cut();
+                            $printer -> close();
+                        }
                     }
                 }
             }
