@@ -405,6 +405,12 @@
 				<?php endif ?>
 			</div>
 			<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
+			<div class="col-xs-12 no-padding">
+				<div class="col-xs-12 no-padding">
+					<button type="button" class="col-xs-12 btn btn-primary" onclick="bayar.printDraft(this)" data-kode="<?php echo $data['kode_faktur']; ?>"><i class="fa fa-print"></i> Draft</button>
+				</div>
+			</div>
+			<div class="col-xs-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 			<div class="col-xs-12 no-padding" style="margin-bottom: 10px;">
 				<!-- <div class="col-xs-6 no-padding cb_left">
 					<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $data['kode_faktur']; ?>" onclick="bayar.saveHutang(this)"><i class="fa fa-save"></i> Hutang</button>

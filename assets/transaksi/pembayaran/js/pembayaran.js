@@ -1061,6 +1061,30 @@ var bayar = {
         });
     }, // end  - printNota
 
+    printDraft: function (elm) {
+        var data = {
+            'faktur_kode': $(elm).attr('data-kode')
+        };
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/printDraft',
+            data: {
+                'params': data
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading('Print Draft ...'); },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    bootbox.alert(data.message);
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end  - printDraft
+
     penjualanForm: function () {
         var baseurl = $('head base').attr('href');
         console.log( baseurl );
