@@ -1233,9 +1233,6 @@ class Penjualan extends Public_Controller
                             /* Print a receipt */
                             $printer = new Mike42\Escpos\Printer($connector);
 
-                            $a = $printer -> getPrinterStatus(Escpos::STATUS_PRINTER);
-                            cetak_r( $a );
-
                             $printer -> initialize();
                             $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
                             $printer -> text($data_jual['nama_branch']."\n");
