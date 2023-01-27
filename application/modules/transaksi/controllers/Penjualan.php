@@ -1220,7 +1220,7 @@ class Penjualan extends Public_Controller
 
                         $jml_print = 1;
                         if ( stristr($printer_name, 'gtr') && stristr($printer_name, 'food') ) {
-                            $jml_print = 2;
+                            $jml_print = 3;
                         }
 
                         for ($i=0; $i < $jml_print; $i++) { 
