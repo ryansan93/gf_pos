@@ -16,7 +16,7 @@
 				</tr>
 				<tr>
 					<td class="col-xs-3"><label class="control-label">Tanggal</label></td>
-					<td class="col-xs-9"><label class="control-label">: <?php echo $data_branch['waktu']; ?></label></td>
+					<td class="col-xs-9"><label class="control-label">: <?php echo substr($data_branch['waktu'], 0, 19); ?></label></td>
 				</tr>
 			</tbody>
 		</table>
@@ -47,7 +47,7 @@
 							<tr>
 								<td class="col-xs-1"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
 								<td class="col-xs-7"><label class="control-label"><?php echo $v_ji['nama']; ?></label></td>
-								<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
+								<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaRibuan($v_ji['total_show']); ?></label></td>
 							</tr>
 						<?php endforeach ?>
 					</tbody>
@@ -61,10 +61,21 @@
 			<tbody>
 				<tr>
 					<td class="col-xs-8 text-right"><label class="control-label">Total. =</label></td>
-					<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($data['grand_total']); ?></label></td>
+					<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaRibuan($data['grand_total']); ?></label></td>
+				</tr>
+				<tr>
+					<td class="col-xs-8 text-right"><label class="control-label">Bayar. =</label></td>
+					<td class="col-xs-4 text-right"><label class="control-label bayar"><?php echo angkaRibuan(0); ?></label></td>
 				</tr>
 			</tbody>
 		</table>
+	</div>
+	<div class="col-xs-12 text-center font10">
+		<div class="col-xs-3 no-padding text-left"><label class="control-label">Pembayaran</label></div>
+		<div class="col-xs-9 no-padding"><hr class="dashed"></div>
+	</div>
+	<div class="col-xs-12 text-left font10 pembayaran">
+		<label class="control-label"></label>
 	</div>
 	<div class="col-xs-12 text-left font10"><hr class="dashed"></div>
 	<div class="col-xs-12 text-center font10"><label class="control-label">*** TERIMA KASIH ***</label></div>

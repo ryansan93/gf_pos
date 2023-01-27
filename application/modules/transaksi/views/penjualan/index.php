@@ -5,9 +5,11 @@
 	<div class="col-md-12 no-padding"><hr style="margin-top: 10px; margin-bottom: 10px;"></div>
 	<div class="col-md-12 no-padding jenis">
 		<ul class="jenis">
-			<?php foreach ($jenis as $k_jenis => $v_jenis): ?>
-				<li class="cursor-p" onclick="jual.getMenu(this)" data-id="<?php echo $v_jenis['id']; ?>" data-aktif="0"><?php echo strtoupper($v_jenis['nama']); ?></li>
-			<?php endforeach ?>
+			<?php if ( !empty($jenis) ): ?>
+				<?php foreach ($jenis as $k_jenis => $v_jenis): ?>
+					<li class="cursor-p" onclick="jual.getMenu(this)" data-id="<?php echo $v_jenis['id']; ?>" data-aktif="0"><?php echo strtoupper($v_jenis['nama']); ?></li>
+				<?php endforeach ?>
+			<?php endif ?>
 		</ul>
 	</div>
 </div>

@@ -11,7 +11,7 @@
 						<div class="col-xs-5 no-padding"><label class="control-label">MEJA</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: -</label></div>
 					</div>
-					<div class="col-xs-12 no-padding">
+					<div class="col-xs-12 no-padding member" data-val="<?php echo $data['member']; ?>">
 						<div class="col-xs-5 no-padding"><label class="control-label">MEMBER / PELANGGAN</label></div>
 						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo $data['member']; ?></label></div>
 					</div>
@@ -105,7 +105,7 @@
 												<td class="text-right bayar" data-val="<?php echo $value['bayar']; ?>"><?php echo angkaRibuan($value['bayar']) ?></td>
 												<td>
 													<!-- <div class="col-xs-12 no-padding"> -->
-														<input type="text" class="text-right form-control nominal_bayar_hutang" placeholder="Nominal" data-tipe="integer" style="padding: 6px;" maxlength="11" onkeyup="bayar.cekNominalBayarHutang(this)" data-val="0" readonly>
+														<input type="text" class="text-right form-control nominal_bayar_hutang" placeholder="Nominal" data-tipe="integer" style="padding: 6px;" maxlength="11" onkeyup="bayar.cekNominalBayarHutang(this)" data-val="0" value="0" readonly>
 													<!-- </div> -->
 												</td>
 											</tr>

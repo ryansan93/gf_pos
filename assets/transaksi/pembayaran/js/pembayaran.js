@@ -13,7 +13,12 @@ var bayar = {
         // console.log( window.location.href.indexOf("pembayaranFormEdit") );
         if (window.location.href.indexOf("pembayaranFormEdit") > -1) {
             var kodeFaktur = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
-            bayar.loadDetailPembayaran( kodeFaktur );
+            bayar.loadDetailPembayaran( kodeFaktur, null );
+        }
+
+        if (window.location.href.indexOf("pembayaranFormHutangEdit") > -1) {
+            var id = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+            bayar.loadDetailPembayaran( null, id );
         }
 	}, // end - startUp
 
@@ -657,16 +662,20 @@ var bayar = {
 
             if ( $(ipt_check).is(':checked') ) {
                 total_tagihan += sisa_hutang;
+                if ( empty($(tr).find('input').val()) ) {
+                    $(tr).find('input').val( numeral.formatInt(sisa_hutang) );
+                }
                 $(tr).find('input').removeAttr('readonly');
-                $(tr).find('input').val( numeral.formatInt(sisa_hutang) );
                 $(tr).find('input').attr( 'data-val', sisa_hutang );
 
                 var _dataHutangBayar = {
                     'faktur_kode': faktur_kode,
                     'hutang': hutang,
                     'sudah_bayar': sudah_bayar,
-                    'bayar': numeral.unformat($(tr).find('input').val())
+                    'bayar': numeral.unformat($(tr).find('input.nominal_bayar_hutang').val())
                 };
+
+                $('.faktur_hutang[data-faktur="'+faktur_kode+'"]').find('.bayar').text( numeral.formatInt(numeral.unformat($(tr).find('input.nominal_bayar_hutang').val())) );
 
                 dataHutangBayar.push( _dataHutangBayar );
             } else {
@@ -724,7 +733,7 @@ var bayar = {
         if ( dataMetodeBayar.length > 0 ) {
             for (var i = 0; i < dataMetodeBayar.length; i++) {
                 if ( !empty(dataMetodeBayar[i]) ) {
-                    total_bayar += dataMetodeBayar[i].jumlah;
+                    total_bayar += parseInt(dataMetodeBayar[i].jumlah);
                 }
             }
         }
@@ -763,6 +772,9 @@ var bayar = {
 
     cekNominalBayarHutang: function(elm) {
         var nominal_bayar_hutang = numeral.unformat($(elm).val());
+
+        $(elm).attr( 'value', numeral.formatInt( nominal_bayar_hutang ) );
+
         var hutang = $(elm).attr('data-val');
         var jenis_kartu = $(elm).attr('data-jk');
 
@@ -782,11 +794,13 @@ var bayar = {
             }
         } else {
             // if ( !empty(jenis_kartu) ) {
-            //     if ( nominal_bayar_hutang > hutang ) {
-            //         bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
-            //             $(elm).val( numeral.formatInt(hutang) );
-            //         });
-            //     }
+                if ( nominal_bayar_hutang > hutang ) {
+                    bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
+                        $(elm).val( numeral.formatInt(hutang) );
+                    });
+                } else {
+                    bayar.hitungTotalTagihan();
+                }
             // }
         }
     }, // end - cekNominalBayarHutang
@@ -872,6 +886,8 @@ var bayar = {
         $('.kategori_jenis_kartu').attr('data-val', 0);
         $('.kategori_jenis_kartu').text( numeral.formatDec(0) );
 
+        var jenis_bayar = '';
+
         if ( !empty(dataMetodeBayar) ) {
             for (var i = 0; i < dataMetodeBayar.length; i++) {
                 if ( !empty(dataMetodeBayar[i]) ) {
@@ -881,9 +897,16 @@ var bayar = {
 
                     $('.kategori_jenis_kartu'+id).attr('data-val', total);
                     $('.kategori_jenis_kartu'+id).text( numeral.formatDec(total) );
+
+                    jenis_bayar += '<span>'+dataMetodeBayar[i].nama+'</span>';
+                    if ( typeof dataMetodeBayar[i+1] !== 'undefined' ) {
+                        jenis_bayar += '<br>';
+                    }
                 }
             }
         }
+
+        $('.faktur_hutang').find('.pembayaran label').html( jenis_bayar );
     }, // end - hitKategoriPembayaran
 
     modalPembayaran: function(elm) {
@@ -891,6 +914,7 @@ var bayar = {
 
         var data = {
             'faktur_kode': $(elm).data('kode'),
+            'id': $(elm).data('id'),
             'diskon': numeral.unformat($('.diskon').val()),
             'jml_tagihan': numeral.unformat($('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($('.total_bayar').val()),
@@ -960,6 +984,7 @@ var bayar = {
         
         var data = {
             'faktur_kode': $(elm).data('kode'),
+            'id': $(elm).data('id'),
             'tot_belanja': numeral.unformat($('.tot_belanja').find('label').text()),
             'ppn': numeral.unformat($('.ppn').find('label').text()),
             'service_charge': numeral.unformat($('.service_charge').find('label').text()),
@@ -967,6 +992,8 @@ var bayar = {
             'jml_tagihan': numeral.unformat($(modal).find('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($(modal).find('.total_bayar').val()),
             'kembalian': numeral.unformat($(modal).find('.kembalian').val()),
+            'member_kode': $('.kode_member').attr('data-val'),
+            'member': $('.member').attr('data-val'),
             'dataMetodeBayar': dataMetodeBayar,
             'dataHutangBayar': dataHutangBayar,
             'dataDiskon': dataDiskonSave
@@ -995,7 +1022,7 @@ var bayar = {
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
-                    bayar.printNota();
+                    bayar.printNota(data.content.id_bayar);
                 } else {
                     bootbox.alert(data.message);
                 }
@@ -1003,8 +1030,9 @@ var bayar = {
         });
     }, // end - execSavePembayaran
 
-    printNota: function () {
+    printNota: function (id_bayar) {
         var data = {
+            'id_bayar': id_bayar,
             'faktur_kode': fakturPrint[idxFaktur]['kode_faktur'],
             'jenis': fakturPrint[idxFaktur]['jenis'],
         };
@@ -1016,13 +1044,13 @@ var bayar = {
             },
             type: 'POST',
             dataType: 'JSON',
-            beforeSend: function() { showLoading(); },
+            beforeSend: function() { showLoading('Print Nota ...'); },
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
                     idxFaktur++;
                     if ( typeof fakturPrint[idxFaktur] !== 'undefined' ) {
-                        bayar.printNota();
+                        bayar.printNota(id_bayar);
                     } else {
                         bayar.penjualanForm();
                     }
@@ -1087,9 +1115,10 @@ var bayar = {
         window.location.href = pagePembayaran;
     }, // end - pembayaranFormEdit
 
-    loadDetailPembayaran: function (kodeFaktur) {
+    loadDetailPembayaran: function (kodeFaktur, id) {
         var params = {
-            'faktur_kode': kodeFaktur
+            'faktur_kode': kodeFaktur,
+            'id': id
         }
 
         $.ajax({
@@ -1490,6 +1519,24 @@ var bayar = {
             }
         });
     }, // end - getDataDiskon
+
+    pembayaranFormHutang: function (elm) {
+        var kodeMember = $(elm).data('kode');
+
+        var baseurl = $('head base').attr('href');
+        var pagePembayaran = baseurl + 'transaksi/Pembayaran/pembayaranFormHutang/'+kodeMember;
+
+        window.location.href = pagePembayaran;
+    }, // end - pembayaranFormByMember
+
+    pembayaranFormHutangEdit: function (elm) {
+        var id = $(elm).data('id');
+
+        var baseurl = $('head base').attr('href');
+        var pagePembayaran = baseurl + 'transaksi/Pembayaran/pembayaranFormHutangEdit/'+id;
+
+        window.location.href = pagePembayaran;
+    }, // end - pembayaranFormByMember
 };
 
 bayar.startUp();

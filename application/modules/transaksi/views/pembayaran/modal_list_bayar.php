@@ -128,7 +128,14 @@
 													<td class="text-right bayar"><?php echo angkaDecimal($value['bayar']); ?></td>
 													<td class="col-lg-1 text-center">
 														<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
-															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="bayar.modalListBill(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-usd"></i></button>
+															<?php 
+																$onclick = 'bayar.modalListBill(this)';
+																if ( empty($value['kode_faktur']) ) {
+																	$onclick = 'bayar.pembayaranFormHutangEdit(this)';
+																} 
+															?>
+
+															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="<?php echo $onclick; ?>" data-kode="<?php echo $value['kode_pesanan']; ?>" data-id="<?php echo exEncrypt($key); ?>"><i class="fa fa-usd"></i></button>
 														<?php endif ?>
 														</td>
 													</td>

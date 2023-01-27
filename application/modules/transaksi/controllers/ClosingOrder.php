@@ -177,6 +177,7 @@ class ClosingOrder extends Public_Controller
                 j.branch = '".$branch_kode."' and
                 j.tgl_trans between '".$start_date."' and '".$end_date."' and
                 j.mstatus = 1 ".$sql_user." and
+                b.mstatus = 1 and
                 b.id is not null
             group by
                 j.branch,
@@ -684,7 +685,7 @@ class ClosingOrder extends Public_Controller
                 foreach ($data_cashier as $k_dc => $v_dc) {
                     $printer -> text(buatBaris3Kolom('Branch', ':', $v_dc['nama_branch'], 'header'));
                     $printer -> text(buatBaris3Kolom('Kasir', ':', $v_dc['nama'], 'header'));
-                    $printer -> text(buatBaris3Kolom('Tanggal Print', ':', $now['waktu'], 'header'));
+                    $printer -> text(buatBaris3Kolom('Tanggal Print', ':', substr($now['waktu'], 0, 19), 'header'));
                     $printer -> text('================================================'."\n");
 
                     $idx = 0;
@@ -870,7 +871,7 @@ class ClosingOrder extends Public_Controller
             $printer -> initialize();
             $printer -> text(buatBaris3Kolom('Branch', ':', $this->session->userdata()['namaBranch'], 'header'));
             $printer -> text(buatBaris3Kolom('User', ':', $this->userdata['detail_user']['nama_detuser'], 'header'));
-            $printer -> text(buatBaris3Kolom('Tanggal Print', ':', $now['waktu'], 'header'));
+            $printer -> text(buatBaris3Kolom('Tanggal Print', ':', substr($now['waktu'], 0, 19), 'header'));
             $printer -> text('================================================'."\n");
 
             $printer -> initialize();
