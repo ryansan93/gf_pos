@@ -741,8 +741,8 @@ var bayar = {
         kembalian = total_bayar - total_tagihan;
 
         $('.total_bayar').val( numeral.formatInt(total_bayar) );
-        $('.jml_bayar').text( numeral.formatDec(total_bayar) );
-        $('.jml_bayar').attr('data-val', total_bayar);
+        $('div.data').find('.jml_bayar').text( numeral.formatDec(total_bayar) );
+        $('div.data').find('.jml_bayar').attr('data-val', total_bayar);
 
         if ( kembalian > 0 ) {
             // $('.kembalian').val( numeral.formatInt(kembalian) );
