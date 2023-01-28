@@ -2360,8 +2360,8 @@ var jual = {
                                 if ( kasir == 0 ) {
                                     jual.printCheckList(kodePesanan);
                                 } else {
-                                    // sak.cekSaldoAwalKasir();
-                                    jual.modalJenisPesanan();
+                                    sak.cekSaldoAwalKasir();
+                                    // jual.modalJenisPesanan();
                                     jual.resetPesanan();
                                     jual.resetDiskon();
                                 }

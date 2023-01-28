@@ -646,7 +646,8 @@ class Pembayaran extends Public_Controller
                 j.grand_total,
                 j.lunas,
                 j.ppn,
-                j.service_charge
+                j.service_charge,
+                m.nama_meja
             from jual j
             left join
                 (select * from bayar where mstatus = 1) b
@@ -656,6 +657,14 @@ class Pembayaran extends Public_Controller
                 branch brc
                 on
                     j.branch = brc.kode_branch
+            right join
+                pesanan p
+                on
+                    j.pesanan_kode = p.kode_pesanan
+            right join
+                meja m
+                on
+                    m.id = p.meja_id
             where
                 j.kode_faktur = '".trim($kode_faktur)."' and
                 j.mstatus = 1
@@ -873,6 +882,7 @@ class Pembayaran extends Public_Controller
                 'telp_branch' => $d_jual[0]['telp_branch'],
                 'kasir' => $d_jual[0]['kasir'],
                 'nama_kasir' => $d_jual[0]['nama_kasir'],
+                'nama_meja' => $d_jual[0]['nama_meja'],
                 'total' => $total,
                 'diskon' => $diskon,
                 'ppn' => $ppn,
@@ -1299,7 +1309,8 @@ class Pembayaran extends Public_Controller
                 j.grand_total,
                 j.lunas,
                 j.ppn,
-                j.service_charge
+                j.service_charge,
+                m.nama_meja
             from jual j
             left join
                 (
@@ -1338,6 +1349,14 @@ class Pembayaran extends Public_Controller
                 branch brc
                 on
                     j.branch = j.branch
+            right join
+                pesanan p
+                on
+                    j.pesanan_kode = p.kode_pesanan
+            right join
+                meja m
+                on
+                    m.id = p.meja_id
             where
                 j.kode_faktur = '".trim($kode_faktur)."' and
                 j.mstatus = 1
@@ -1620,6 +1639,7 @@ class Pembayaran extends Public_Controller
                 'nama_branch' => $d_jual[0]['nama_branch'],
                 'alamat_branch' => $d_jual[0]['alamat_branch'],
                 'telp_branch' => $d_jual[0]['telp_branch'],
+                'nama_meja' => $d_jual[0]['nama_meja'],
                 'total' => $total,
                 'diskon' => $diskon,
                 'ppn' => $ppn,

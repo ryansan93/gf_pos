@@ -9,7 +9,7 @@
 					</div>
 					<div class="col-xs-12 no-padding">
 						<div class="col-xs-5 no-padding"><label class="control-label">MEJA</label></div>
-						<div class="col-xs-7 no-padding"><label class="control-label">: -</label></div>
+						<div class="col-xs-7 no-padding"><label class="control-label">: <?php echo $data['nama_meja']; ?></label></div>
 					</div>
 					<div class="col-xs-12 no-padding member" data-val="<?php echo $data['member']; ?>">
 						<div class="col-xs-5 no-padding"><label class="control-label">MEMBER / PELANGGAN</label></div>
