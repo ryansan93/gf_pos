@@ -1298,7 +1298,9 @@ var jual = {
     modalPilihPrivilege: function (elm) {
         $('.modal').modal('hide');
 
-        if ( $(elm).attr('kasir') == 0 ) {
+        var kasir = $(elm).attr('kasir');
+
+        if ( kasir == 0 ) {
 
             $.get('transaksi/Penjualan/modalPilihPrivilege',{
             },function(data){

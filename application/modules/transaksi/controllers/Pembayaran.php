@@ -44,6 +44,7 @@ class Pembayaran extends Public_Controller
             );
             $content['akses_waitress'] = hakAkses('/transaksi/Penjualan');
             $content['akses_kasir'] = hakAkses('/transaksi/Pembayaran');
+            $content['today'] = $today;
 
             $html = $this->load->view($this->pathView . 'modal_list_bayar', $content, TRUE);
             
