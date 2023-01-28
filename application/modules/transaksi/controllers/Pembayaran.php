@@ -1712,11 +1712,15 @@ class Pembayaran extends Public_Controller
                 return implode($hasilBaris, "\n") . "\n";
             }
 
-            // $printer_name = $data['kode_branch'].'_KASIR';
+            $m_ps = new \Model\Storage\PrinterStation_model();
+            $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+
+            $m_printer = new \Model\Storage\Printer_model();
+            $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
 
             // Enter the share name for your USB printer here
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
             // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
@@ -1888,11 +1892,15 @@ class Pembayaran extends Public_Controller
                 return implode($hasilBaris, "\n") . "\n";
             }
 
-            // $printer_name = $data['kode_branch'].'_KASIR';
+            $m_ps = new \Model\Storage\PrinterStation_model();
+            $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+
+            $m_printer = new \Model\Storage\Printer_model();
+            $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
 
             // Enter the share name for your USB printer here
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
             // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
@@ -1963,8 +1971,8 @@ class Pembayaran extends Public_Controller
             }
 
             $printer -> text('------------------------------------------------'."\n");
-            $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-            $printer -> text("*** TERIMA KASIH ***");
+            $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer -> text("*** INI BUKAN BUKTI PEMBAYARAN ***");
 
             $printer -> feed(3);
             $printer -> cut();

@@ -1298,44 +1298,49 @@ var jual = {
     modalPilihPrivilege: function (elm) {
         $('.modal').modal('hide');
 
-        $.get('transaksi/Penjualan/modalPilihPrivilege',{
-        },function(data){
-            var _options = {
-                className : 'large',
-                message : data,
-                addClass : 'form',
-                onEscape: true,
-            };
-            bootbox.dialog(_options).bind('shown.bs.modal', function(){
-                $(this).find('.modal-header').css({'padding-top': '0px'});
-                $(this).find('.modal-dialog').css({'width': '60%', 'max-width': '100%'});
+        if ( $(elm).attr('kasir') == 0 ) {
 
-                $('input').keyup(function(){
-                    $(this).val($(this).val().toUpperCase());
-                });
+            $.get('transaksi/Penjualan/modalPilihPrivilege',{
+            },function(data){
+                var _options = {
+                    className : 'large',
+                    message : data,
+                    addClass : 'form',
+                    onEscape: true,
+                };
+                bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                    $(this).find('.modal-header').css({'padding-top': '0px'});
+                    $(this).find('.modal-dialog').css({'width': '60%', 'max-width': '100%'});
 
-                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
-                });
+                    $('input').keyup(function(){
+                        $(this).val($(this).val().toUpperCase());
+                    });
 
-                $(this).find('.btn-privilege').click(function() { 
-                    privilege = 1;
-                    if ( $(elm).hasClass('save') ) {
-                        jual.savePesanan('simpan');
-                    } else {
-                        jual.editPesanan( $(elm) );
-                    }
+                    $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                        $(this).priceFormat(Config[$(this).data('tipe')]);
+                    });
+
+                    $(this).find('.btn-privilege').click(function() { 
+                        privilege = 1;
+                        if ( $(elm).hasClass('save') ) {
+                            jual.savePesanan('simpan');
+                        } else {
+                            jual.editPesanan( $(elm), kasir );
+                        }
+                    });
+                    $(this).find('.btn-non-privilege').click(function() { 
+                        privilege = 0;
+                        if ( $(elm).hasClass('save') ) {
+                            jual.savePesanan('simpan');
+                        } else {
+                            jual.editPesanan( $(elm), kasir );
+                        }
+                    });
                 });
-                $(this).find('.btn-non-privilege').click(function() { 
-                    privilege = 0;
-                    if ( $(elm).hasClass('save') ) {
-                        jual.savePesanan('simpan');
-                    } else {
-                        jual.editPesanan( $(elm) );
-                    }
-                });
-            });
-        },'html');
+            },'html');
+        } else {
+            jual.editPesanan( $(elm), kasir );
+        }
     }, // end - modalPilihPrivilege
 
     getPesanan: function(action) {
@@ -2327,7 +2332,7 @@ var jual = {
         location.reload();
     }, // end - batalEdit
 
-    editPesanan: function(elm) {
+    editPesanan: function(elm, kasir) {
         kodePesanan = $(elm).data('kode');
 
         bootbox.confirm('Apakah anda yakin ingin meng-ubah transaksi ?', function(result) {
@@ -2350,12 +2355,14 @@ var jual = {
                             if ( data.status == 1 ) {
                                 ws.send(JSON.stringify("pesan"));
 
-                                jual.printCheckList(kodePesanan);
-                                
-                                // sak.cekSaldoAwalKasir();
-                                // jual.modalJenisPesanan();
-                                // jual.resetPesanan();
-                                // jual.resetDiskon();
+                                if ( kasir == 0 ) {
+                                    jual.printCheckList(kodePesanan);
+                                } else {
+                                    // sak.cekSaldoAwalKasir();
+                                    jual.modalJenisPesanan();
+                                    jual.resetPesanan();
+                                    jual.resetDiskon();
+                                }
 
                                 $('.simpan_pesanan').removeClass('hide');
                                 $('.edit_pesanan').addClass('hide');

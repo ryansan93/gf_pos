@@ -59,6 +59,7 @@ class SaldoAwalKasir extends Public_Controller
     public function modalSaldoAwalKasir()
     {
         $m_sak = new \Model\Storage\SaldoAwalKasir_model();
+        $now = $m_sak->getDate();
         $d_sak = $m_sak->where('tanggal', date('Y-m-d'))->where('user_id', $this->userid)->where('branch_kode', $this->kodebranch)->orderBy('id', 'desc')->first();
 
         $nominal = null;
@@ -67,6 +68,7 @@ class SaldoAwalKasir extends Public_Controller
         }
 
         $content['nominal'] = $nominal;
+        $content['waktu'] = $now['waktu'];
         $html = $this->load->view($this->pathView . 'modal_saldo_awal_kasir', $content, TRUE);
 
         echo $html;

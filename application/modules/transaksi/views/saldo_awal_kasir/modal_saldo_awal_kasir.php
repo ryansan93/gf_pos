@@ -16,7 +16,7 @@
             <div class="col-md-12 no-padding">
                 <div class="col-md-2 no-padding"><label class="label-control" style="padding-top: 0px;">Waktu</label></div>
                 <div class="col-md-10 no-padding">
-                    <label class="label-control" style="padding-top: 0px;">: <?php echo strtoupper(tglIndonesia(date('Y-m-d h:s'), '-', ' ')).' '.substr(date('Y-m-d h:s'), 11, 5); ?></label>
+                    <label class="label-control" style="padding-top: 0px;">: <?php echo strtoupper(tglIndonesia($waktu, '-', ' ')).' '.substr($waktu, 11, 5); ?></label>
                 </div>
             </div>
             <div class="col-md-12 no-padding" style="padding-top: 2%;">

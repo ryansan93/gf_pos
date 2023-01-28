@@ -1034,7 +1034,7 @@ class Penjualan extends Public_Controller
         return $data;
     }
 
-    public function mappingDataCheckList($kode_pesanan, $kategori_menu_id)
+    public function mappingDataCheckList($kode_pesanan, $kategori_menu_id, $kode_branch)
     {
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
@@ -1053,6 +1053,10 @@ class Penjualan extends Public_Controller
                     on
                         ji.menu_kode = m.kode_menu 
                 right join
+                    branch b
+                    on
+                        m.branch_kode = b.kode_branch
+                right join
                     (
                         select * from kategori_menu where print_cl = 1
                     ) km
@@ -1065,7 +1069,8 @@ class Penjualan extends Public_Controller
                 where
                     j.pesanan_kode = '".$kode_pesanan."' and
                     j.mstatus = 1 and
-                    km.id = '".$kategori_menu_id."'
+                    km.id = '".$kategori_menu_id."' and
+                    b.kode_branch = '".$kode_branch."'
 
                 union all
                     
@@ -1075,6 +1080,10 @@ class Penjualan extends Public_Controller
                     menu m 
                     on
                         jid.menu_kode = m.kode_menu 
+                right join
+                    branch b
+                    on
+                        m.branch_kode = b.kode_branch
                 right join
                     (
                         select * from kategori_menu where print_cl = 1
@@ -1097,7 +1106,8 @@ class Penjualan extends Public_Controller
                     j.pesanan_kode = '".$kode_pesanan."' and
                     j.mstatus = 1 and
                     jid.menu_kode is not null and
-                    km.id = '".$kategori_menu_id."'
+                    km.id = '".$kategori_menu_id."' and
+                    b.kode_branch = '".$kode_branch."'
             ) data
         ";
         $d_data = $m_conf->hydrateRaw( $sql );
@@ -1177,11 +1187,25 @@ class Penjualan extends Public_Controller
 
             $m_jual = new \Model\Storage\Jual_model();
             $sql = "
-                select b.kode_branch as kode_branch, b.nama as nama_branch, p.nama_user as nama_kasir, m.nama_meja, p.privilege from jual j
+                select 
+                    b.kode_branch as kode_branch, 
+                    b.nama as nama_branch, 
+                    p.nama_user as nama_kasir, 
+                    m.nama_meja, 
+                    p.privilege 
+                from jual_item ji
+                right join
+                    jual j
+                    on
+                        j.kode_faktur = ji.faktur_kode
+                right join
+                    menu mn
+                    on
+                        ji.menu_kode = mn.kode_menu
                 right join
                     branch b
                     on
-                        b.kode_branch = j.branch
+                        b.kode_branch = mn.branch_kode
                 right join
                     pesanan p
                     on
@@ -1192,90 +1216,171 @@ class Penjualan extends Public_Controller
                         m.id = p.meja_id
                 where
                     j.pesanan_kode = '".$kode_pesanan."'
+                group by
+                    b.kode_branch, 
+                    b.nama, 
+                    p.nama_user, 
+                    m.nama_meja, 
+                    p.privilege
             ";
             $d_jual = $m_jual->hydrateRaw( $sql );
 
             if ( $d_jual->count() > 0 ) {
                 $d_jual = $d_jual->toArray();
 
-                $data_jual = $d_jual[0];
+                foreach ($d_jual as $k_jual => $v_jual) {
+                    $data_jual = $v_jual;
 
-                $m_km = new \Model\Storage\KategoriMenu_model();
-                $d_km = $m_km->where('print_cl', 1)->get()->toArray();
+                    $m_ps = new \Model\Storage\PrinterStation_model();
+                    $d_ps = $m_ps->where('nama', 'KITCHEN')->first();
 
-                foreach ($d_km as $k_km => $v_km) {
-                    $m_conf = new \Model\Storage\Conf();
-                    $now = $m_conf->getDate();
+                    $m_printer = new \Model\Storage\Printer_model();
+                    $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $data_jual['kode_branch'])->where('status', 1)->get();
 
-                    $d_data = $this->mappingDataCheckList( $kode_pesanan, $v_km['id'] );
+                    if ( $d_printer->count() > 0 ) {
+                        $d_printer = $d_printer->toArray();
 
-                    if ( !empty($d_data) ) {
-                        // Enter the share name for your USB printer here
-                        $printer_name = '';
-                        if ( $v_km['nama'] == 'BAVERAGE' ) {
-                            $printer_name = 'GTR_BAVERAGE';
-                        } else {
-                            $printer_name = 'GTR_FOOD';
-                        }
+                        foreach ($d_printer as $k_p => $v_p) {
+                            $jml_print = $v_p['jml_print'];
+                            $printer_name = $v_p['sharing_name'];
 
-                        $jml_print = 1;
-                        if ( stristr($printer_name, 'gtr') && stristr($printer_name, 'food') ) {
-                            $jml_print = 3;
-                        }
+                            $m_conf = new \Model\Storage\Conf();
+                            $now = $m_conf->getDate();
+                            
+                            $sql = "
+                                select pkm.* from printer_kategori_menu pkm
+                                where
+                                    pkm.id_header = ".$v_p['id']."
+                            ";
+                            $d_pkm = $m_conf->hydrateRaw( $sql );
 
-                        for ($i=0; $i < $jml_print; $i++) { 
-                            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-                            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
-                            // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-                            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+                            $kategori_menu_printer = null;
+                            if ( $d_pkm->count() > 0 ) {
+                                $d_pkm = $d_pkm->toArray();
 
-
-                            /* Print a receipt */
-                            $printer = new Mike42\Escpos\Printer($connector);
-
-                            $printer -> initialize();
-                            $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                            $printer -> text($data_jual['nama_branch']."\n");
-
-                            $printer = new Mike42\Escpos\Printer($connector);
-                            $printer -> initialize();
-
-                            $printer -> text("\n");
-                            $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
-                            $printer -> text(buatBaris3Kolom('No. Meja', ':', $data_jual['nama_meja'], 'header'));
-                            $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
-                            $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
-
-                            $printer -> initialize();
-                            $printer -> text('================================================'."\n");
-
-                            $printer -> initialize();
-
-                            $jml_member = 1;
-                            foreach ($d_data as $k_data => $v_data) {
-                                $printer -> text($v_data['nama']);
-                                $printer -> text("\n");
-                                foreach ($v_data['detail'] as $k_det => $v_det) {
-                                    $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                                foreach ($d_pkm as $k_pkm => $v_pkm) {
+                                    $kategori_menu_printer[] = $v_pkm['kategori_menu_id'];
                                 }
                             }
 
-                            $printer -> initialize();
-                            $printer -> text('================================================'."\n");
+                            if ( !empty($kategori_menu_printer) ) {
+                                for ($i=0; $i < $jml_print; $i++) { 
+                                    // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+                                    $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
+                                    // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                                    // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
-                            if ( $data_jual['privilege'] == 1 ) {
-                                $printer -> initialize();
-                                $printer -> selectPrintMode(32);
-                                $printer -> setTextSize(2, 1);
-                                $printer -> text("PRIVILEGE");
+
+                                    /* Print a receipt */
+                                    $printer = new Mike42\Escpos\Printer($connector);
+
+                                    $printer -> initialize();
+                                    $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                                    $printer -> text($data_jual['nama_branch']."\n");
+
+                                    $printer -> initialize();
+                                    $printer -> text("\n");
+                                    $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
+                                    $printer -> text(buatBaris3Kolom('No. Meja', ':', $data_jual['kode_branch'].'\\'.$data_jual['nama_meja'], 'header'));
+                                    $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
+                                    // $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
+
+                                    $printer -> initialize();
+                                    $printer -> text('================================================'."\n");
+
+                                    $m_km = new \Model\Storage\KategoriMenu_model();
+                                    $d_km = $m_km->where('print_cl', 1)->get()->toArray();
+
+                                    foreach ($d_km as $k_km => $v_km) {
+                                        if ( in_array($v_km['id'], $kategori_menu_printer) ) {
+                                            $d_data = $this->mappingDataCheckList( $kode_pesanan, $v_km['id'], $data_jual['kode_branch'] );
+
+                                            if ( !empty($d_data) ) {
+                                                $printer -> initialize();
+                                                $printer -> text('------------------------------------------------'."\n");
+                                                $printer -> text($v_km['nama']."\n");
+                                                $printer -> text('------------------------------------------------'."\n");
+
+                                                $printer -> initialize();
+
+                                                $jml_member = 1;
+                                                foreach ($d_data as $k_data => $v_data) {
+                                                    $printer -> text($v_data['nama']);
+                                                    $printer -> text("\n");
+                                                    foreach ($v_data['detail'] as $k_det => $v_det) {
+                                                        $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    $printer -> initialize();
+                                    $printer -> text('================================================'."\n");
+
+                                    if ( $data_jual['privilege'] == 1 ) {
+                                        $printer -> initialize();
+                                        $printer -> selectPrintMode(32);
+                                        $printer -> setTextSize(2, 1);
+                                        $printer -> text("PRIVILEGE");
+                                    }
+
+                                    $printer -> feed(3);
+                                    $printer -> cut();
+                                    $printer -> close();
+                                }
                             }
-
-                            $printer -> feed(3);
-                            $printer -> cut();
-                            $printer -> close();
                         }
                     }
                 }
+
+                // $m_km = new \Model\Storage\KategoriMenu_model();
+                // $d_km = $m_km->where('print_cl', 1)->get()->toArray();
+
+                // foreach ($d_km as $k_km => $v_km) {
+                //     $m_conf = new \Model\Storage\Conf();
+                //     $now = $m_conf->getDate();
+
+                //     $d_data = $this->mappingDataCheckList( $kode_pesanan, $v_km['id'] );
+
+                //     if ( !empty($d_data) ) {
+                //         // Enter the share name for your USB printer here
+                //         $printer_name = '';
+                //         if ( $v_km['nama'] == 'BAVERAGE' ) {
+                //             $printer_name = 'GTR_BAVERAGE';
+                //         } else {
+                //             $printer_name = 'GTR_FOOD';
+                //         }
+
+                //         $jml_print = 1;
+                //         if ( stristr($printer_name, 'gtr') && stristr($printer_name, 'food') ) {
+                //             $jml_print = 3;
+                //         }
+
+                //         for ($i=0; $i < $jml_print; $i++) { 
+                //             $printer -> initialize();
+
+                //             $jml_member = 1;
+                //             foreach ($d_data as $k_data => $v_data) {
+                //                 $printer -> text($v_data['nama']);
+                //                 $printer -> text("\n");
+                //                 foreach ($v_data['detail'] as $k_det => $v_det) {
+                //                     $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                //                 }
+                //             }
+
+                //             $printer -> initialize();
+                //             $printer -> text('================================================'."\n");
+
+                //             if ( $data_jual['privilege'] == 1 ) {
+                //                 $printer -> initialize();
+                //                 $printer -> selectPrintMode(32);
+                //                 $printer -> setTextSize(2, 1);
+                //                 $printer -> text("PRIVILEGE");
+                //             }
+                //         }
+                //     }
+                // }
             }
 
             $this->result['status'] = 1;

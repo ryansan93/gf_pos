@@ -119,14 +119,17 @@
 							$padding2 = 'padding-left: 1%;'; 
 							$padding3 = 'padding-left: 1%;'; 
 							$col_size = 'col-md-6'; 
+
+							$kasir = 0;
 							if ( hasAkses('transaksi/Pembayaran') ) {
 								$col_size = 'col-md-4';
 								$padding2 = 'padding-left: 1%; padding-right: 1%;'; 
+								$kasir = 1;
 							}
 						?>
 
 						<div class="<?php echo $col_size; ?> no-padding" style="height: 100%; <?php echo $padding1; ?>">
-							<div class="col-md-12 text-center cursor-p button edit" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="/* jual.editPesanan(this); */ jual.modalPilihPrivilege(this);" data-kode="">
+							<div class="col-md-12 text-center cursor-p button edit" style="height: 100%; display: flex; justify-content: center; align-items: center;" onclick="/* jual.editPesanan(this); */ jual.modalPilihPrivilege(this);" data-kode="" data-kasir="<?php echo $kasir; ?>">
 								<span><b>SIMPAN UBAH</b></span>
 							</div>
 						</div>
