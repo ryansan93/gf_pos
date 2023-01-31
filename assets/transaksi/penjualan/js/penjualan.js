@@ -968,8 +968,6 @@ var jual = {
                             success: function(data) {
                                 hideLoading();
                                 if ( data.status == 1 ) {
-
-
                                     if ( empty(jenis) ) {
                                         var pesanan_kode = $('div.button.edit').attr('data-kode');
                                         var div_menu = $(elm).closest('div.menu');
@@ -1298,10 +1296,9 @@ var jual = {
     modalPilihPrivilege: function (elm) {
         $('.modal').modal('hide');
 
-        var kasir = $(elm).attr('kasir');
+        var kasir = $(elm).attr('data-kasir');
 
-        if ( kasir == 0 ) {
-
+        if ( empty(kasir) || kasir == 0 ) {
             $.get('transaksi/Penjualan/modalPilihPrivilege',{
             },function(data){
                 var _options = {
@@ -2357,7 +2354,7 @@ var jual = {
                             if ( data.status == 1 ) {
                                 ws.send(JSON.stringify("pesan"));
 
-                                if ( kasir == 0 ) {
+                                if ( empty(kasir) || kasir == 0 ) {
                                     jual.printCheckList(kodePesanan);
                                 } else {
                                     sak.cekSaldoAwalKasir();

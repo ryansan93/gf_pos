@@ -1310,7 +1310,8 @@ class Pembayaran extends Public_Controller
                 j.lunas,
                 j.ppn,
                 j.service_charge,
-                m.nama_meja
+                m.nama_meja,
+                j.print_nota
             from jual j
             left join
                 (
@@ -1640,6 +1641,7 @@ class Pembayaran extends Public_Controller
                 'alamat_branch' => $d_jual[0]['alamat_branch'],
                 'telp_branch' => $d_jual[0]['telp_branch'],
                 'nama_meja' => $d_jual[0]['nama_meja'],
+                'print_nota' => $d_jual[0]['print_nota'],
                 'total' => $total,
                 'diskon' => $diskon,
                 'ppn' => $ppn,
@@ -1831,9 +1833,24 @@ class Pembayaran extends Public_Controller
             $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
             $printer -> text("*** TERIMA KASIH ***");
 
+            if ( $data['print_nota'] == 1 ) {
+                $printer -> text("\n\n");
+                $printer -> initialize();
+                $printer -> selectPrintMode(32);
+                $printer -> setTextSize(2, 1);
+                $printer -> text("RE-PRINT BILL");
+            }
+
             $printer -> feed(3);
             $printer -> cut();
             $printer -> close();
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
+                array(
+                    'print_nota' => 1
+                )
+            );
 
             $this->result['status'] = 1;
         } catch (Exception $e) {

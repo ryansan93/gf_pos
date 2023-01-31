@@ -98,6 +98,10 @@ class ClosingOrder extends Public_Controller
                 on
                     ji.menu_kode = m.kode_menu 
             right join
+                branch b
+                on
+                    b.kode_branch = m.branch_kode
+            right join
                 (
                     select * from kategori_menu where print_cl = 1
                 ) km
@@ -112,7 +116,7 @@ class ClosingOrder extends Public_Controller
                 on
                     p.kode_pesanan = j.pesanan_kode
             where
-                j.branch = '".$branch_kode."' and
+                b.kode_branch = '".$branch_kode."' and
                 j.tgl_trans between '".$start_date."' and '".$end_date."' and
                 j.mstatus = 1 ".$sql_user."
             group by
@@ -368,6 +372,14 @@ class ClosingOrder extends Public_Controller
                         ji2.menu_kode = b.menu_kode 
             ) ji
             right join
+                menu m
+                on
+                    ji.menu_kode = m.kode_menu
+            right join
+                branch b
+                on
+                    b.kode_branch = m.branch_kode
+            right join
                 (
                     select j.kode_faktur as kode_faktur_utama, j.kode_faktur as kode_faktur from jual j where j.kode_faktur in (
                         select j_params.kode_faktur from jual j_params
@@ -388,7 +400,8 @@ class ClosingOrder extends Public_Controller
                 on
                     ji.faktur_kode = jual.kode_faktur
             where
-                ji.menu_kode is not null
+                ji.menu_kode is not null and
+                b.kode_branch = '".$branch_kode."'
         ";
 
         $data = null;
@@ -732,7 +745,7 @@ class ClosingOrder extends Public_Controller
     public function saveClosingOrder()
     {
         try {
-            $data_penjualan =    $this->getDataPenjualan();
+            $data_penjualan = $this->getDataPenjualan();
             $data_void_menu = $this->getDataVoidMenu();
 
             $m_clo = new \Model\Storage\ClosingOrder_model();

@@ -1215,7 +1215,8 @@ class Penjualan extends Public_Controller
                     on
                         m.id = p.meja_id
                 where
-                    j.pesanan_kode = '".$kode_pesanan."'
+                    j.pesanan_kode = '".$kode_pesanan."' and
+                    j.mstatus = 1
                 group by
                     b.kode_branch, 
                     b.nama, 
@@ -1281,7 +1282,7 @@ class Penjualan extends Public_Controller
                                     $printer -> initialize();
                                     $printer -> text("\n");
                                     $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
-                                    $printer -> text(buatBaris3Kolom('No. Meja', ':', $data_jual['kode_branch'].'\\'.$data_jual['nama_meja'], 'header'));
+                                    $printer -> text(buatBaris3Kolom('No. Meja', ':', $this->kodebranch.'\\'.$data_jual['nama_meja'], 'header'));
                                     $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
                                     // $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
 
@@ -2619,14 +2620,26 @@ class Penjualan extends Public_Controller
             }
 
             if ( isset($params['waste']) && !empty($params['waste']) ) {
-                $m_wm = new \Model\Storage\WasteMenu_model();
-                $m_wm->tanggal = $now['tanggal'];
-                $m_wm->branch_kode = $this->kodebranch;
-                $m_wm->save();
-
                 foreach ($params['waste'] as $k_waste => $v_waste) {
+                    $m_menu = new \Model\Storage\Menu_model();
+                    $d_menu = $m_menu->where('kode_menu', $v_waste['menu_kode'])->first();
+
+                    $m_wm = new \Model\Storage\WasteMenu_model();
+                    $d_wm = $m_wm->where('tanggal', $now['tanggal'])->where('branch_kode', $d_menu->branch_kode)->first();
+
+                    $id = null;
+                    if ( !$d_wm ) {
+                        $m_wm->tanggal = $now['tanggal'];
+                        $m_wm->branch_kode = $d_menu->branch_kode;
+                        $m_wm->save();
+
+                        $id = $m_wm->id;
+                    } else {
+                        $id = $d_wm->id;
+                    }
+
                     $m_wmi = new \Model\Storage\WasteMenuItem_model();
-                    $m_wmi->id_header = $m_wm->id;
+                    $m_wmi->id_header = $id;
                     $m_wmi->menu_kode = $v_waste['menu_kode'];
                     $m_wmi->jumlah = $v_waste['jumlah'];
                     $m_wmi->pesanan_kode = $kode_pesanan;

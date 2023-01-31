@@ -1,4 +1,4 @@
-<div class="col-md-2 no-padding">
+<div class="col-md-2 no-padding" style="height: 100%;">
 	<div class="col-md-12" style="padding-top: 10px;">
 		<button type="button" class="col-md-12 btn btn-primary btn-kode-branch" data-kode="<?php echo strtoupper($kode_branch); ?>" onclick="jual.modalPilihBranch()"><b><?php echo strtoupper($kode_branch); ?></b></button>
 	</div>

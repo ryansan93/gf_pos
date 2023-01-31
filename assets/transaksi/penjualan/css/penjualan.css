@@ -3,14 +3,27 @@ div.main > div.list_menu {
 	border-left: 1px solid #dedede;
 }
 
-.list_menu, .jenis, .nota {
+.list_menu, .nota {
 	height: 100%;
 	padding: 0px;
+}
+
+div.jenis {
+	/* -ms-overflow-style: none; /* for Internet Explorer, Edge */
+    /* scrollbar-width: none; /* for Firefox */
+    overflow-y: hidden;
+	height: 85%;
+}
+
+div.jenis > ul.jenis::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
 }
 
 div.jenis > ul.jenis {
 	list-style-type: none;
 	padding-left: 0px;
+	height: 100%;
+	overflow-y: scroll;
 }
 
 div.jenis > ul.jenis > li {
