@@ -1955,15 +1955,20 @@ class Pembayaran extends Public_Controller
             $printer -> text('Telp.'. $data['telp_branch']."\n");
             $printer -> text("\n");
 
-            $printer = new Mike42\Escpos\Printer($connector);
-            $printer -> initialize();
-
             $kode_faktur = $data['kode_faktur'];
 
+            $printer -> initialize();
             $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
             $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
             $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
 
+            $printer -> initialize();
+            $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer -> selectPrintMode(32);
+            $printer -> setTextSize(2, 1);
+            $printer -> text("DRAFT");
+
+            $printer -> initialize();
             $printer -> text('------------------------------------------------'."\n");
 
             $jml_member = 1;
@@ -2009,8 +2014,8 @@ class Pembayaran extends Public_Controller
             }
 
             $printer -> text('------------------------------------------------'."\n");
-            $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-            $printer -> text("*** INI BUKAN BUKTI PEMBAYARAN ***");
+            // $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            // $printer -> text("*** INI BUKAN BUKTI PEMBAYARAN ***");
 
             $printer -> feed(3);
             $printer -> cut();
