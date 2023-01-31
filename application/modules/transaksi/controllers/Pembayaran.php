@@ -1969,6 +1969,7 @@ class Pembayaran extends Public_Controller
             $printer -> text("\n");
             $printer -> text('------------------------------------------------'."\n");
 
+            $printer -> initialize();
             $jml_member = 1;
             foreach ($data['detail'] as $k_det => $v_det) {
                 if ( $jml_member > 1 ) {
