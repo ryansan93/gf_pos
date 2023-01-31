@@ -1961,9 +1961,10 @@ class Pembayaran extends Public_Controller
             $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
             $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
             $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
-            
+
             // $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-            $printer -> text('DRAFT');
+            $printer -> text("\n");
+            $printer -> text("*** INI BUKAN BUKTI PEMBAYARAN ***");
 
             // $printer = new Mike42\Escpos\Printer($connector);
             // $printer -> initialize();
