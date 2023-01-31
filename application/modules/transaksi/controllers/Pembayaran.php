@@ -1964,6 +1964,8 @@ class Pembayaran extends Public_Controller
 
             $printer -> initialize();
             $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer -> selectPrintMode(32);
+            $printer -> setTextSize(2, 1);
             $printer -> text("\n");
             $printer -> text("DRAFT");
             $printer -> text("\n");
