@@ -1968,6 +1968,8 @@ class Pembayaran extends Public_Controller
             $printer -> setTextSize(2, 1);
             $printer -> text("\n");
             $printer -> text("DRAFT");
+
+            $printer -> initialize();
             $printer -> text("\n");
             $printer -> text('------------------------------------------------'."\n");
 
