@@ -1143,6 +1143,11 @@ class Penjualan extends Public_Controller
                     $lebar_kolom_2 = 3;
                     $lebar_kolom_3 = 10;
                 }
+                if ( $jenis == 'request' ) {
+                    $lebar_kolom_1 = 3;
+                    $lebar_kolom_2 = 43;
+                    $lebar_kolom_3 = 0;
+                }
      
                 // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
                 $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
@@ -1162,7 +1167,7 @@ class Penjualan extends Public_Controller
      
                 // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
                 for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                    if ( $jenis == 'header' ) {
+                    if ( $jenis == 'header' || $jenis == 'request' ) {
                         // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
                         $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
                         $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
@@ -1310,6 +1315,9 @@ class Penjualan extends Public_Controller
                                                     $printer -> text("\n");
                                                     foreach ($v_data['detail'] as $k_det => $v_det) {
                                                         $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                                                        if ( isset($v_det['request']) && !empty($v_det['request']) ) {
+                                                            $printer -> text(buatBaris3Kolom('', $v_det['request'], '', 'request'));
+                                                        }
                                                     }
                                                 }
                                             }
