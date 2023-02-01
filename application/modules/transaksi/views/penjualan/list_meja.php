@@ -1,6 +1,6 @@
 <?php foreach ($data as $k_lantai => $v_lantai): ?>
 	<?php foreach ($v_lantai['list_meja'] as $k_meja => $v_meja): ?>
-		<div class="col-xs-2" style="padding-left: 0px;">
+		<div class="col-xs-2" style="padding-left: 0px; padding-bottom: 10px;">
 			<?php
 				$class = 'btn-primary';
 				$disabled = '';

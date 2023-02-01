@@ -134,7 +134,7 @@ class Penjualan extends Public_Controller
     public function getLantai()
     {
         $m_lantai = new \Model\Storage\Lantai_model();
-        $d_lantai = $m_lantai->with(['meja'])->get();
+        $d_lantai = $m_lantai->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->with(['meja'])->get();
 
         $data = null;
         if ( $d_lantai->count() > 0 ) {
@@ -156,10 +156,11 @@ class Penjualan extends Public_Controller
         $params = $this->input->get('params');
 
         $m_lantai = new \Model\Storage\Lantai_model();
+        $now = $m_lantai->getDate();
         $d_lantai = $m_lantai->where('id', $params['lantai_id'])->with(['meja'])->first();
 
-        $start_date = date('Y-m-d').' 00:00:00';
-        $end_date = date('Y-m-d').' 23:59:59';
+        $start_date = $now['tanggal'].' 00:00:00';
+        $end_date = $now['tanggal'].' 23:59:59';
 
         $data = null;
         if ( $d_lantai ) {
@@ -176,9 +177,11 @@ class Penjualan extends Public_Controller
                 $d_mejal = $m_mejal->whereBetween('tgl_trans', [$start_date, $end_date])->where('meja_id', $v_meja['id'])->orderBy('tgl_trans', 'desc')->first();
 
                 $aktif = 0;
-                // if ( $d_mejal ) {
-                //     $aktif = $d_mejal->status;
-                // }
+                if ( $d_mejal ) {
+                    if ( $d_lantai['kontrol_meja'] == 1 ) {
+                        $aktif = $d_mejal->status;
+                    }
+                }
 
                 $key_meja = $v_meja['nama_meja'].' | '.$v_meja['id'];
                 $data[ $key_lantai ]['list_meja'][] = array(
