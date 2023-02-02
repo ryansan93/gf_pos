@@ -1802,8 +1802,10 @@ class Pembayaran extends Public_Controller
                 $printer -> text('------------------------------------------------'."\n");
                 $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
                 $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
-                $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
-                $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+                if ( $data['jenis_bayar_exclude'] == 1 ) {
+                    $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
+                    $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+                }
                 $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
                 $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
                 $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
@@ -1997,8 +1999,10 @@ class Pembayaran extends Public_Controller
             $printer -> text('------------------------------------------------'."\n");
             $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
             $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
-            $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
-            $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+            if ( $data['jenis_bayar_exclude'] == 1 ) {
+                $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
+                $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+            }
             // $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
             $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
             // $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
@@ -2585,6 +2589,7 @@ class Pembayaran extends Public_Controller
                                  ->where('start_time', '<=', $jam)
                                  ->where('end_time', '>=', $jam)
                                  ->where('member', 1)
+                                 ->where('mstatus', 1)
                                  ->get();
         } else {
             $d_diskon = $m_diskon->where('start_date', '<=', $today)
@@ -2592,6 +2597,7 @@ class Pembayaran extends Public_Controller
                                  ->where('start_time', '<=', $jam)
                                  ->where('end_time', '>=', $jam)
                                  ->where('non_member', 1)
+                                 ->where('mstatus', 1)
                                  ->get();
         }
 

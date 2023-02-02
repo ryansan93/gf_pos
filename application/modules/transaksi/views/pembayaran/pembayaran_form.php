@@ -233,6 +233,17 @@
 						<?php endforeach ?>
 					</div>
 					<div class="col-xs-12 text-center font10"><hr class="double-dashed"></div>
+					<?php
+    					$hide_include = 'hide';
+    					$hide_exclude = 'hide';
+    					if ( $data['jenis_bayar_include'] ) {
+    						$hide_include = null;
+    						$hide_exclude = 'hide';
+    					} else if ( $data['jenis_bayar_exclude'] ) {
+    						$hide_include = 'hide';
+    						$hide_exclude = null;
+    					}
+    				?>
 					<div class="col-xs-12 font10">
 						<table class="table table-nobordered" style="margin-bottom: 0px;">
 							<tbody>
@@ -244,11 +255,11 @@
 		        					<td class="col-xs-8 text-right"><label class="control-label">Disc. =</label></td>
 		        					<td class="col-xs-4 text-right"><label class="control-label nota_diskon" data-val="<?php echo '('.angkaDecimal($data['diskon']).')'; ?>"><?php echo $data['diskon']; ?></label></td>
 		        				</tr>
-		        				<tr>
+		        				<tr class="<?php echo $hide_exclude; ?>">
 		        					<td class="col-xs-8 text-right"><label class="control-label">Service Charge. =</label></td>
 		        					<td class="col-xs-4 text-right service_charge" data-real="<?php echo $data['service_charge']; ?>"><label class="control-label"><?php echo angkaDecimal($data['service_charge']); ?></label></td>
 		        				</tr>
-		        				<tr>
+		        				<tr class="<?php echo $hide_exclude; ?>">
 		        					<td class="col-xs-8 text-right"><label class="control-label">PB1. =</label></td>
 		        					<td class="col-xs-4 text-right ppn" data-real="<?php echo $data['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($data['ppn']); ?></label></td>
 		        				</tr>
@@ -281,15 +292,7 @@
 							</tbody>
 						</table>
 					</div>
-					<?php
-    					$hide = null;
-    					if ( $data['jenis_bayar_include'] ) {
-    						$hide = null;
-    					} else if ( $data['jenis_bayar_exclude'] ) {
-    						$hide = 'hide';
-    					}
-    				?>
-					<div class="col-xs-12 include font10 <?php echo $hide; ?>">
+					<div class="col-xs-12 include font10 <?php echo $hide_include; ?>">
         				<div class="col-xs-12 no-padding">
         					<br>
         					<br>

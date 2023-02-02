@@ -10,7 +10,6 @@ var idxFaktur = 0;
 
 var bayar = {
 	startUp: function () {
-        // console.log( window.location.href.indexOf("pembayaranFormEdit") );
         if (window.location.href.indexOf("pembayaranFormEdit") > -1) {
             var kodeFaktur = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
             bayar.loadDetailPembayaran( kodeFaktur, null );
@@ -371,8 +370,6 @@ var bayar = {
                     });
 
                     tr_split = $(elm).closest('tr');
-
-                    // console.log( numeral.unformat($(tr_split).find('td.jumlah').text()) );
                 });
             },'html');
         } else {
@@ -1087,7 +1084,6 @@ var bayar = {
 
     penjualanForm: function () {
         var baseurl = $('head base').attr('href');
-        console.log( baseurl );
         var pagePenjualan = baseurl + 'transaksi/Penjualan';
 
         window.location.href = pagePenjualan;
@@ -1520,9 +1516,6 @@ var bayar = {
 
                     var ppn_new = parseFloat(data.content.total_ppn);
                     var service_charge_new = parseFloat(data.content.total_service_charge);
-
-                    console.log( ppn_new );
-                    console.log( service_charge_new );
 
                     if ( data.content.jenis_harga_exclude == 1 ) {
                         $('.include').addClass('hide');
