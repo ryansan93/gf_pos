@@ -1279,63 +1279,65 @@ class Penjualan extends Public_Controller
                                         $d_data = $this->mappingDataCheckList( $kode_pesanan, $v_km['id'], $data_jual['kode_branch'] );
 
                                         if ( !empty($d_data) ) {
-                                            if ( $printer_id != $v_p['id'] ) {
-                                                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-                                                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
-                                                // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-                                                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+                                            for ($i=0; $i < $jml_print; $i++) { 
+                                                if ( $printer_id != $v_p['id'] ) {
+                                                    // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+                                                    $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($printer_name);
+                                                    // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                                                    // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
-                                                /* Print a receipt */
-                                                $printer = new Mike42\Escpos\Printer($connector);
+                                                    /* Print a receipt */
+                                                    $printer = new Mike42\Escpos\Printer($connector);
+
+                                                    $printer -> initialize();
+                                                    $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                                                    $printer -> text($data_jual['nama_branch']."\n");
+
+                                                    $printer -> initialize();
+                                                    $printer -> text("\n");
+                                                    $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
+                                                    $printer -> text(buatBaris3Kolom('No. Meja', ':', $this->kodebranch.'\\'.$data_jual['nama_meja'], 'header'));
+                                                    $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
+                                                    // $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
+
+                                                    $printer -> initialize();
+                                                    $printer -> text('================================================'."\n");
+                                                }
 
                                                 $printer -> initialize();
-                                                $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                                                $printer -> text($data_jual['nama_branch']."\n");
+                                                $printer -> text('------------------------------------------------'."\n");
+                                                $printer -> text($v_km['nama']."\n");
+                                                $printer -> text('------------------------------------------------'."\n");
 
                                                 $printer -> initialize();
-                                                $printer -> text("\n");
-                                                $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
-                                                $printer -> text(buatBaris3Kolom('No. Meja', ':', $this->kodebranch.'\\'.$data_jual['nama_meja'], 'header'));
-                                                $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
-                                                // $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
 
-                                                $printer -> initialize();
-                                                $printer -> text('================================================'."\n");
-                                            }
-
-                                            $printer -> initialize();
-                                            $printer -> text('------------------------------------------------'."\n");
-                                            $printer -> text($v_km['nama']."\n");
-                                            $printer -> text('------------------------------------------------'."\n");
-
-                                            $printer -> initialize();
-
-                                            $jml_member = 1;
-                                            foreach ($d_data as $k_data => $v_data) {
-                                                $printer -> text($v_data['nama']);
-                                                $printer -> text("\n");
-                                                foreach ($v_data['detail'] as $k_det => $v_det) {
-                                                    $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
-                                                    if ( isset($v_det['request']) && !empty($v_det['request']) ) {
-                                                        $printer -> text(buatBaris3Kolom('', $v_det['request'], '', 'request'));
+                                                $jml_member = 1;
+                                                foreach ($d_data as $k_data => $v_data) {
+                                                    $printer -> text($v_data['nama']);
+                                                    $printer -> text("\n");
+                                                    foreach ($v_data['detail'] as $k_det => $v_det) {
+                                                        $printer -> text(buatBaris3Kolom($v_det['nama_menu'], '', angkaRibuan($v_det['jumlah']), 'center'));
+                                                        if ( isset($v_det['request']) && !empty($v_det['request']) ) {
+                                                            $printer -> text(buatBaris3Kolom('', $v_det['request'], '', 'request'));
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            if ( $printer_id != $v_p['id'] ) {
-                                                $printer -> initialize();
-                                                $printer -> text('================================================'."\n");
-
-                                                if ( $data_jual['privilege'] == 1 ) {
+                                                if ( $printer_id != $v_p['id'] ) {
                                                     $printer -> initialize();
-                                                    $printer -> selectPrintMode(32);
-                                                    $printer -> setTextSize(2, 1);
-                                                    $printer -> text("PRIVILEGE");
-                                                }
+                                                    $printer -> text('================================================'."\n");
 
-                                                $printer -> feed(3);
-                                                $printer -> cut();
-                                                $printer -> close();
+                                                    if ( $data_jual['privilege'] == 1 ) {
+                                                        $printer -> initialize();
+                                                        $printer -> selectPrintMode(32);
+                                                        $printer -> setTextSize(2, 1);
+                                                        $printer -> text("PRIVILEGE");
+                                                    }
+
+                                                    $printer -> feed(3);
+                                                    $printer -> cut();
+                                                    $printer -> close();
+                                                }
                                             }
                                         }
                                     }
