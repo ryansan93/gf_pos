@@ -240,17 +240,25 @@
   <script>
     var baseurl = $('head base').attr('href');
     var defaultPage = baseurl + 'transaksi/Penjualan';
-    <?php if ( (hasAkses('transaksi/Dapur') or hasAkses('transaksi/MenuGagal')) and !hasAkses('transaksi/Penjualan') ) { ?>
+    <?php if ( hasAkses('transaksi/Dapur') or hasAkses('transaksi/MenuGagal') ) { ?>
       defaultPage = baseurl + 'transaksi/Dapur';
 
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
         defaultPage = baseurl + 'transaksi/MenuGagal';
+      } else if ( window.location.href.indexOf("Penjualan") > -1 ) {
+        if ( hasAkses('transaksi/Penjualan') ) {
+          defaultPage = baseurl + 'transaksi/Penjualan';
+        }
       }
     <?php } ?>
 
-    <?php if ( hasAkses('transaksi/ClosingOrder') and !hasAkses('transaksi/Penjualan') ) { ?>
+    <?php if ( hasAkses('transaksi/ClosingOrder') ) { ?>
       if ( window.location.href.indexOf("ClosingOrder") >= 0 ) {
         defaultPage = baseurl + 'transaksi/ClosingOrder';
+      } else if ( window.location.href.indexOf("Penjualan") > -1 ) {
+        if ( hasAkses('transaksi/Penjualan') ) {
+          defaultPage = baseurl + 'transaksi/Penjualan';
+        }
       }
     <?php } ?>
     // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
