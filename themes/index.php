@@ -246,9 +246,9 @@
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
         defaultPage = baseurl + 'transaksi/MenuGagal';
       } else if ( window.location.href.indexOf("Penjualan") > -1 ) {
-        if ( hasAkses('transaksi/Penjualan') ) {
+        <?php if ( hasAkses('transaksi/Penjualan') ) { ?>
           defaultPage = baseurl + 'transaksi/Penjualan';
-        }
+        <?php } ?>
       }
     <?php } ?>
 
@@ -256,9 +256,9 @@
       if ( window.location.href.indexOf("ClosingOrder") >= 0 ) {
         defaultPage = baseurl + 'transaksi/ClosingOrder';
       } else if ( window.location.href.indexOf("Penjualan") > -1 ) {
-        if ( hasAkses('transaksi/Penjualan') ) {
+        <?php if ( hasAkses('transaksi/Penjualan') ) { ?>
           defaultPage = baseurl + 'transaksi/Penjualan';
-        }
+        <?php } ?>
       }
     <?php } ?>
     // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
