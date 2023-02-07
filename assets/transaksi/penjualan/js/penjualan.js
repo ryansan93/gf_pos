@@ -771,10 +771,17 @@ var jual = {
             } else if ( jenis_harga_include == 1 ) {
                 var _total_include = _harga * jumlah;
                 _total_show = _total_include;
-                _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
-                _total_include = _total_include - _total_ppn;
-                _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
-                _total = _total_include - _total_service_charge;
+
+                var _pembagi = parseFloat((100 + parseFloat(persen_service_charge))) + parseFloat(((100 + parseFloat(persen_service_charge)) * (persen_ppn/100)));
+                var _total = parseFloat(_total_include / (_pembagi / 100));
+
+                _total_service_charge = _total * (parseFloat(persen_service_charge)/100);
+                _total_ppn = parseFloat((_total + _total_service_charge)) * (persen_ppn/100);
+
+                // _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
+                // _total_include = _total_include - _total_ppn;
+                // _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
+                // _total = _total_include - _total_service_charge;
             }
             if ( jenis == 'edit' ) {
                 var jml_awal = $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').attr('data-jmlawal');
@@ -806,10 +813,17 @@ var jual = {
                 } else if ( jenis_harga_include == 1 ) {
                     var _total_include = _harga * jumlah;
                     _total_show = _total_include;
-                    _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
-                    _total_include = _total_include - _total_ppn;
-                    _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
-                    _total = _total_include - _total_service_charge;
+
+                    var _pembagi = parseFloat((100 + parseFloat(persen_service_charge))) + parseFloat(((100 + parseFloat(persen_service_charge)) * (persen_ppn/100)));
+                    var _total = parseFloat(_total_include / (_pembagi / 100));
+
+                    _total_service_charge = _total * (parseFloat(persen_service_charge)/100);
+                    _total_ppn = parseFloat((_total + _total_service_charge)) * (persen_ppn/100);
+
+                    // _total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(_total_include * (persen_ppn / 100)) : 0;
+                    // _total_include = _total_include - _total_ppn;
+                    // _total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(_total_include * (persen_service_charge / 100)) : 0;
+                    // _total = _total_include - _total_service_charge;
                 }
             }
 
@@ -873,10 +887,17 @@ var jual = {
 
                 var total_include = harga * jml_menu;
                 total_show = total_include;
-                total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(total_include * (persen_ppn / 100)) : 0;
-                total_include = total_include - total_ppn;
-                total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(total_include * (persen_service_charge / 100)) : 0;
-                total = total_include - total_service_charge;
+
+                var _pembagi = parseFloat((100 + parseFloat(persen_service_charge))) + parseFloat(((100 + parseFloat(persen_service_charge)) * (persen_ppn/100)));
+                var total = parseFloat(total_include / (_pembagi / 100));
+
+                total_service_charge = total * (parseFloat(persen_service_charge)/100);
+                total_ppn = parseFloat((total + total_service_charge)) * (persen_ppn/100);
+                
+                // total_ppn = (status_ppn == 1 && persen_ppn > 0) ? Math.round(total_include * (persen_ppn / 100)) : 0;
+                // total_include = total_include - total_ppn;
+                // total_service_charge = (status_service_charge == 1 && persen_service_charge > 0) ? Math.round(total_include * (persen_service_charge / 100)) : 0;
+                // total = total_include - total_service_charge;
                 harga = total / jml_menu;
             }
 

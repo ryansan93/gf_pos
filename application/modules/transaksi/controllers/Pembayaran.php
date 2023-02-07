@@ -1784,7 +1784,7 @@ class Pembayaran extends Public_Controller
                     $printer -> text("\n");
                 }
 
-                $printer -> text(buatBaris3Kolom('Member', ':', $v_det['member'], 'header'));
+                $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
                 $printer -> text('------------------------------------------------'."\n");
 
                 $printer -> initialize();
@@ -1982,7 +1982,7 @@ class Pembayaran extends Public_Controller
                     $printer -> text("\n");
                 }
 
-                $printer -> text(buatBaris3Kolom('Member', ':', $v_det['member'], 'header'));
+                $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
                 $printer -> text('------------------------------------------------'."\n");
 
                 $printer -> initialize();

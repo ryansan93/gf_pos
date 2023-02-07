@@ -240,7 +240,7 @@
   <script>
     var baseurl = $('head base').attr('href');
     var defaultPage = baseurl + 'transaksi/Penjualan';
-    <?php if ( hasAkses('transaksi/Dapur') or hasAkses('transaksi/MenuGagal') ) { ?>
+    <?php if ( (hasAkses('transaksi/Dapur') or hasAkses('transaksi/MenuGagal')) and !hasAkses('transaksi/Penjualan') ) { ?>
       defaultPage = baseurl + 'transaksi/Dapur';
 
       if ( window.location.href.indexOf("MenuGagal") > -1 ) {
@@ -248,7 +248,7 @@
       }
     <?php } ?>
 
-    <?php if ( hasAkses('transaksi/ClosingOrder') ) { ?>
+    <?php if ( hasAkses('transaksi/ClosingOrder') and !hasAkses('transaksi/Penjualan') ) { ?>
       if ( window.location.href.indexOf("ClosingOrder") >= 0 ) {
         defaultPage = baseurl + 'transaksi/ClosingOrder';
       }

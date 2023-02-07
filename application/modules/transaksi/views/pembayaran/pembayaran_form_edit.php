@@ -200,7 +200,7 @@
 							<table class="table table-nobordered" style="margin-bottom: 0px;">
 								<tbody>
 									<tr>
-										<td class="col-xs-3"><label class="control-label">Member</label></td>
+										<td class="col-xs-3"><label class="control-label">Order ID</label></td>
 										<td class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></td>
 									</tr>
 								</tbody>
@@ -342,7 +342,7 @@
 									<table class="table table-nobordered" style="margin-bottom: 0px;">
 										<tbody>
 											<tr>
-												<td class="col-xs-3"><label class="control-label">Member</label></td>
+												<td class="col-xs-3"><label class="control-label">Order ID</label></td>
 												<td class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></td>
 											</tr>
 										</tbody>
