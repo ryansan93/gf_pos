@@ -39,6 +39,14 @@
       </div>
       <div class="list-group list-group-flush content mCustomScrollbar" style="max-width: 20rem; width: 17rem; height: 100%; padding-bottom: 0px;">
         <ul class="list-unstyled components">
+          <?php if ( hasAkses('transaksi/Penjualan') ): ?>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/Penjualan">
+                <i class="fa fa-shopping-cart" style="width: 8%;"></i>
+                <span style="width: 92%;">Penjualan</span>
+              </a>
+            </li>
+          <?php endif ?>
           <?php if ( hasAkses('transaksi/SaldoAwalKasir') ): ?>
             <li class="">
               <a class="list-group-item list-group-item-action bg-light-black cursor-p" onclick="sak.modalSaldoAwalKasir()">
@@ -47,14 +55,14 @@
               </a>
             </li>
           <?php endif ?>
-          <?php // if ( hasAkses('transaksi/SaldoAkhirKasir') ): ?>
+          <!-- <?php // if ( hasAkses('transaksi/SaldoAkhirKasir') ): ?>
             <li class="">
               <a class="list-group-item list-group-item-action bg-light-black cursor-p" onclick="co.modalSaldoAkhirKasir()">
                 <i class="fa fa-usd" style="width: 8%;"></i>
                 <span style="width: 92%;">Saldo Akhir Kasir</span>
               </a>
             </li>
-          <?php // endif ?>
+          <?php // endif ?> -->
           <li class="">
             <a href="#member" data-toggle="collapse" aria-expanded="false" data-val="0" class="dropdown-toggle list-group-item list-group-item-action bg-light-black cursor-p">
               <i class="fa fa-users" style="width: 8%;"></i>

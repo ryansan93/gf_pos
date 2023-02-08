@@ -72,9 +72,9 @@
 									</div>
 									<div class="col-md-2">
 										<div class="col-md-6 no-padding">
-											<?php if ( $tanggal <= $value['tgl_berakhir'] && $value['mstatus'] == 1 ): ?>
+											<?php // if ( $tanggal <= $value['tgl_berakhir'] && $value['mstatus'] == 1 ): ?>
 												<button type="button" class="btn btn-success col-md-12 btn_pilih" style="padding: 0px; margin-right: 5px;"><i class="fa fa-arrow-right"></i></button>
-											<?php endif ?>
+											<?php // endif ?>
 										</div>
 										<div class="col-md-6 no-padding"><button type="button" class="btn btn-primary col-md-12" style="padding: 0px; margin-left: 5px;" onclick="bayar.pembayaranFormHutang(this)" data-kode="<?php echo exEncrypt($value['kode_member']); ?>"><i class="fa fa-usd"></i></button></div>
 									</div>
