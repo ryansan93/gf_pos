@@ -879,6 +879,7 @@ var bayar = {
             'no_kartu': $(modal).find('.no_kartu').val(),
             'nama_kartu': $(modal).find('.nama_kartu').val(),
             'jumlah': numeral.unformat($(modal).find('.jml_bayar').val()),
+            'cl': cl
         };
 
         dataMetodeBayar.push( _dataMetodeBayar );
@@ -900,7 +901,7 @@ var bayar = {
                 if ( !empty(dataMetodeBayar[i]) ) {
                     var id = dataMetodeBayar[i].kategori_jenis_kartu;
                     var val = $('.kategori_jenis_kartu'+id).attr('data-val');
-                    var total = dataMetodeBayar[i].jumlah;
+                    var total = (dataMetodeBayar[i].cl == 0) ? dataMetodeBayar[i].jumlah : numeral.unformat($('.total_bayar').val());
 
                     $('.kategori_jenis_kartu'+id).attr('data-val', total);
                     $('.kategori_jenis_kartu'+id).text( numeral.formatDec(total) );

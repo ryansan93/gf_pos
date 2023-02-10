@@ -1698,14 +1698,16 @@ class Pembayaran extends Public_Controller
                 select
                     kjk.id,
                     kjk.nama,
-                    data.jumlah
+                    data.jumlah,
+                    data.cl
                 from
                     kategori_jenis_kartu kjk 
                 left join
                     (
                         select 
                             jk.kategori_jenis_kartu_id,
-                            sum(bd.nominal) as jumlah
+                            sum(bd.nominal) as jumlah,
+                            jk.cl
                         from bayar b 
                         right join
                             bayar_det bd 
@@ -1719,7 +1721,8 @@ class Pembayaran extends Public_Controller
                             b.faktur_kode = '".trim($kode_faktur)."' and
                             b.mstatus = 1
                         group by
-                            jk.kategori_jenis_kartu_id
+                            jk.kategori_jenis_kartu_id,
+                            jk.cl
                     ) data
                     on
                         kjk.id = data.kategori_jenis_kartu_id
@@ -1952,7 +1955,11 @@ class Pembayaran extends Public_Controller
                 $printer -> text(buatBaris3Kolom('Kembalian.', '=', angkaRibuan($kembalian), 'footer'));
                 $printer -> text(buatBaris3Kolom('', '', '----------', 'footer'));
                 foreach ($data['kategori_jenis_kartu'] as $k_kjk => $v_kjk) {
-                    $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($v_kjk['jumlah']), 'footer'));
+                    $jumlah = $v_kjk['jumlah'];
+                    if ( $v_kjk['cl'] == 1 ) {
+                        $jumlah = $data['grand_total'];
+                    }
+                    $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($jumlah), 'footer'));
                 }
 
                 if ( $data['jenis_bayar_include'] == 1 ) {
@@ -1967,7 +1974,7 @@ class Pembayaran extends Public_Controller
                 $printer -> text(buatBaris3Kolom('Bayar.', '=', angkaRibuan($data['bayar_hutang']), 'footer'));
                 $printer -> text('Pembayaran -------------------------------------'."\n");
                 foreach ($data['jenis_bayar'] as $k_jb => $v_jb) {
-                    $printer -> text($v_jb['jenis_bayar']."\n");                    
+                    $printer -> text($v_jb['jenis_bayar']."\n");
                 }
             }
             $printer -> text('------------------------------------------------'."\n");
