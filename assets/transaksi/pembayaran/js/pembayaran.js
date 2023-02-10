@@ -765,6 +765,8 @@ var bayar = {
         sisa_tagihan = (total_tagihan <= total_bayar) ? 0 : total_tagihan - total_bayar;
 
         $('input.sisa_tagihan').val( numeral.formatInt(sisa_tagihan) );
+
+        bayar.hitKategoriPembayaran();
     }, // end - hitungSisaTagihan
 
     cekNominalBayarHutang: function(elm) {
@@ -884,7 +886,7 @@ var bayar = {
 
         dataMetodeBayar.push( _dataMetodeBayar );
         
-        bayar.hitKategoriPembayaran();
+        // bayar.hitKategoriPembayaran();
         bayar.getDataDiskon( $(elm).attr('data-kodefaktur') );
 
         $('.modal').modal('hide');
@@ -901,7 +903,10 @@ var bayar = {
                 if ( !empty(dataMetodeBayar[i]) ) {
                     var id = dataMetodeBayar[i].kategori_jenis_kartu;
                     var val = $('.kategori_jenis_kartu'+id).attr('data-val');
-                    var total = (dataMetodeBayar[i].cl == 0) ? dataMetodeBayar[i].jumlah : numeral.unformat($('.total_bayar').val());
+
+                    console.log( $('.nota_total_bayar').attr('data-val') );
+
+                    var total = (dataMetodeBayar[i].cl == 0) ? dataMetodeBayar[i].jumlah : $('.nota_total_bayar').attr('data-val');
 
                     $('.kategori_jenis_kartu'+id).attr('data-val', total);
                     $('.kategori_jenis_kartu'+id).text( numeral.formatDec(total) );
@@ -969,7 +974,7 @@ var bayar = {
             $('div.jenis_pembayaran').find('button').removeAttr('disabled');
         }
 
-        bayar.hitKategoriPembayaran();
+        // bayar.hitKategoriPembayaran();
         bayar.getDataDiskon( $(elm).attr('data-kode') );
     }, // end - hapusMetodePembayaran
 
