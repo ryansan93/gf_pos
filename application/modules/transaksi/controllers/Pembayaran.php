@@ -22,7 +22,7 @@ class Pembayaran extends Public_Controller
             $m_conf = new \Model\Storage\Conf();
             $now = $m_conf->getDate();
             $today = $now['tanggal'];
-            // $today = '2023-01-02';
+            // $today = '2023-02-09';
 
             $start_date = $today.' 00:00:00';
             $end_date = $today.' 23:59:59';
@@ -936,7 +936,8 @@ class Pembayaran extends Public_Controller
                     'kode_jenis_kartu' => $kode_jenis_kartu,
                     'kategori_jenis_kartu_id' => $value['kategori_jenis_kartu_id'],
                     'nama' => $value['nama'],
-                    'status' => $value['status']
+                    'status' => $value['status'],
+                    'cl' => $value['cl']
                 );
             }
         }
@@ -953,13 +954,135 @@ class Pembayaran extends Public_Controller
 
         $data = null;
         if ( !empty($d_jual['kode_member']) ) {
-            $m_jual = new \Model\Storage\Jual_model();
-            $d_jual_hutang = $m_jual->where('tgl_trans', '>=', $date)->where('kode_member', $d_jual['kode_member'])->where('kode_faktur', '<>', $kode_faktur)->where('hutang', 1)->where('mstatus', 1)->with(['pesanan'])->get();
+            // $m_jual = new \Model\Storage\Jual_model();
+            // $d_jual_hutang = $m_jual->where('tgl_trans', '>=', $date)->where('kode_member', $d_jual['kode_member'])->where('kode_faktur', '<>', $kode_faktur)->where('hutang', 1)->where('mstatus', 1)->with(['pesanan'])->get();
+
+            $m_conf = new \Model\Storage\DiskonMenu_model();
+            $sql = "
+                select
+                    data.*,
+                    sum(b.diskon) as total_diskon
+                from
+                (
+                    select 
+                        jual.kode_faktur_utama as kode_faktur,
+                        sum(ji.total) as grand_total,
+                        j.tgl_trans as tgl_pesan
+                    from jual_item ji
+                    right join
+                        (
+                            select 
+                                jl1.*
+                            from 
+                                (
+                                    select 
+                                        jual.*,
+                                        p.kode_pesanan as pesanan_kode
+                                    from 
+                                        (
+                                            select 
+                                                j.kode_faktur as kode_faktur,
+                                                j.kode_faktur as kode_faktur_utama
+                                            from jual j 
+                                            where 
+                                                j.tgl_trans >= '".$date."' and
+                                                j.kode_member = '".$d_jual['kode_member']."' and
+                                                j.kode_faktur <> '".$kode_faktur."' and
+                                                j.mstatus = 1
+                                            group by
+                                                j.kode_faktur
+                                            UNION ALL
+                                            select 
+                                                jg.faktur_kode_gabungan as kode_faktur,
+                                                jg.faktur_kode as kode_faktur_utama
+                                            from jual_gabungan jg
+                                            right join
+                                                (
+                                                    select 
+                                                        j.kode_faktur as kode_faktur,
+                                                        j.tgl_trans
+                                                    from jual j 
+                                                    where 
+                                                        j.tgl_trans >= '".$date."' and
+                                                        j.kode_member = '".$d_jual['kode_member']."' and
+                                                        j.kode_faktur <> '".$kode_faktur."' and
+                                                        j.mstatus = 1
+                                                    group by
+                                                        j.kode_faktur,
+                                                        j.tgl_trans
+                                                ) j
+                                                on
+                                                    j.kode_faktur = jg.faktur_kode
+                                            where
+                                                jg.faktur_kode_gabungan is not null
+                                            group by
+                                                jg.faktur_kode_gabungan,
+                                                jg.faktur_kode
+                                        ) jual
+                                    right join
+                                        jual jl
+                                        on
+                                            jual.kode_faktur = jl.kode_faktur 
+                                    right join  
+                                        pesanan p
+                                        on
+                                            p.kode_pesanan = jl.pesanan_kode 
+                                    where
+                                        jual.kode_faktur is not null
+                                    group by
+                                        jual.kode_faktur,
+                                        jual.kode_faktur_utama,
+                                        p.kode_pesanan
+                                ) jl1
+                            right join
+                                jual j
+                                on
+                                    j.kode_faktur = jl1.kode_faktur
+                            right join
+                                pesanan p
+                                on
+                                    j.pesanan_kode = p.kode_pesanan
+                            where
+                                jl1.kode_faktur is not null
+                        ) jual
+                        on
+                            jual.kode_faktur = ji.faktur_kode
+                    right join
+                        pesanan p
+                        on
+                            jual.pesanan_kode = p.kode_pesanan
+                    right join
+                        jual j
+                        on
+                            jual.kode_faktur_utama = j.kode_faktur
+                    where
+                        jual.kode_faktur is not null and
+                        j.lunas = 0
+                    group by 
+                        jual.kode_faktur_utama,
+                        j.lunas,
+                        j.tgl_trans
+                ) data
+                right join
+                    (
+                        select * from bayar where mstatus = 1
+                    ) b
+                    on
+                        data.kode_faktur = b.faktur_kode
+                where
+                    data.kode_faktur is not null
+                group by
+                    data.kode_faktur,
+                    data.grand_total,
+                    data.tgl_pesan
+            ";
+            $d_jual_hutang = $m_conf->hydrateRaw( $sql );
 
             if ( $d_jual_hutang->count() > 0 ) {
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
+                    $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
                     $sql = "select sum(bayar) as total_bayar from bayar_hutang bh 
                         left join
                             (
@@ -971,21 +1094,20 @@ class Pembayaran extends Public_Controller
                             b.mstatus = 1 and
                             bh.faktur_kode = '".$value['kode_faktur']."'
                     ";
-
-                    $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
                     $d_bayar_hutang = $m_bayar_hutang->hydrateRaw($sql);
 
                     $total_bayar = 0;
+                    $total_diskon = $value['total_diskon'];
                     if ( $d_bayar_hutang->count() > 0 ) {
                         $total_bayar = $d_bayar_hutang->toArray()[0]['total_bayar'];
                     }
 
                     if ( $value['grand_total'] > $total_bayar ) {
                         $data[] = array(
-                            'tgl_pesan' => !empty($value['pesanan']) ? $value['pesanan']['tgl_pesan'] : $value['tgl_trans'],
+                            'tgl_pesan' => $value['tgl_pesan'],
                             'faktur_kode' => $value['kode_faktur'],
-                            'hutang' => $value['grand_total'],
-                            'bayar' => $total_bayar
+                            'hutang' => $value['grand_total']-$total_diskon,
+                            'bayar' => $total_bayar,
                         );
                     }
                 }
@@ -1050,6 +1172,8 @@ class Pembayaran extends Public_Controller
         $content['kode_faktur'] = $kode_faktur;
         $content['saldo_member'] = $saldo_member;
         $content['data'] = $params;
+
+        $content['data']['sisa_tagihan'] -= $data_diskon['total_diskon'];
 
         $html = $this->load->view($this->pathView . 'modal_metode_pembayaran', $content, TRUE);
 
@@ -1126,8 +1250,16 @@ class Pembayaran extends Public_Controller
 
             $id_header = $m_bayar->id;
 
+            $print_nota = 1;
             foreach ($params['dataMetodeBayar'] as $key => $value) {
                 if ( !empty($value) ) {
+                    $m_jk = new \Model\Storage\JenisKartu_model();
+                    $d_jk = $m_jk->where('kode_jenis_kartu', $value['kode_jenis_kartu'])->where('cl', 1)->first();
+
+                    if ( $d_jk ) {
+                        $print_nota = 0;
+                    }
+
                     $m_bayard = new \Model\Storage\BayarDet_model();
                     $m_bayard->id_header = $id_header;
                     $m_bayard->jenis_bayar = $value['nama'];
@@ -1227,6 +1359,12 @@ class Pembayaran extends Public_Controller
                 $m_jual = new \Model\Storage\Jual_model();
                 $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
 
+                if ( $print_nota == 0 ) {
+                    $m_jual->where('kode_faktur', $params['faktur_kode'])->update(
+                        array('hutang' => 1)
+                    );
+                }
+
                 $m_pesanan = new \Model\Storage\Pesanan_model();
                 $d_pesanan = $m_pesanan->where('kode_pesanan', $d_jual->pesanan_kode)->first();
 
@@ -1275,6 +1413,7 @@ class Pembayaran extends Public_Controller
             
             $this->result['status'] = 1;
             $this->result['content'] = array('id_bayar' => $id_header);
+            $this->result['print_nota'] = $print_nota;
             $this->result['message'] = 'Data berhasil di simpan.';
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
@@ -2590,6 +2729,7 @@ class Pembayaran extends Public_Controller
                                  ->where('end_time', '>=', $jam)
                                  ->where('member', 1)
                                  ->where('mstatus', 1)
+                                 ->where('branch_kode', $this->kodebranch)
                                  ->get();
         } else {
             $d_diskon = $m_diskon->where('start_date', '<=', $today)
@@ -2598,6 +2738,7 @@ class Pembayaran extends Public_Controller
                                  ->where('end_time', '>=', $jam)
                                  ->where('non_member', 1)
                                  ->where('mstatus', 1)
+                                 ->where('branch_kode', $this->kodebranch)
                                  ->get();
         }
 
@@ -2853,18 +2994,21 @@ class Pembayaran extends Public_Controller
                                     right join
                                         (
                                             select 
+                                                jm.id as id_jenis_menu,
+                                                jm.nama as nama_jenis_menu,
                                                 ji.menu_kode, 
                                                 ji.menu_nama, 
                                                 ji.kode_jenis_pesanan,
                                                 jp.exclude,
                                                 jp.include,
                                                 sum(ji.jumlah) as jumlah, 
-                                                case 
+                                                sum(ji.total) as total
+                                                /* case 
                                                     when jp.exclude = 1 then
                                                         sum(ji.total)
                                                     when jp.include = 1 then
                                                         sum(ji.total) + sum(ji.ppn) + sum(ji.service_charge)
-                                                end as total
+                                                end as total */
                                             from jual_item ji
                                             right join
                                                 (
@@ -2882,9 +3026,15 @@ class Pembayaran extends Public_Controller
                                                 jenis_pesanan jp
                                                 on
                                                     jp.kode = ji.kode_jenis_pesanan
+                                            right join
+                                                jenis_menu jm
+                                                on
+                                                    jm.id = m.jenis_menu_id
                                             where
                                                 ji.jumlah > 0
                                             group by
+                                                jm.id,
+                                                jm.nama,
                                                 ji.kode_jenis_pesanan,
                                                 jp.exclude,
                                                 jp.include,
@@ -2892,7 +3042,9 @@ class Pembayaran extends Public_Controller
                                                 ji.menu_nama
                                         ) ji
                                         on
-                                            dm.menu_kode = ji.menu_kode
+                                            (dm.jenis_menu_id = ji.id_jenis_menu or dm.jenis_menu_id = 'all')
+                                            and
+                                            (dm.menu_kode = ji.menu_kode or dm.menu_kode = 'all')
                                     where
                                         dm.diskon_kode = '".$v_dd."'
                                 ";
@@ -3048,8 +3200,127 @@ class Pembayaran extends Public_Controller
         $data = null;
 
         if ( empty($id) ) {
-            $m_jual = new \Model\Storage\Jual_model();
-            $d_jual_hutang = $m_jual->where('tgl_trans', '>=', $date)->where('kode_member', $kode_member)->where('hutang', 1)->where('mstatus', 1)->with(['pesanan'])->get();
+            // $m_jual = new \Model\Storage\Jual_model();
+            // $d_jual_hutang = $m_jual->where('tgl_trans', '>=', $date)->where('kode_member', $kode_member)->where('hutang', 1)->where('mstatus', 1)->with(['pesanan'])->get();
+
+            $m_conf = new \Model\Storage\DiskonMenu_model();
+            $sql = "
+                select
+                    data.*,
+                    sum(b.diskon) as total_diskon
+                from
+                (
+                    select 
+                        jual.kode_faktur_utama as kode_faktur,
+                        sum(ji.total) as grand_total,
+                        j.tgl_trans as tgl_pesan
+                    from jual_item ji
+                    right join
+                        (
+                            select 
+                                jl1.*
+                            from 
+                                (
+                                    select 
+                                        jual.*,
+                                        p.kode_pesanan as pesanan_kode
+                                    from 
+                                        (
+                                            select 
+                                                j.kode_faktur as kode_faktur,
+                                                j.kode_faktur as kode_faktur_utama
+                                            from jual j 
+                                            where 
+                                                j.tgl_trans >= '".$date."' and
+                                                j.kode_member = '".$kode_member."' and
+                                                j.mstatus = 1
+                                            group by
+                                                j.kode_faktur
+                                            UNION ALL
+                                            select 
+                                                jg.faktur_kode_gabungan as kode_faktur,
+                                                jg.faktur_kode as kode_faktur_utama
+                                            from jual_gabungan jg
+                                            right join
+                                                (
+                                                    select 
+                                                        j.kode_faktur as kode_faktur,
+                                                        j.tgl_trans
+                                                    from jual j 
+                                                    where 
+                                                        j.tgl_trans >= '".$date."' and
+                                                        j.kode_member = '".$kode_member."' and
+                                                        j.mstatus = 1
+                                                    group by
+                                                        j.kode_faktur,
+                                                        j.tgl_trans
+                                                ) j
+                                                on
+                                                    j.kode_faktur = jg.faktur_kode
+                                            where
+                                                jg.faktur_kode_gabungan is not null
+                                            group by
+                                                jg.faktur_kode_gabungan,
+                                                jg.faktur_kode
+                                        ) jual
+                                    right join
+                                        jual jl
+                                        on
+                                            jual.kode_faktur = jl.kode_faktur 
+                                    right join  
+                                        pesanan p
+                                        on
+                                            p.kode_pesanan = jl.pesanan_kode 
+                                    where
+                                        jual.kode_faktur is not null
+                                    group by
+                                        jual.kode_faktur,
+                                        jual.kode_faktur_utama,
+                                        p.kode_pesanan
+                                ) jl1
+                            right join
+                                jual j
+                                on
+                                    j.kode_faktur = jl1.kode_faktur
+                            right join
+                                pesanan p
+                                on
+                                    j.pesanan_kode = p.kode_pesanan
+                            where
+                                jl1.kode_faktur is not null
+                        ) jual
+                        on
+                            jual.kode_faktur = ji.faktur_kode
+                    right join
+                        pesanan p
+                        on
+                            jual.pesanan_kode = p.kode_pesanan
+                    right join
+                        jual j
+                        on
+                            jual.kode_faktur_utama = j.kode_faktur
+                    where
+                        jual.kode_faktur is not null and
+                        j.lunas = 0
+                    group by 
+                        jual.kode_faktur_utama,
+                        j.lunas,
+                        j.tgl_trans
+                ) data
+                right join
+                    (
+                        select * from bayar where mstatus = 1
+                    ) b
+                    on
+                        data.kode_faktur = b.faktur_kode
+                where
+                    data.kode_faktur is not null
+                group by
+                    data.kode_faktur,
+                    data.grand_total,
+                    data.tgl_pesan
+            ";
+            $d_jual_hutang = $m_conf->hydrateRaw( $sql );
 
             if ( $d_jual_hutang->count() > 0 ) {
                 $d_jual_hutang = $d_jual_hutang->toArray();
@@ -3071,15 +3342,16 @@ class Pembayaran extends Public_Controller
                     $d_bayar_hutang = $m_bayar_hutang->hydrateRaw($sql);
 
                     $total_bayar = 0;
+                    $total_diskon = $value['total_diskon'];
                     if ( $d_bayar_hutang->count() > 0 ) {
                         $total_bayar = $d_bayar_hutang->toArray()[0]['total_bayar'];
                     }
 
                     if ( $value['grand_total'] > $total_bayar ) {
                         $data[] = array(
-                            'tgl_pesan' => !empty($value['pesanan']) ? $value['pesanan']['tgl_pesan'] : $value['tgl_trans'],
+                            'tgl_pesan' => $value['tgl_pesan'],
                             'faktur_kode' => $value['kode_faktur'],
-                            'hutang' => $value['grand_total'],
+                            'hutang' => $value['grand_total']-$total_diskon,
                             'bayar' => $total_bayar
                         );
                     }

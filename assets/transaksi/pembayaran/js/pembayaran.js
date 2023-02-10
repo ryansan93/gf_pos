@@ -821,6 +821,7 @@ var bayar = {
             'nama': $(elm).text(),
             'kode_jenis_kartu': $(elm).data('kode'),
             'kategori_jenis_kartu_id': $(elm).data('kategori'),
+            'cl': $(elm).attr('data-cl'),
             'total_bayar': numeral.unformat($('input.total_bayar').val()),
             'sisa_tagihan': numeral.unformat($('input.sisa_tagihan').val()),
             'member_kode': $('.kode_member').attr('data-val'),
@@ -861,6 +862,15 @@ var bayar = {
 
     saveMetodePembayaran: function(elm) {
         var modal = $(elm).closest('.modal-body');
+
+        var cl = $(elm).attr('data-cl');
+
+        $('div.jenis_pembayaran').find('button').removeAttr('disabled');
+        if ( cl == 1 ) {
+            $('div.jenis_pembayaran').find('button:not([data-cl="1"])').attr('disabled', 'disabled');
+        } else {
+            $('div.jenis_pembayaran').find('button[data-cl="1"]').attr('disabled', 'disabled');
+        }
 
         var _dataMetodeBayar = {
             'nama': $(elm).data('nama'),
@@ -952,7 +962,11 @@ var bayar = {
         var tr = $(elm).closest('tr');
         $(tr).remove();
 
-        dataMetodeBayar[id] = null;
+        dataMetodeBayar.splice(id, (id+1));
+
+        if ( dataMetodeBayar.length == 0 ) {
+            $('div.jenis_pembayaran').find('button').removeAttr('disabled');
+        }
 
         bayar.hitKategoriPembayaran();
         bayar.getDataDiskon( $(elm).attr('data-kode') );
@@ -1019,7 +1033,13 @@ var bayar = {
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
-                    bayar.printNota(data.content.id_bayar);
+                    if ( data.print_nota == 1 ) {
+                        bayar.printNota(data.content.id_bayar);
+                    } else {
+                        bootbox.alert(data.message, function() {
+                            bayar.penjualanForm();
+                        });
+                    }
                 } else {
                     bootbox.alert(data.message);
                 }
@@ -1098,30 +1118,32 @@ var bayar = {
             title: 'Alasan Hutang',
             inputType: 'textarea',
             callback: function (alasan) {
-                var params = {
-                    'faktur_kode': $(elm).data('kode'),
-                    'alasan': alasan
-                }
-
-                $.ajax({
-                    url: 'transaksi/Pembayaran/saveHutang',
-                    data: {
-                        'params': params
-                    },
-                    type: 'POST',
-                    dataType: 'JSON',
-                    beforeSend: function() { showLoading(); },
-                    success: function(data) {
-                        hideLoading();
-                        if ( data.status == 1 ) {
-                            bootbox.alert(data.message, function() {
-                                bayar.batal();
-                            });
-                        } else {
-                            bootbox.alert(data.message);
-                        }
+                if ( alasan != null ) {
+                    var params = {
+                        'faktur_kode': $(elm).data('kode'),
+                        'alasan': alasan
                     }
-                });
+
+                    $.ajax({
+                        url: 'transaksi/Pembayaran/saveHutang',
+                        data: {
+                            'params': params
+                        },
+                        type: 'POST',
+                        dataType: 'JSON',
+                        beforeSend: function() { showLoading(); },
+                        success: function(data) {
+                            hideLoading();
+                            if ( data.status == 1 ) {
+                                bootbox.alert(data.message, function() {
+                                    bayar.batal();
+                                });
+                            } else {
+                                bootbox.alert(data.message);
+                            }
+                        }
+                    });
+                }
             }
         });
     }, // end - hutang

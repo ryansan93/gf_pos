@@ -42,13 +42,15 @@
 
 								$idx++;
 							?>
-							<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
-								<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kategori="<?php echo $value['kategori_jenis_kartu_id']; ?>" data-id="<?php echo $data['id']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
-							</div>
+							<?php if ( $value['cl'] == 0 ): ?>
+								<div class="col-xs-4 no-padding <?php echo $class; ?>" style="padding-bottom: 10px;">
+									<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo $value['kode_jenis_kartu']; ?>" data-kategori="<?php echo $value['kategori_jenis_kartu_id']; ?>" data-id="<?php echo $data['id']; ?>" data-cl="<?php echo $value['cl']; ?>" onclick="bayar.modalMetodePembayaran(this)"><?php echo strtoupper($value['nama']); ?></button>
+								</div>
+							<?php endif ?>
 						<?php endforeach ?>
-						<div class="col-xs-4 no-padding cb_left">
+						<!-- <div class="col-xs-4 no-padding cb_left">
 							<button type="button" class="col-xs-12 btn btn-primary" data-id="<?php echo $data['id']; ?>" onclick="bayar.saveHutang(this)">CL</button>
-						</div>
+						</div> -->
 					</div>
 				</div>
 			</div>
