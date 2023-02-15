@@ -1484,7 +1484,7 @@ var jual = {
                             beforeSend: function() { showLoading('Simpan Transaksi ...'); },
                             success: function(data) {
                                 if ( data.status == 1 ) {
-                                    ws.send(JSON.stringify("pesan"));
+                                    // ws.send(JSON.stringify("pesan"));
                                     // ws.addEventListener("open", () => {
                                     //     ws.send(JSON.stringify("pesan"));
                                     // });

@@ -1039,13 +1039,13 @@ var bayar = {
             success: function(data) {
                 hideLoading();
                 if ( data.status == 1 ) {
-                    if ( data.print_nota == 1 ) {
-                        bayar.printNota(data.content.id_bayar);
-                    } else {
-                        bootbox.alert(data.message, function() {
-                            bayar.penjualanForm();
-                        });
-                    }
+                    bayar.printNota(data.content.id_bayar);
+                    // if ( data.print_nota == 1 ) {
+                    // } else {
+                    //     bootbox.alert(data.message, function() {
+                    //         bayar.penjualanForm();
+                    //     });
+                    // }
                 } else {
                     bootbox.alert(data.message);
                 }
