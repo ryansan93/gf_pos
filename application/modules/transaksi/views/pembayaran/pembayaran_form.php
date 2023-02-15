@@ -253,7 +253,7 @@
 		        				</tr>
 		        				<tr>
 		        					<td class="col-xs-8 text-right"><label class="control-label">Disc. =</label></td>
-		        					<td class="col-xs-4 text-right"><label class="control-label nota_diskon" data-val="<?php echo '('.angkaDecimal($data['diskon']).')'; ?>"><?php echo $data['diskon']; ?></label></td>
+		        					<td class="col-xs-4 text-right"><label class="control-label nota_diskon" data-val="<?php echo $data['diskon']; ?>"><?php echo '('.angkaDecimal($data['diskon']).')'; ?></label></td>
 		        				</tr>
 		        				<tr class="<?php echo $hide_exclude; ?>">
 		        					<td class="col-xs-8 text-right"><label class="control-label">Service Charge. =</label></td>

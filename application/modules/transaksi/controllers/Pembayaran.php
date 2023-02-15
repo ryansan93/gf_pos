@@ -2013,6 +2013,8 @@ class Pembayaran extends Public_Controller
         $params = $this->input->post('params');
 
         try {
+            cetak_r( $params, 1 );
+
             $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'], null );
 
             function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
@@ -2143,21 +2145,13 @@ class Pembayaran extends Public_Controller
             }
 
             $printer -> text('------------------------------------------------'."\n");
-            $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
-            $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
+            $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($params['tot_belanja']), 'footer'));
+            $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($params['diskon']).')', 'footer'));
             if ( $data['jenis_bayar_exclude'] == 1 ) {
-                $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
-                $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+                $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($params['service_charge']), 'footer'));
+                $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($params['ppn']), 'footer'));
             }
-            // $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
-            $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
-            // $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
-            // $kembalian = (($data['jml_bayar'] - $data['grand_total']) > 0) ? $data['jml_bayar'] - $data['grand_total'] : 0;
-            // $printer -> text(buatBaris3Kolom('Kembalian.', '=', angkaRibuan($kembalian), 'footer'));
-            // $printer -> text(buatBaris3Kolom('', '', '----------', 'footer'));
-            // foreach ($data['kategori_jenis_kartu'] as $k_kjk => $v_kjk) {
-            //     $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($v_kjk['jumlah']), 'footer'));
-            // }
+            $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($params['jml_tagihan']), 'footer'));
 
             if ( $data['jenis_bayar_include'] == 1 ) {
                 $printer -> initialize();
@@ -2167,8 +2161,6 @@ class Pembayaran extends Public_Controller
             }
 
             $printer -> text('------------------------------------------------'."\n");
-            // $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-            // $printer -> text("*** INI BUKAN BUKTI PEMBAYARAN ***");
 
             $printer -> feed(3);
             $printer -> cut();

@@ -1086,7 +1086,12 @@ var bayar = {
 
     printDraft: function (elm) {
         var data = {
-            'faktur_kode': $(elm).attr('data-kode')
+            'faktur_kode': $(elm).attr('data-kode'),
+            'tot_belanja': numeral.unformat($('.tot_belanja').find('label').text()),
+            'diskon': $('.nota_diskon').attr('data-val'),
+            'ppn': numeral.unformat($('.ppn').find('label').text()),
+            'service_charge': numeral.unformat($('.service_charge').find('label').text()),
+            'jml_tagihan': $('.nota_total_bayar').attr('data-val')
         };
 
         $.ajax({
