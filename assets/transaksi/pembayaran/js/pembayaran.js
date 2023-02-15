@@ -1550,13 +1550,13 @@ var bayar = {
                     var ppn_new = parseFloat(data.content.total_ppn);
                     var service_charge_new = parseFloat(data.content.total_service_charge);
 
+                    $('.ppn').attr('data-real', ppn_new);
+                    $('.service_charge').attr('data-real', service_charge_new);
                     if ( data.content.jenis_harga_exclude == 1 ) {
                         $('.include').addClass('hide');
                         $('.ppn').find('label').text( numeral.formatDec(ppn_new) );
                         $('.service_charge').find('label').text( numeral.formatDec(service_charge_new) );
 
-                        $('.ppn').attr('data-real', ppn_new);
-                        $('.service_charge').attr('data-real', service_charge_new);
                     } else if ( data.content.jenis_harga_include == 1 ) {
                         $('.include').removeClass('hide');
                         $('.ppn_include').find('label').text( numeral.formatDec(ppn_new) );
