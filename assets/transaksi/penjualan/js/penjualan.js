@@ -2373,7 +2373,7 @@ var jual = {
                         success: function(data) {
                             // hideLoading();
                             if ( data.status == 1 ) {
-                                ws.send(JSON.stringify("pesan"));
+                                // ws.send(JSON.stringify("pesan"));
 
                                 if ( empty(kasir) || kasir == 0 ) {
                                     jual.printCheckList(kodePesanan);
