@@ -2640,6 +2640,9 @@ class Pembayaran extends Public_Controller
                     $m_jual_gabungan->jml_tagihan = $value['total'];
                     $m_jual_gabungan->save();
                 }
+            } else {
+                $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+                $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
             }
 
             $this->result['status'] = 1;
