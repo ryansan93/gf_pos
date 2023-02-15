@@ -3088,8 +3088,10 @@ class Pembayaran extends Public_Controller
                         }
                     }
                 } else {
-                    $tot_ppn = $v_jual['nilai_ppn'];
-                    $tot_sc = $v_jual['nilai_service_charge'];
+                    if ( $v_jual['exclude'] == 1 ) {
+                        $tot_ppn = $v_jual['nilai_ppn'];
+                        $tot_sc = $v_jual['nilai_service_charge'];
+                    }
                 }
             }
         }
