@@ -2903,21 +2903,22 @@ class Pembayaran extends Public_Controller
                         if ( $d_diskon->diskon_tipe == 1 ) {
                             $tot_diskon_by_kode = 0;
 
-                            $hitung = 0;
-                            if ( !empty($data_metode_bayar) ) {
-                                foreach ($data_metode_bayar as $k_dmb => $v_dmb) {
-                                    if ( !empty($v_dmb) ) {
-                                        $m_djk = new \Model\Storage\DiskonJenisKartu_model();
-                                        $d_djk = $m_djk->where('diskon_kode', $v_dd)->where('jenis_kartu_kode', $v_dmb['kode_jenis_kartu'])->first();
+                            $hitung = 1;
+                            // $hitung = 0;
+                            // if ( !empty($data_metode_bayar) ) {
+                            //     foreach ($data_metode_bayar as $k_dmb => $v_dmb) {
+                            //         if ( !empty($v_dmb) ) {
+                            //             $m_djk = new \Model\Storage\DiskonJenisKartu_model();
+                            //             $d_djk = $m_djk->where('diskon_kode', $v_dd)->where('jenis_kartu_kode', $v_dmb['kode_jenis_kartu'])->first();
 
-                                        if ( $d_djk ) {
-                                            $hitung = 1;
+                            //             if ( $d_djk ) {
+                            //                 $hitung = 1;
 
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                            //                 break;
+                            //             }
+                            //         }
+                            //     }
+                            // }
 
                             if ( $hitung == 1 ) {
                                 if ( $d_diskon->status_ppn == 1 ) {
@@ -2957,21 +2958,22 @@ class Pembayaran extends Public_Controller
                         if ( $d_diskon->diskon_tipe == 2 ) {
                             $tot_diskon_by_kode = 0;
 
-                            $hitung = 0;
-                            if ( !empty($data_metode_bayar) ) {
-                                foreach ($data_metode_bayar as $k_dmb => $v_dmb) {
-                                    if ( !empty($v_dmb) ) {
-                                        $m_djk = new \Model\Storage\DiskonJenisKartu_model();
-                                        $d_djk = $m_djk->where('diskon_kode', $v_dd)->where('jenis_kartu_kode', $v_dmb['kode_jenis_kartu'])->first();
+                            $hitung = 1;
+                            // $hitung = 0;
+                            // if ( !empty($data_metode_bayar) ) {
+                            //     foreach ($data_metode_bayar as $k_dmb => $v_dmb) {
+                            //         if ( !empty($v_dmb) ) {
+                            //             $m_djk = new \Model\Storage\DiskonJenisKartu_model();
+                            //             $d_djk = $m_djk->where('diskon_kode', $v_dd)->where('jenis_kartu_kode', $v_dmb['kode_jenis_kartu'])->first();
 
-                                        if ( $d_djk ) {
-                                            $hitung = 1;
+                            //             if ( $d_djk ) {
+                            //                 $hitung = 1;
 
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                            //                 break;
+                            //             }
+                            //         }
+                            //     }
+                            // }
 
                             if ( $hitung == 1 ) {
                                 if ( $d_diskon->status_ppn == 1 ) {
@@ -3049,9 +3051,9 @@ class Pembayaran extends Public_Controller
                                                 ji.menu_nama
                                         ) ji
                                         on
-                                            (dm.jenis_menu_id = ji.id_jenis_menu or dm.jenis_menu_id = 'all')
+                                            (dm.jenis_menu_id = 'all' or dm.jenis_menu_id = ji.id_jenis_menu)
                                             and
-                                            (dm.menu_kode = ji.menu_kode or dm.menu_kode = 'all')
+                                            (dm.menu_kode = 'all' or dm.menu_kode = ji.menu_kode)
                                     where
                                         dm.diskon_kode = '".$v_dd."'
                                 ";
