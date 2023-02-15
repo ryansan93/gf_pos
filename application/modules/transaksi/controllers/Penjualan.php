@@ -2055,6 +2055,8 @@ class Penjualan extends Public_Controller
 
         try {
             $m_pesanan = new \Model\Storage\Pesanan_model();
+            $now = $m_pesanan->getDate();
+
             $d_pesanan = $m_pesanan->where('kode_pesanan', $params['pesanan_kode'])->with(['pesanan_item', 'meja'])->first();
 
             $jenis_pesanan = null;
@@ -2085,6 +2087,31 @@ class Penjualan extends Public_Controller
                     $m_hm = new \Model\Storage\HargaMenu_model();
                     $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
 
+                    $m_menu = new \Model\Storage\Menu_model();
+                    $d_menu = $m_menu->where('kode_menu', $v_ji['menu_kode'])->orderBy('id', 'desc')->first();
+
+                    $m_sc = new \Model\Storage\ServiceCharge_model();
+                    $d_sc = $m_sc->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->where('tgl_berlaku', '<=', $now['tanggal'])->orderBy('id', 'desc')->first();
+
+                    $m_ppn = new \Model\Storage\Ppn_model();
+                    $d_ppn = $m_ppn->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->where('tgl_berlaku', '<=', $now['tanggal'])->orderBy('id', 'desc')->first();
+
+                    if ( $d_jp->exclude == 1 ) {
+                        $total = $d_hm->harga * $v_ji['jumlah'];
+                        $total_show = $total;
+                        $total_service_charge = ($d_menu->service_charge == 1 && $d_sc->nilai > 0) ? $total * ($d_sc->nilai / 100) : 0;
+                        $total_ppn = ($d_menu->ppn == 1 && $d_ppn->nilai > 0) ? ($total + $total_service_charge) * ($d_ppn->nilai / 100) : 0;
+                    } else if ( $d_jp->include == 1 ) {
+                        $total_include = $d_hm->harga * $v_ji['jumlah'];
+                        $total_show = $total_include;
+
+                        $pembagi = (100 + $d_sc->nilai) + ((100 + $d_sc->nilai) * ($d_ppn->nilai/100));
+                        $total = $total_include / ($pembagi / 100);
+
+                        $total_service_charge = $total * ($d_sc->nilai/100);
+                        $total_ppn = ($total + $total_service_charge) * ($d_ppn->nilai/100);
+                    }
+
                     $key_ji = $k_ji;
                     $pesanan_item[$key_jp]['detail'][$key_ji] = array(
                         'kode_pesanan_item' => $v_ji['kode_pesanan_item'],
@@ -2094,11 +2121,11 @@ class Penjualan extends Public_Controller
                         'menu_kode' => $v_ji['menu_kode'],
                         'jumlah' => $v_ji['jumlah'],
                         'harga_show' => $d_hm->harga,
-                        'harga' => $v_ji['harga'],
-                        'total' => $v_ji['total'],
-                        'service_charge' => $v_ji['service_charge'],
-                        'ppn' => $v_ji['ppn'],
-                        'total_show' => $v_ji['total'],
+                        'harga' => $d_hm->harga,
+                        'total' => $total,
+                        'service_charge' => $total_service_charge,
+                        'ppn' => $total_ppn,
+                        'total_show' => $total_show,
                         'request' => $v_ji['request'],
                         'pesanan_item_detail' => $v_ji['pesanan_item_detail'],
                         'proses' => $v_ji['proses']

@@ -661,7 +661,7 @@ class Pembayaran extends Public_Controller
                 pesanan p
                 on
                     j.pesanan_kode = p.kode_pesanan
-            right join
+            left join
                 meja m
                 on
                     m.id = p.meja_id
@@ -882,7 +882,7 @@ class Pembayaran extends Public_Controller
                 'telp_branch' => $d_jual[0]['telp_branch'],
                 'kasir' => $d_jual[0]['kasir'],
                 'nama_kasir' => $d_jual[0]['nama_kasir'],
-                'nama_meja' => $d_jual[0]['nama_meja'],
+                'nama_meja' => (isset($d_jual[0]['nama_meja']) && !empty($d_jual[0]['nama_meja'])) ? $d_jual[0]['nama_meja'] : null,
                 'total' => $total,
                 'diskon' => $diskon,
                 'ppn' => $ppn,
@@ -1493,7 +1493,7 @@ class Pembayaran extends Public_Controller
                 pesanan p
                 on
                     j.pesanan_kode = p.kode_pesanan
-            right join
+            left join
                 meja m
                 on
                     m.id = p.meja_id
@@ -1782,7 +1782,7 @@ class Pembayaran extends Public_Controller
                 'nama_branch' => $d_jual[0]['nama_branch'],
                 'alamat_branch' => $d_jual[0]['alamat_branch'],
                 'telp_branch' => $d_jual[0]['telp_branch'],
-                'nama_meja' => $d_jual[0]['nama_meja'],
+                'nama_meja' => (isset($d_jual[0]['nama_meja']) && !empty($d_jual[0]['nama_meja'])) ? $d_jual[0]['nama_meja'] : null,
                 'print_nota' => $d_jual[0]['print_nota'],
                 'total' => $total,
                 'diskon' => $diskon,
