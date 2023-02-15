@@ -489,7 +489,7 @@ class ClosingOrder extends Public_Controller
             if ( !empty($data['data_sales']) ) {
                 $data_sales = $data['data_sales'];
 
-                function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                function buatBaris3KolomSales($kolom1, $kolom2, $kolom3, $jenis) {
                     // Mengatur lebar setiap kolom (dalam satuan karakter)
                     if ( $jenis == 'header' ) {
                         $lebar_kolom_1 = 10;
@@ -568,17 +568,17 @@ class ClosingOrder extends Public_Controller
                         $tot_jumlah = 0;
                         $tot_value = 0;
                         foreach ($v_km['detail'] as $k_det => $v_det) {
-                            $printer -> text(buatBaris3Kolom('   - '.$v_det['menu_nama'], '', '', 'center'));
-                            $printer -> text(buatBaris3Kolom('      - Qty', ':', angkaRibuan($v_det['jumlah']), 'center'));
-                            $printer -> text(buatBaris3Kolom('      - Value', ':', angkaRibuan($v_det['total']), 'center'));
+                            $printer -> text(buatBaris3KolomSales('   - '.$v_det['menu_nama'], '', '', 'center'));
+                            $printer -> text(buatBaris3KolomSales('      - Qty', ':', angkaRibuan($v_det['jumlah']), 'center'));
+                            $printer -> text(buatBaris3KolomSales('      - Value', ':', angkaRibuan($v_det['total']), 'center'));
 
                             $tot_jumlah += $v_det['jumlah'];
                             $tot_value += $v_det['total'];
                         }
 
                         $printer -> text($v_ds['nama'].' - '.$v_km['nama'].' Summary Total'."\n");
-                        $printer -> text(buatBaris3Kolom('   - Qty', ':', angkaRibuan($tot_jumlah), 'center'));
-                        $printer -> text(buatBaris3Kolom('   - Value', ':', angkaRibuan($tot_value), 'center'));
+                        $printer -> text(buatBaris3KolomSales('   - Qty', ':', angkaRibuan($tot_jumlah), 'center'));
+                        $printer -> text(buatBaris3KolomSales('   - Value', ':', angkaRibuan($tot_value), 'center'));
 
                         $idx++;
                     }
@@ -607,12 +607,12 @@ class ClosingOrder extends Public_Controller
 
                         $tot_jumlah = 0;
                         foreach ($v_km['detail'] as $k_det => $v_det) {
-                            $printer -> text(buatBaris3Kolom('   - '.$v_det['menu_nama'], ':', angkaRibuan($v_det['jumlah']), 'center'));
+                            $printer -> text(buatBaris3KolomSales('   - '.$v_det['menu_nama'], ':', angkaRibuan($v_det['jumlah']), 'center'));
 
                             $tot_jumlah += $v_det['jumlah'];
                         }
 
-                        $printer -> text(buatBaris3Kolom($v_ds['nama'].' - '.$v_km['nama'].' Summary Total', ':', angkaRibuan($tot_jumlah), 'center'));
+                        $printer -> text(buatBaris3KolomSales($v_ds['nama'].' - '.$v_km['nama'].' Summary Total', ':', angkaRibuan($tot_jumlah), 'center'));
 
                         $idx++;
                     }
@@ -628,7 +628,7 @@ class ClosingOrder extends Public_Controller
             if ( !empty($data['data_cashier']) ) {
                 $data_cashier = $data['data_cashier'];
 
-                function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                function buatBaris3KolomCashier($kolom1, $kolom2, $kolom3, $jenis) {
                     // Mengatur lebar setiap kolom (dalam satuan karakter)
                     if ( $jenis == 'header' ) {
                         $lebar_kolom_1 = 15;
@@ -696,9 +696,9 @@ class ClosingOrder extends Public_Controller
 
                 $printer -> initialize();
                 foreach ($data_cashier as $k_dc => $v_dc) {
-                    $printer -> text(buatBaris3Kolom('Branch', ':', $v_dc['nama_branch'], 'header'));
-                    $printer -> text(buatBaris3Kolom('Kasir', ':', $v_dc['nama'], 'header'));
-                    $printer -> text(buatBaris3Kolom('Tanggal Print', ':', substr($now['waktu'], 0, 19), 'header'));
+                    $printer -> text(buatBaris3KolomCashier('Branch', ':', $v_dc['nama_branch'], 'header'));
+                    $printer -> text(buatBaris3KolomCashier('Kasir', ':', $v_dc['nama'], 'header'));
+                    $printer -> text(buatBaris3KolomCashier('Tanggal Print', ':', substr($now['waktu'], 0, 19), 'header'));
                     $printer -> text('================================================'."\n");
 
                     $idx = 0;
@@ -709,21 +709,21 @@ class ClosingOrder extends Public_Controller
 
                         $tot_value = 0;
                         foreach ($v_jk['detail'] as $k_det => $v_det) {
-                            $printer -> text(buatBaris3Kolom($v_det['kode_faktur'], ':', angkaRibuan($v_det['total']), 'center'));
+                            $printer -> text(buatBaris3KolomCashier($v_det['kode_faktur'], ':', angkaRibuan($v_det['total']), 'center'));
 
                             $tot_value += $v_det['total'];
                             $tot_value_all += $v_det['total'];
                         }
 
                         $printer -> text('------------------------------------------------'."\n");
-                        $printer -> text(buatBaris3Kolom('Total '.$v_jk['nama'], ':', angkaRibuan($tot_value), 'center'));
+                        $printer -> text(buatBaris3KolomCashier('Total '.$v_jk['nama'], ':', angkaRibuan($tot_value), 'center'));
 
                         $idx++;
                     }
                 }
                 $printer -> text('================================================'."\n");
                 $printer -> text('************************************************'."\n");
-                $printer -> text(buatBaris3Kolom('Total All', ':', angkaRibuan($tot_value_all), 'center'));
+                $printer -> text(buatBaris3KolomCashier('Total All', ':', angkaRibuan($tot_value_all), 'center'));
                 $printer -> text('************************************************'."\n");
                 $printer -> text("\n");
                 $printer -> text('********************** END *********************'."\n");
