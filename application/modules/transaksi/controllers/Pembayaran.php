@@ -2632,6 +2632,9 @@ class Pembayaran extends Public_Controller
             $data_utama = $params['data_utama'];
             $data = isset($params['data']) ? $params['data'] : null;
 
+            $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+            $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
+
             if ( !empty($data) ) {
                 foreach ($data as $key => $value) {
                     $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
@@ -2640,10 +2643,11 @@ class Pembayaran extends Public_Controller
                     $m_jual_gabungan->jml_tagihan = $value['total'];
                     $m_jual_gabungan->save();
                 }
-            } else {
-                $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
-                $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
-            }
+            } 
+            // else {
+            //     $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+            //     $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
+            // }
 
             $this->result['status'] = 1;
             $this->result['content'] = array('kode' => exEncrypt( $data_utama['kode_faktur'] ));
