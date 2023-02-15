@@ -1173,7 +1173,7 @@ class Pembayaran extends Public_Controller
         $content['saldo_member'] = $saldo_member;
         $content['data'] = $params;
 
-        $content['data']['sisa_tagihan'] -= $data_diskon['total_diskon'];
+        // $content['data']['sisa_tagihan'] -= $data_diskon['total_diskon'];
 
         $html = $this->load->view($this->pathView . 'modal_metode_pembayaran', $content, TRUE);
 
