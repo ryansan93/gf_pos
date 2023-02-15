@@ -2013,8 +2013,6 @@ class Pembayaran extends Public_Controller
         $params = $this->input->post('params');
 
         try {
-            cetak_r( $params, 1 );
-
             $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'], null );
 
             function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
