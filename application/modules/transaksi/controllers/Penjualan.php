@@ -552,7 +552,7 @@ class Penjualan extends Public_Controller
             $m_mejal->save();
 
             $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/save', $m_pesanan, $deskripsi_log_gaktifitas );
+            Modules::run( 'base/event/save', $m_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
             
             $this->result['status'] = 1;
             $this->result['content'] = array('kode_pesanan' => $kode_pesanan);
@@ -586,7 +586,7 @@ class Penjualan extends Public_Controller
             $d_jual = $m_jual->where('pesanan_kode', $params)->first();
             
             $deskripsi_log = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/update', $d_jual, $deskripsi_log );
+            Modules::run( 'base/event/update', $d_jual, $deskripsi_log, $params );
 
             $m_pesanan = new \Model\Storage\Pesanan_model();
             $m_pesanan->where('kode_pesanan', $params)->update(
@@ -635,7 +635,7 @@ class Penjualan extends Public_Controller
             }
             
             $deskripsi = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/update', $d_pesanan, $deskripsi );
+            Modules::run( 'base/event/update', $d_pesanan, $deskripsi, $params );
 
             $this->result['status'] = 1;
             $this->result['message'] = 'Data berhasil di hapus.';
@@ -753,7 +753,7 @@ class Penjualan extends Public_Controller
             }
 
             $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/save', $m_jual, $deskripsi_log_gaktifitas );
+            Modules::run( 'base/event/save', $m_jual, $deskripsi_log_gaktifitas, $kode_faktur );
             
             $this->result['status'] = 1;
             $this->result['content'] = array('kode_faktur' => $kode_faktur);
@@ -787,7 +787,7 @@ class Penjualan extends Public_Controller
             $d_jual = $m_jual->where('kode_faktur', $params)->first();
             
             $deskripsi_log_gaktifitas = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas );
+            Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas, $params );
 
             $this->result['status'] = 1;
             $this->result['message'] = 'Data berhasil di hapus.';
