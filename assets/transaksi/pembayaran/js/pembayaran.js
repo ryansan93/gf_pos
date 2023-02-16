@@ -1084,6 +1084,16 @@ var bayar = {
         });
     }, // end  - printNota
 
+    rePrintNota: function (elm) {
+        var idx = 0;
+        fakturPrint[idx] = {
+            'kode_faktur': $(elm).attr('data-faktur'),
+            'jenis': ''
+        };
+
+        bayar.printNota( $(elm).attr('data-id') );
+    }, // end - rePrintNota
+
     printDraft: function (elm) {
         var data = {
             'faktur_kode': $(elm).attr('data-kode'),

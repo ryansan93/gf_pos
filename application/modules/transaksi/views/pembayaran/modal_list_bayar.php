@@ -106,6 +106,12 @@
 								<i class="fa fa-search"></i><input class="form-control" type="search" data-table="tbl_bayar" placeholder="Search" onkeyup="filter_all(this)">
 							</div>
 							<small>
+								<?php
+									$colspan_action = 2;
+									if ( $akses_waitress['a_edit'] == 0 ) {
+										$colspan_action -= 2;
+									}
+								?>
 								<table class="table table-bordered tbl_bayar" style="margin-bottom: 0px;">
 									<thead>
 										<tr>
@@ -114,7 +120,7 @@
 											<th class="col-lg-2">Pelanggan</th>
 											<th class="col-lg-1">Total</th>
 											<th class="col-lg-1">Bayar</th>
-											<th class="col-lg-1">Action</th>
+											<th class="col-lg-1" colspan="<?php echo $colspan_action; ?>">Action</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -126,8 +132,8 @@
 													<td><?php echo !empty($value['member_group']) ? $value['member_group'].' - '.$value['pelanggan'] : $value['pelanggan']; ?></td>
 													<td class="text-right total"><?php echo angkaDecimal($value['total']); ?></td>
 													<td class="text-right bayar"><?php echo angkaDecimal($value['bayar']); ?></td>
-													<td class="col-lg-1 text-center">
-														<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
+													<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
+														<td class="col-lg-1 text-center">
 															<?php 
 																$onclick = 'bayar.modalListBill(this)';
 																if ( empty($value['kode_faktur']) ) {
@@ -135,10 +141,18 @@
 																} 
 															?>
 
-															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="<?php echo $onclick; ?>" data-kode="<?php echo $value['kode_pesanan']; ?>" data-id="<?php echo exEncrypt($key); ?>"><i class="fa fa-usd"></i></button>
-														<?php endif ?>
+															<button type="button" class="btn btn-success" style="padding: 1px 0px; width: 100%;" onclick="<?php echo $onclick; ?>" data-kode="<?php echo $value['kode_pesanan']; ?>" data-id="<?php echo exEncrypt($key); ?>" title="Edit Bill"><i class="fa fa-usd"></i></button>
 														</td>
-													</td>
+													<?php endif ?>
+													<?php if ( $akses_kasir['a_edit'] == 1 ): ?>
+														<td class="col-lg-1 text-center">
+															<?php 
+																$onclick = 'bayar.rePrintNota(this)';
+															?>
+
+															<button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="<?php echo $onclick; ?>" data-id="<?php echo $key; ?>" data-faktur="<?php echo $value['kode_faktur']; ?>" title="Re-Print Bill"><i class="fa fa-print"></i></button>
+														</td>
+													<?php endif ?>
 												</tr>
 												<?php $jml_transaksi++; $grand_total += $value['total']; ?>
 											<?php endforeach ?>
