@@ -1820,184 +1820,184 @@ class Pembayaran extends Public_Controller
                 $jenis = isset($params['jenis']) ? $params['jenis'] : null;
                 $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'], $params['id_bayar'] );
 
-                function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
-                    // Mengatur lebar setiap kolom (dalam satuan karakter)
-                    if ( $jenis == 'header' ) {
-                        $lebar_kolom_1 = 10;
-                        $lebar_kolom_2 = 3;
-                        $lebar_kolom_3 = 33;
-                    }
-                    if ( $jenis == 'center' ) {
-                        $lebar_kolom_1 = 6;
-                        $lebar_kolom_2 = 30;
-                        $lebar_kolom_3 = 10;
-                    }
-                    if ( $jenis == 'footer' ) {
-                        $lebar_kolom_1 = 33;
-                        $lebar_kolom_2 = 3;
-                        $lebar_kolom_3 = 10;
-                    }
+                // function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
+                //     // Mengatur lebar setiap kolom (dalam satuan karakter)
+                //     if ( $jenis == 'header' ) {
+                //         $lebar_kolom_1 = 10;
+                //         $lebar_kolom_2 = 3;
+                //         $lebar_kolom_3 = 33;
+                //     }
+                //     if ( $jenis == 'center' ) {
+                //         $lebar_kolom_1 = 6;
+                //         $lebar_kolom_2 = 30;
+                //         $lebar_kolom_3 = 10;
+                //     }
+                //     if ( $jenis == 'footer' ) {
+                //         $lebar_kolom_1 = 33;
+                //         $lebar_kolom_2 = 3;
+                //         $lebar_kolom_3 = 10;
+                //     }
          
-                    // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
-                    $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
-                    $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
-                    $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+                //     // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+                //     $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+                //     $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+                //     $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
          
-                    // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
-                    $kolom1Array = explode("\n", $kolom1);
-                    $kolom2Array = explode("\n", $kolom2);
-                    $kolom3Array = explode("\n", $kolom3);
+                //     // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+                //     $kolom1Array = explode("\n", $kolom1);
+                //     $kolom2Array = explode("\n", $kolom2);
+                //     $kolom3Array = explode("\n", $kolom3);
          
-                    // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
-                    $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+                //     // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+                //     $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
          
-                    // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
-                    $hasilBaris = array();
+                //     // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+                //     $hasilBaris = array();
          
-                    // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
-                    for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
-                        if ( $jenis == 'header' ) {
-                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
-                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
-                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
-                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
-                        }
-                        if ( $jenis == 'center' ) {
-                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
-                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
-                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
-                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
-                        }
-                        if ( $jenis == 'footer' ) {
-                            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
-                            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ", STR_PAD_LEFT);
-                            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
-                            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
-                        }
+                //     // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+                //     for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+                //         if ( $jenis == 'header' ) {
+                //             // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                //             $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                //             $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                //             $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ");
+                //         }
+                //         if ( $jenis == 'center' ) {
+                //             // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                //             $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+                //             $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                //             $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                //         }
+                //         if ( $jenis == 'footer' ) {
+                //             // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+                //             $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ", STR_PAD_LEFT);
+                //             $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ");
+                //             $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+                //         }
          
-                        // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
-                        $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
-                    }
+                //         // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+                //         $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+                //     }
          
-                    // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
-                    return implode($hasilBaris, "\n") . "\n";
-                }
+                //     // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+                //     return implode($hasilBaris, "\n") . "\n";
+                // }
 
-                $m_ps = new \Model\Storage\PrinterStation_model();
-                $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+                // $m_ps = new \Model\Storage\PrinterStation_model();
+                // $d_ps = $m_ps->where('nama', 'CASHIER')->first();
 
-                $m_printer = new \Model\Storage\Printer_model();
-                $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
+                // $m_printer = new \Model\Storage\Printer_model();
+                // $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
 
-                // Enter the share name for your USB printer here
-                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
-                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
-                // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
+                // // Enter the share name for your USB printer here
+                // // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('kasir');
+                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
+                // // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                // // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
-                /* Print a receipt */
-                $printer = new Mike42\Escpos\Printer($connector);
-                $printer -> initialize();
+                // /* Print a receipt */
+                // $printer = new Mike42\Escpos\Printer($connector);
+                // $printer -> initialize();
 
-                // $printer -> text('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+                // // $printer -> text('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 
-                $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                // $printer -> selectPrintMode(32);
-                // $printer -> setTextSize(2, 1);
-                $printer -> text($data['nama_branch']."\n");
+                // $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                // // $printer -> selectPrintMode(32);
+                // // $printer -> setTextSize(2, 1);
+                // $printer -> text($data['nama_branch']."\n");
 
-                $printer -> initialize();
-                $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                $printer -> text($data['alamat_branch']."\n");
-                $printer -> text('Telp.'. $data['telp_branch']."\n");
-                $printer -> text("\n");
+                // $printer -> initialize();
+                // $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                // $printer -> text($data['alamat_branch']."\n");
+                // $printer -> text('Telp.'. $data['telp_branch']."\n");
+                // $printer -> text("\n");
 
-                $printer = new Mike42\Escpos\Printer($connector);
-                $printer -> initialize();
+                // $printer = new Mike42\Escpos\Printer($connector);
+                // $printer -> initialize();
 
-                $kode_faktur = $data['kode_faktur'];
-                if ( stristr($jenis, 'hutang') !== false ) {
-                    $kode_faktur = $data['kode_faktur'].' (CL)';
-                }
+                // $kode_faktur = $data['kode_faktur'];
+                // if ( stristr($jenis, 'hutang') !== false ) {
+                //     $kode_faktur = $data['kode_faktur'].' (CL)';
+                // }
 
-                $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
-                $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
-                $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
+                // $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
+                // $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
+                // $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
 
-                $printer -> text('------------------------------------------------'."\n");
+                // $printer -> text('------------------------------------------------'."\n");
 
-                $jml_member = 1;
-                foreach ($data['detail'] as $k_det => $v_det) {
-                    if ( $jml_member > 1 ) {
-                        $printer -> text("\n");
-                    }
+                // $jml_member = 1;
+                // foreach ($data['detail'] as $k_det => $v_det) {
+                //     if ( $jml_member > 1 ) {
+                //         $printer -> text("\n");
+                //     }
 
-                    $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
-                    $printer -> text('------------------------------------------------'."\n");
+                //     $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
+                //     $printer -> text('------------------------------------------------'."\n");
 
-                    $printer -> initialize();
-                    foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp) {
-                        $printer -> text($v_jp['nama']."\n");
-                        foreach ($v_jp['jual_item'] as $k_ji => $v_ji) {
-                            $printer -> text(buatBaris3Kolom($v_ji['jumlah'].'X', $v_ji['nama'], angkaRibuan($v_ji['total_show']), 'center'));
-                        }
-                    }
+                //     $printer -> initialize();
+                //     foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp) {
+                //         $printer -> text($v_jp['nama']."\n");
+                //         foreach ($v_jp['jual_item'] as $k_ji => $v_ji) {
+                //             $printer -> text(buatBaris3Kolom($v_ji['jumlah'].'X', $v_ji['nama'], angkaRibuan($v_ji['total_show']), 'center'));
+                //         }
+                //     }
 
-                    $jml_member++;
-                }
+                //     $jml_member++;
+                // }
 
-                if ( stristr($jenis, 'hutang') === false ) {
-                    $printer -> text('------------------------------------------------'."\n");
-                    $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
-                    $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
-                    if ( $data['jenis_bayar_exclude'] == 1 ) {
-                        $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
-                        $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
-                    }
-                    $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
-                    $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
-                    $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
-                    $kembalian = (($data['jml_bayar'] - $data['grand_total']) > 0) ? $data['jml_bayar'] - $data['grand_total'] : 0;
-                    $printer -> text(buatBaris3Kolom('Kembalian.', '=', angkaRibuan($kembalian), 'footer'));
-                    $printer -> text(buatBaris3Kolom('', '', '----------', 'footer'));
-                    foreach ($data['kategori_jenis_kartu'] as $k_kjk => $v_kjk) {
-                        $jumlah = $v_kjk['jumlah'];
-                        if ( $v_kjk['cl'] == 1 ) {
-                            $jumlah = $data['grand_total'];
-                        }
-                        $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($jumlah), 'footer'));
-                    }
+                // if ( stristr($jenis, 'hutang') === false ) {
+                //     $printer -> text('------------------------------------------------'."\n");
+                //     $printer -> text(buatBaris3Kolom('Total Belanja.', '=', angkaRibuan($data['total']), 'footer'));
+                //     $printer -> text(buatBaris3Kolom('Disc.', '=', '('.angkaRibuan($data['diskon']).')', 'footer'));
+                //     if ( $data['jenis_bayar_exclude'] == 1 ) {
+                //         $printer -> text(buatBaris3Kolom('Service Charge.', '=', angkaRibuan($data['service_charge']), 'footer'));
+                //         $printer -> text(buatBaris3Kolom('PB1.', '=', angkaRibuan($data['ppn']), 'footer'));
+                //     }
+                //     $printer -> text(buatBaris3Kolom('CL.', '=', angkaRibuan($data['hutang']), 'footer'));
+                //     $printer -> text(buatBaris3Kolom('Total Bayar.', '=', angkaRibuan($data['grand_total']), 'footer'));
+                //     $printer -> text(buatBaris3Kolom('Jumlah Bayar.', '=', angkaRibuan($data['jml_bayar']), 'footer'));
+                //     $kembalian = (($data['jml_bayar'] - $data['grand_total']) > 0) ? $data['jml_bayar'] - $data['grand_total'] : 0;
+                //     $printer -> text(buatBaris3Kolom('Kembalian.', '=', angkaRibuan($kembalian), 'footer'));
+                //     $printer -> text(buatBaris3Kolom('', '', '----------', 'footer'));
+                //     foreach ($data['kategori_jenis_kartu'] as $k_kjk => $v_kjk) {
+                //         $jumlah = $v_kjk['jumlah'];
+                //         if ( $v_kjk['cl'] == 1 ) {
+                //             $jumlah = $data['grand_total'];
+                //         }
+                //         $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($jumlah), 'footer'));
+                //     }
 
-                    if ( $data['jenis_bayar_include'] == 1 ) {
-                        $printer -> initialize();
-                        $printer -> text("\n\n");
-                        $printer -> text(buatBaris3Kolom('Price Include of Service Charge.', '=', angkaRibuan($data['service_charge_include']), 'footer'));
-                        $printer -> text(buatBaris3Kolom('Price Include of PB1.', '=', angkaRibuan($data['ppn_include']), 'footer'));
-                    }
-                } else {
-                    $printer -> text('------------------------------------------------'."\n");
-                    $printer -> text(buatBaris3Kolom('Total.', '=', angkaRibuan($data['grand_total']), 'footer'));
-                    $printer -> text(buatBaris3Kolom('Bayar.', '=', angkaRibuan($data['bayar_hutang']), 'footer'));
-                    $printer -> text('Pembayaran -------------------------------------'."\n");
-                    foreach ($data['jenis_bayar'] as $k_jb => $v_jb) {
-                        $printer -> text($v_jb['jenis_bayar']."\n");
-                    }
-                }
-                $printer -> text('------------------------------------------------'."\n");
-                $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
-                $printer -> text("*** TERIMA KASIH ***");
+                //     if ( $data['jenis_bayar_include'] == 1 ) {
+                //         $printer -> initialize();
+                //         $printer -> text("\n\n");
+                //         $printer -> text(buatBaris3Kolom('Price Include of Service Charge.', '=', angkaRibuan($data['service_charge_include']), 'footer'));
+                //         $printer -> text(buatBaris3Kolom('Price Include of PB1.', '=', angkaRibuan($data['ppn_include']), 'footer'));
+                //     }
+                // } else {
+                //     $printer -> text('------------------------------------------------'."\n");
+                //     $printer -> text(buatBaris3Kolom('Total.', '=', angkaRibuan($data['grand_total']), 'footer'));
+                //     $printer -> text(buatBaris3Kolom('Bayar.', '=', angkaRibuan($data['bayar_hutang']), 'footer'));
+                //     $printer -> text('Pembayaran -------------------------------------'."\n");
+                //     foreach ($data['jenis_bayar'] as $k_jb => $v_jb) {
+                //         $printer -> text($v_jb['jenis_bayar']."\n");
+                //     }
+                // }
+                // $printer -> text('------------------------------------------------'."\n");
+                // $printer->setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
+                // $printer -> text("*** TERIMA KASIH ***");
 
-                if ( $data['print_nota'] == 1 ) {
-                    $printer -> text("\n\n");
-                    $printer -> initialize();
-                    $printer -> selectPrintMode(32);
-                    $printer -> setTextSize(2, 1);
-                    $printer -> text("RE-PRINT BILL");
-                }
+                // if ( $data['print_nota'] == 1 ) {
+                //     $printer -> text("\n\n");
+                //     $printer -> initialize();
+                //     $printer -> selectPrintMode(32);
+                //     $printer -> setTextSize(2, 1);
+                //     $printer -> text("RE-PRINT BILL");
+                // }
 
-                $printer -> feed(3);
-                $printer -> cut();
-                $printer -> close();
+                // $printer -> feed(3);
+                // $printer -> cut();
+                // $printer -> close();
 
                 $m_jual = new \Model\Storage\Jual_model();
                 $d_jual = $m_jual->where('kode_faktur', $params['faktur_kode'])->first();
@@ -2033,7 +2033,7 @@ class Pembayaran extends Public_Controller
 
                 $this->result['status'] = 1;
             } else {
-                $this->result['message'] = "Anda sudah melakukan re-print sebanyak 2x.";
+                $this->result['message'] = "Anda sudah melakukan Re-Print sebanyak 2x.";
             }
         } catch (Exception $e) {
             $this->result['message'] = "Couldn't print to this printer: " . $e -> getMessage() . "\n";
