@@ -759,6 +759,10 @@ var jual = {
 
             var jumlah = parseInt(_jumlah) + parseInt(jml_menu);
             var jumlah_detail = parseInt(_jumlah_detail) + parseInt(jml_menu);
+
+            console.log( jumlah );
+            console.log( _harga );
+
             var _total = 0;
             var _total_show = 0;
             var _total_service_charge = 0;
