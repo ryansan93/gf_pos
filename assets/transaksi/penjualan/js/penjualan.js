@@ -757,8 +757,8 @@ var jual = {
             var _jumlah = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"] .menu_utama .jumlah').text());
             var _jumlah_detail = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .jumlah:first').text());
 
-            var jumlah = parseInt(_jumlah) + jml_menu;
-            var jumlah_detail = parseInt(_jumlah_detail) + jml_menu;
+            var jumlah = parseInt(_jumlah) + parseInt(jml_menu);
+            var jumlah_detail = parseInt(_jumlah_detail) + parseInt(jml_menu);
             var _total = 0;
             var _total_show = 0;
             var _total_service_charge = 0;
