@@ -754,8 +754,11 @@ var jual = {
 
         if ( $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"]').length > 0 ) {
             var _harga = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .hrg').text());
-            var _jumlah = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"] .menu_utama .jumlah').text());
+            var _jumlah = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah').text());
             var _jumlah_detail = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .jumlah:first').text());
+
+            console.log(_jumlah);
+            console.log(jml_menu);
 
             var jumlah = parseInt(_jumlah) + parseInt(jml_menu);
             var jumlah_detail = parseInt(_jumlah_detail) + parseInt(jml_menu);
