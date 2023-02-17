@@ -1,4 +1,4 @@
-<div class="col-xs-12" style="padding-top: 10px; height: 100%;">
+<div class="col-xs-12" style="padding-top: 10px; height: 95%;">
 	<div class="col-xs-9 no-padding" style="height: 100%;">
 		<div class="col-xs-12 no-padding jenis_pembayaran">
 			<div class="col-xs-6 no-padding contain_border cb_left">

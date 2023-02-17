@@ -735,11 +735,13 @@ var bayar = {
             }
         }
 
-        kembalian = total_bayar - total_tagihan;
 
-        $('.total_bayar').val( numeral.formatInt(total_bayar) );
-        $('div.data').find('.jml_bayar').text( numeral.formatDec(total_bayar) );
-        $('div.data').find('.jml_bayar').attr('data-val', total_bayar);
+        var _total_bayar = (total_bayar < 0) ? 0 : total_bayar;
+        kembalian = (total_bayar < 0) ? 0 : ((total_bayar - total_tagihan < 0) ? 0 : total_bayar - total_tagihan);
+
+        $('.total_bayar').val( numeral.formatInt(_total_bayar) );
+        $('div.data').find('.jml_bayar').text( numeral.formatDec(_total_bayar) );
+        $('div.data').find('.jml_bayar').attr('data-val', _total_bayar);
 
         if ( kembalian > 0 ) {
             // $('.kembalian').val( numeral.formatInt(kembalian) );

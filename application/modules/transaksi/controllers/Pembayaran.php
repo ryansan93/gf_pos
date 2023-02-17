@@ -69,31 +69,33 @@ class Pembayaran extends Public_Controller
 
             foreach ($d_bayar as $key => $value) {
                 $m_jual = new \Model\Storage\Jual_model();
-                $d_jual = $m_jual->where('kode_faktur', $value['faktur_kode'])->where('mstatus', 1)->with(['pesanan'])->first();
+                $d_jual = $m_jual->where('branch', $this->kodebranch)->where('kode_faktur', $value['faktur_kode'])->where('mstatus', 1)->with(['pesanan'])->first();
 
-                $member_group = null;
-                $member = $value['member'];
+                if ( $d_jual ) {
+                    $member_group = null;
+                    $member = $value['member'];
 
-                if ( !empty($value['member_kode']) ) {
-                    $m_member = new \Model\Storage\Member_model();
-                    $d_member = $m_member->where('kode_member', $value['member_kode'])->with(['member_group'])->first()->toArray();
+                    if ( !empty($value['member_kode']) ) {
+                        $m_member = new \Model\Storage\Member_model();
+                        $d_member = $m_member->where('kode_member', $value['member_kode'])->with(['member_group'])->first()->toArray();
 
-                    $member = $d_member['nama'];
+                        $member = $d_member['nama'];
 
-                    if ( !empty($d_member['member_group']) ) {
-                        $member_group = $d_member['member_group']['nama'];
+                        if ( !empty($d_member['member_group']) ) {
+                            $member_group = $d_member['member_group']['nama'];
+                        }
                     }
-                }
 
-                $data[ $value['id'] ] = array(
-                    'kode_pesanan' => !empty($d_jual) ? $d_jual->pesanan_kode : null,
-                    'kode_faktur' => !empty($d_jual) ? $d_jual->kode_faktur : null,
-                    'member_group' => $member_group,
-                    'pelanggan' => $member,
-                    'kasir' => $value['nama_kasir'],
-                    'total' => $value['jml_tagihan'],
-                    'bayar' => $value['jml_bayar']
-                );
+                    $data[ $value['id'] ] = array(
+                        'kode_pesanan' => !empty($d_jual) ? $d_jual->pesanan_kode : null,
+                        'kode_faktur' => !empty($d_jual) ? $d_jual->kode_faktur : null,
+                        'member_group' => $member_group,
+                        'pelanggan' => $member,
+                        'kasir' => $value['nama_kasir'],
+                        'total' => $value['jml_tagihan'],
+                        'bayar' => $value['jml_bayar']
+                    );
+                }
             }
         }
 
