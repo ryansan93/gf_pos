@@ -109,6 +109,15 @@
             </li>
           <?php // endif ?>
 
+          <?php if ( hasAkses('transaksi/SalesRecapitulation') ): ?>
+            <li class="">
+              <a class="list-group-item list-group-item-action bg-light-black cursor-p" href="transaksi/SalesRecapitulation">
+                <i class="fa fa-calendar-check-o" style="width: 8%;"></i>
+                <span style="width: 92%;">Sales Recapitulation</span>
+              </a>
+            </li>
+          <?php endif ?>
+
           <!-- <?php $arr_fitur = $this->session->userdata()['Fitur']; ?>
           <?php foreach ($arr_fitur as $key => $v_fitur): ?>
             <li>
@@ -269,7 +278,16 @@
         <?php } ?>
       }
     <?php } ?>
-    // var pagePembayaran = baseurl + 'transaksi/Pembayaran';
+    
+    <?php if ( hasAkses('transaksi/SalesRecapitulation') ) { ?>
+      if ( window.location.href.indexOf("SalesRecapitulation") >= 0 ) {
+        defaultPage = baseurl + 'transaksi/SalesRecapitulation';
+      } else if ( window.location.href.indexOf("Penjualan") > -1 ) {
+        <?php if ( hasAkses('transaksi/Penjualan') ) { ?>
+          defaultPage = baseurl + 'transaksi/Penjualan';
+        <?php } ?>
+      }
+    <?php } ?>
 
     var url = window.location.href;
 

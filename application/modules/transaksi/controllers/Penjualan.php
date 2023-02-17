@@ -2321,7 +2321,7 @@ class Penjualan extends Public_Controller
             $this->execSavePenjualan( $params, $kode_pesanan );
 
             $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
-            Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas );
+            Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
             
             $this->result['status'] = 1;
             $this->result['content'] = array('kode_pesanan' => $kode_pesanan);
