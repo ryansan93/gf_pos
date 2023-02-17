@@ -1053,7 +1053,8 @@ class Penjualan extends Public_Controller
                     ji.jumlah as jumlah_menu, 
                     ISNULL(ji_print.jumlah, 0) as jumlah_print, 
                     (ji.jumlah - ISNULL(ji_print.jumlah, 0)) as jumlah, 
-                    ji.request, jp.kode as kode_jenis_pesanan, 
+                    ji.request, 
+                    jp.kode as kode_jenis_pesanan, 
                     jp.nama as nama_jenis_pesanan
                 from jual_item ji
                 right join
@@ -1085,12 +1086,14 @@ class Penjualan extends Public_Controller
                             CASE
                                 when ji.jumlah is null then 0
                                 when ji.jumlah > 0 then ji.jumlah
-                            END as jumlah 
+                            END as jumlah,
+                            ji.request
                         from 
                         (
                             select
                                 ji.menu_kode,
-                                ji.jumlah
+                                ji.jumlah,
+                                ji.request
                             from jual_item ji
                             right join
                                 jual j
@@ -1109,7 +1112,8 @@ class Penjualan extends Public_Controller
                         ) ji
                     ) ji_print
                     on
-                        ji.menu_kode = ji_print.menu_kode
+                        ji.menu_kode = ji_print.menu_kode and
+                        ji.request like ji_print.request
                 where
                     (ji_print.menu_kode is null or ji.jumlah > ji_print.jumlah ) and
                     j.pesanan_kode = '".$kode_pesanan."' and
