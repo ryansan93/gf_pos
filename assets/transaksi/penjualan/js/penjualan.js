@@ -757,14 +757,8 @@ var jual = {
             var _jumlah = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah').text());
             var _jumlah_detail = numeral.unformat($(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .jumlah:first').text());
 
-            console.log(_jumlah);
-            console.log(jml_menu);
-
             var jumlah = parseInt(_jumlah) + parseInt(jml_menu);
             var jumlah_detail = parseInt(_jumlah_detail) + parseInt(jml_menu);
-
-            console.log( jumlah );
-            console.log( _harga );
 
             var _total = 0;
             var _total_show = 0;
@@ -833,8 +827,6 @@ var jual = {
                     // _total = _total_include - _total_service_charge;
                 }
             }
-
-            console.log( _total );
 
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').text(numeral.formatInt(jumlah_detail));
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').text(numeral.formatInt(_total_show));
