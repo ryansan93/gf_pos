@@ -13,6 +13,8 @@
 			    			foreach ($v_det['pesanan_item_detail'] as $k_jid => $v_jid) {
 			    				$data_detail .= $v_jid['menu_kode'].$v_jid['jumlah'].$v_det['request'];
 			    			}
+			    		} else {
+			    			$data_detail .= $v_det['request'];
 			    		}
 		    		?>
 			        <div class="col-md-12 cursor-p no-padding menu" style="margin-bottom: 10px;" data-kode="<?php echo $v_det['menu_kode']; ?>" data-detail="<?php echo $data_detail; ?>">
