@@ -827,6 +827,8 @@ var jual = {
                 }
             }
 
+            console.log( _total );
+
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .jumlah:first').text(numeral.formatInt(jumlah_detail));
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').text(numeral.formatInt(_total_show));
             $(div_jenis_pesanan).find('div.menu[data-kode="'+kode+'"][data-detail="'+detail+'"] .menu_utama .total').attr('data-val', _total);
