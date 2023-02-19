@@ -4,9 +4,9 @@
 </div>
 <div class="modal-body body no-padding modal-gabung-bill">
 	<div class="col-xs-12 no-padding" style="height: 90%; padding-top: 10px;">
-		<div class="col-xs-6 no-padding" style="height: 100%; max-width: 46.5%; overflow-y: scroll;">
+		<div class="col-xs-6 no-padding" style="height: 100%; max-width: 46.5%;">
 			<div class="col-xs-12 no-padding" style="height: 5%;"><label class="control-label">List Bill Belum Bayar</label></div>
-			<div class="col-xs-12 no-padding belum_bayar" style="height: 90%;">
+			<div class="col-xs-12 no-padding belum_bayar" style="height: 90%; overflow-y: scroll;">
 				<div class="col-md-12 search left-inner-addon no-padding" style="padding-bottom: 10px;">
 					<i class="fa fa-search"></i><input class="form-control" type="search" data-table="tbl_belum_bayar" placeholder="Search" onkeyup="filter_all(this)">
 				</div>
