@@ -33,8 +33,8 @@
 						<th class="col-xs-1">Kode Pesanan</th>
 						<th class="col-xs-1">Kode Faktur</th>
 						<th class="col-xs-1">Kode Faktur Utama</th>
-						<th class="col-xs-2">Waitress</th>
-						<th class="col-xs-2">Kasir</th>
+						<th class="col-xs-1">Waitress</th>
+						<th class="col-xs-1">Kasir</th>
 						<th class="col-xs-1">Grand Total</th>
 					</tr>
 				</thead>

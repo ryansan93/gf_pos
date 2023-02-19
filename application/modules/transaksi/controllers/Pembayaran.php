@@ -77,12 +77,16 @@ class Pembayaran extends Public_Controller
 
                     if ( !empty($value['member_kode']) ) {
                         $m_member = new \Model\Storage\Member_model();
-                        $d_member = $m_member->where('kode_member', $value['member_kode'])->with(['member_group'])->first()->toArray();
+                        $d_member = $m_member->where('kode_member', $value['member_kode'])->with(['member_group'])->first();
 
-                        $member = $d_member['nama'];
+                        if ( $d_member ) {
+                            $d_member = $d_member->toArray();
+                            
+                            $member = $d_member['nama'];
 
-                        if ( !empty($d_member['member_group']) ) {
-                            $member_group = $d_member['member_group']['nama'];
+                            if ( !empty($d_member['member_group']) ) {
+                                $member_group = $d_member['member_group']['nama'];
+                            }
                         }
                     }
 
@@ -422,8 +426,8 @@ class Pembayaran extends Public_Controller
 
                 $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->first();
 
-                $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
-                Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas );
+                $deskripsi_log_gaktifitas = 'di-split oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas, $kode_faktur );
             }
             // END - FAKTUR MAIN
 
@@ -2684,6 +2688,12 @@ class Pembayaran extends Public_Controller
             //     $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
             //     $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
             // }
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $d_jual = $m_jual->where('kode_faktur', $data_utama['kode_faktur'])->first();
+
+            $deskripsi_log_gaktifitas = 'di-gabung oleh ' . $this->userdata['detail_user']['nama_detuser'];
+            Modules::run( 'base/event/save', $d_jual, $deskripsi_log_gaktifitas, $data_utama['kode_faktur'] );
 
             $this->result['status'] = 1;
             $this->result['content'] = array('kode' => exEncrypt( $data_utama['kode_faktur'] ));

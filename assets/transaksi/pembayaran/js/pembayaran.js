@@ -1373,8 +1373,10 @@ var bayar = {
         $(table_left).find('tbody').append( $(tr_aktif) );
     }, // end - changeLeftAll
 
-    saveBillGabung: function () {
+    saveBillGabung: function (elm) {
         var table = $('div.bill_gabung table');
+
+        var _bayar = $(elm).attr('data-bayar');
 
         var data_utama = {
             'utama': $(table).find('tbody tr[data-utama=1]').attr('data-utama'),
@@ -1407,9 +1409,13 @@ var bayar = {
             beforeSend: function() { showLoading(); },
             success: function(data) {
                 if ( data.status == 1 ) {
-                    var btn = '<button type="button" data-kode="'+data.content.kode+'"></button>';
+                    if ( _bayar == 1 ) {
+                        var btn = '<button type="button" data-kode="'+data.content.kode+'"></button>';
 
-                    bayar.pembayaranForm( $(btn) );
+                        bayar.pembayaranForm( $(btn) );
+                    } else {
+                        bayar.penjualanForm();
+                    }
                 } else {
                     bootbox.alert(data.message);
                 }

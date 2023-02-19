@@ -1,11 +1,17 @@
 <?php if ( !empty($data) && count($data) > 0 ): ?>
 	<?php foreach ($data as $key => $value): ?>
-		<tr>
-			<td><?php echo $value['tgl_trans']; ?></td>
+		<?php
+			$bg_color = 'transparent';
+			if ( $value['status_gabungan'] == 1 ) {
+				$bg_color = '#ffb3b3';
+			}
+		?>
+		<tr class="cursor-p" style="background-color: <?php echo $bg_color; ?>;">
+			<td><?php echo strtoupper(tglIndonesia($value['tgl_trans'], '-', ' ')).' '.substr($value['tgl_trans'], 11, 5); ?></td>
 			<td><?php echo $value['member']; ?></td>
 			<td><?php echo $value['kode_pesanan']; ?></td>
 			<td><?php echo $value['kode_faktur']; ?></td>
-			<td><?php echo $value['kode_faktur_utama']; ?></td>
+			<td><?php echo ($value['status_gabungan'] == 1) ? $value['kode_faktur_utama'] : '-'; ?></td>
 			<td><?php echo $value['nama_waitress']; ?></td>
 			<td><?php echo $value['nama_kasir']; ?></td>
 			<td class="text-right"><?php echo angkaDecimal($value['grand_total']); ?></td>
