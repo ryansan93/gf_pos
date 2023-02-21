@@ -116,7 +116,8 @@ class SalesRecapitulation extends Public_Controller
                             on
                                 jg.faktur_kode = j.kode_faktur
                         where
-                            j.mstatus = 1
+                            j.mstatus = 1 and
+                            j.utama = 0
                     ) _jg
                     on
                         jg.id = _jg.id
