@@ -85,14 +85,40 @@ class SalesRecapitulation extends Public_Controller
                     p.nama_user as nama_waitress,
                     j.nama_kasir as nama_kasir,
                     j.grand_total as grand_total,
+                    jg.id as id_gabungan,
                     0 as status_gabungan
                 from jual j
                 right join
                     pesanan p
                     on
                         j.pesanan_kode = p.kode_pesanan
+                left outer join
+                    (
+                        select jg.*, j.member, j.nama_kasir as nama_kasir from jual_gabungan jg
+                        right join
+                            jual j
+                            on
+                                jg.faktur_kode = j.kode_faktur
+                        where
+                            j.mstatus = 1 and
+                            jg.id is not null
+                    ) jg
+                    on
+                        jg.faktur_kode_gabungan = j.kode_faktur
                 where
-                    j.mstatus = 1
+                    j.mstatus = 1 and
+                    jg.id is null
+                group by
+                    j.tgl_trans,
+                    j.mstatus,
+                    j.member,
+                    p.kode_pesanan,
+                    j.kode_faktur,
+                    j.kode_faktur,
+                    p.nama_user,
+                    j.nama_kasir,
+                    j.grand_total,
+                    jg.id
 
                 union all
 
@@ -106,6 +132,7 @@ class SalesRecapitulation extends Public_Controller
                     p.nama_user as nama_waitress,
                     _jg.nama_kasir as nama_kasir,
                     j.grand_total as grand_total,
+                    jg.id as id_gabungan,
                     1 as status_gabungan
                 from jual_gabungan jg
                 right join
@@ -116,8 +143,7 @@ class SalesRecapitulation extends Public_Controller
                             on
                                 jg.faktur_kode = j.kode_faktur
                         where
-                            j.mstatus = 1 and
-                            j.utama = 0
+                            j.mstatus = 1
                     ) _jg
                     on
                         jg.id = _jg.id
