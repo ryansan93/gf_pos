@@ -59,6 +59,60 @@ var sr = {
             });
 		}
 	}, // end - getLists
+
+    viewForm: function(elm) {
+        $('.modal').modal('hide');
+
+        var data = {
+            'kode_faktur': $(elm).data('kode'),
+        };
+
+        $.get('transaksi/SalesRecapitulation/viewForm',{
+            'params': data
+        },function(data){
+            var _options = {
+                className : 'large',
+                message : data,
+                addClass : 'form',
+                onEscape: true,
+            };
+            bootbox.dialog(_options).bind('shown.bs.modal', function(){
+                // $(this).find('.modal-header').css({'padding-top': '0px'});
+                // $(this).find('.modal-dialog').css({'width': '70%', 'max-width': '100%'});
+                // $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+
+                $(this).css({'height': '100%'});
+                $(this).find('.modal-header').css({'padding-top': '0px'});
+                $(this).find('.modal-dialog').css({'width': '60%', 'max-width': '100%'});
+                $(this).find('.modal-dialog').css({'height': '90%', 'max-height': '100%'});
+                $(this).find('.modal-content').css({'width': '100%', 'max-width': '100%'});
+                $(this).find('.modal-content').css({'height': '90%', 'max-height': '100%'});
+                $(this).find('.modal-body').css({'height': '100%', 'max-height': '100%'});
+                $(this).find('.bootbox-body').css({'height': '100%', 'max-height': '100%'});
+                $(this).find('.bootbox-body .modal-body').css({'height': '100%', 'max-height': '100%'});
+                $(this).find('.bootbox-body .modal-body .row').css({'height': '100%', 'max-height': '100%'});
+
+                $('input').keyup(function(){
+                    $(this).val($(this).val().toUpperCase());
+                });
+
+                $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
+                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                });
+
+                var modal_body = $(this).find('.modal-body');
+
+                // $(modal_body).find('.nav-tabs .nav-link:first').click();
+                // $(modal_body).find('.btn_remove').click(function() {
+                //     bayar.removeItem( $(this) );
+                // });
+
+                // $(modal_body).find('.btn_apply').click(function() {
+                //     bayar.modalJumlahSplit( $(this) );
+                // });
+            });
+        },'html');
+    }, // end - viewForm
 };
 
 sr.startUp();

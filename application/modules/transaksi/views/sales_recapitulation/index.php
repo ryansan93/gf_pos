@@ -25,7 +25,7 @@
 	</div>
 	<div class="col-xs-12 no-padding" style="height: 90%; overflow-y: auto;">
 		<small>
-			<table class="table table-bordered" style="margin-bottom: 0px;">
+			<table class="table table-bordered tbl_list_data" style="margin-bottom: 0px;">
 				<thead>
 					<tr>
 						<th class="col-xs-1">Tgl Trans</th>

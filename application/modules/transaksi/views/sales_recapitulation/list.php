@@ -6,7 +6,7 @@
 				$bg_color = '#ffb3b3';
 			}
 		?>
-		<tr class="cursor-p" style="background-color: <?php echo $bg_color; ?>;">
+		<tr class="cursor-p" onclick="sr.viewForm(this)" data-kode="<?php echo $value['kode_faktur']; ?>" style="background-color: <?php echo $bg_color; ?>;">
 			<td><?php echo strtoupper(tglIndonesia($value['tgl_trans'], '-', ' ')).' '.substr($value['tgl_trans'], 11, 5); ?></td>
 			<td><?php echo $value['member']; ?></td>
 			<td><?php echo $value['kode_pesanan']; ?></td>
