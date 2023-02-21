@@ -49,7 +49,7 @@
                                         <span><?php echo $v_det['menu_nama'].' @ '.angkaDecimal($v_det['harga']); ?></span>
                                         <?php if ( !empty($v_det['request']) ): ?>
                                             <br>
-                                            <span style="padding-left: 15px;"><?php echo $v_det['menu_nama'].' @ '.angkaDecimal($v_det['harga']); ?></span>
+                                            <span style="padding-left: 15px;"><?php echo '* '.$v_det['request']; ?></span>
                                         <?php endif ?>
                                     </div>
                                     <div class="col-xs-1 no-padding">
