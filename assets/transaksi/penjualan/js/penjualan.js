@@ -2246,7 +2246,9 @@ var jual = {
     funcFilterMenu: function() {
         var div_detail_menu = $('.detail_menu');
         
-        var val = $('.filter_menu').val();
+        var val = $('.filter_menu').val().toUpperCase();
+
+        console.log( val );
 
         $(div_detail_menu).find('div.menu').removeClass('hide');
         $.map( $(div_detail_menu).find('div.menu'), function(div_menu) {

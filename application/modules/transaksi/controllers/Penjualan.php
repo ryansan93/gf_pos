@@ -376,21 +376,22 @@ class Penjualan extends Public_Controller
                 m.jenis_menu_id, 
                 count(pm.kode_paket_menu) as jml_paket 
             from menu m
-                left join
-                    (
-                    select * from harga_menu where id in (
-                        select max(id) as id from harga_menu group by jenis_pesanan_kode, menu_kode
-                    )) hm 
-                    on
-                        m.kode_menu = hm.menu_kode 
-                left join
-                    paket_menu pm
-                    on
-                        m.kode_menu = pm.menu_kode
-                where
-                    m.jenis_menu_id = ".$id_jenis." and
-                    hm.jenis_pesanan_kode = '".$jenis_pesanan."' and
-                    m.branch_kode = '".trim($branch_kode)."'
+            left join
+                (
+                select * from harga_menu where id in (
+                    select max(id) as id from harga_menu group by jenis_pesanan_kode, menu_kode
+                )) hm 
+                on
+                    m.kode_menu = hm.menu_kode 
+            left join
+                paket_menu pm
+                on
+                    m.kode_menu = pm.menu_kode
+            where
+                m.jenis_menu_id = ".$id_jenis." and
+                hm.jenis_pesanan_kode = '".$jenis_pesanan."' and
+                m.branch_kode = '".trim($branch_kode)."' and
+                m.status = 1
             group by 
                 m.id, 
                 m.kode_menu, 

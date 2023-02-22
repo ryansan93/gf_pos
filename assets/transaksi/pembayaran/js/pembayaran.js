@@ -906,8 +906,6 @@ var bayar = {
                     var id = dataMetodeBayar[i].kategori_jenis_kartu;
                     var val = $('.kategori_jenis_kartu'+id).attr('data-val');
 
-                    console.log( $('.nota_total_bayar').attr('data-val') );
-
                     var total = (dataMetodeBayar[i].cl == 0) ? dataMetodeBayar[i].jumlah : $('.nota_total_bayar').attr('data-val');
 
                     $('.kategori_jenis_kartu'+id).attr('data-val', total);
@@ -1074,7 +1072,8 @@ var bayar = {
                 hideLoading();
                 if ( data.status == 1 ) {
                     idxFaktur++;
-                    if ( typeof fakturPrint[idxFaktur] !== 'undefined' ) {
+
+                    if ( typeof fakturPrint[idxFaktur] !== 'undefined' && typeof fakturPrint[idxFaktur]['kode_faktur'] !== 'undefined' ) {
                         bayar.printNota(id_bayar);
                     } else {
                         bayar.penjualanForm();
