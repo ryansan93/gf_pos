@@ -21,6 +21,7 @@ var mejaId = null;
 var meja = null;
 var privilege = 0;
 var waste = [];
+var keterangan_waste = null;
 
 var jual = {
 	start_up: function () {
@@ -796,11 +797,11 @@ var jual = {
                 if ( jml_menu < jml_awal ) {
                     var selisih = jml_awal - jml_menu;
 
-                    waste[key] = {'menu_kode': kode, 'jumlah': selisih};
+                    waste[key] = {'menu_kode': kode, 'jumlah': selisih, 'keterangan': keterangan_waste};
 
                     $.map( $(div_menu).find('.detail'), function (div) {
                         var key = kode+' | '+detail+' | '+$(div_menu).find('span.request').text()+' | '+$(div).attr('data-kode');
-                        waste[key] = {'menu_kode': $(div).attr('data-kode'), 'jumlah': selisih};
+                        waste[key] = {'menu_kode': $(div).attr('data-kode'), 'jumlah': selisih, 'keterangan': keterangan_waste};
                     });
                 }
 
@@ -966,7 +967,7 @@ var jual = {
         var pin = null;
 
         bootbox.dialog({
-            message: '<p>Masukkan PIN Otorisasi untuk menghapus data.</p><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
+            message: '<p>Masukkan PIN Otorisasi dan Keterangan untuk menghapus data.</p><p><b>Keterangan</b></p><p><textarea class="form-control keterangan"></textarea></p><b>PIN</b><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
             buttons: {
                 cancel: {
                     label: '<i class="fa fa-times"></i> Batal',
@@ -978,51 +979,59 @@ var jual = {
                     className: 'btn-primary',
                     callback: function(){
                         pin = $('.pin:last').val();
+                        keterangan_waste = $('.keterangan:last').val();
 
-                        $.ajax({
-                            url: 'transaksi/Penjualan/cekPinOtorisasi',
-                            data: {
-                                'pin': pin
-                            },
-                            type: 'POST',
-                            dataType: 'JSON',
-                            beforeSend: function() { showLoading(); },
-                            success: function(data) {
-                                hideLoading();
-                                if ( data.status == 1 ) {
-                                    if ( empty(jenis) ) {
-                                        var pesanan_kode = $('div.button.edit').attr('data-kode');
-                                        var div_menu = $(elm).closest('div.menu');
-                                        var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
+                        if ( !empty(pin) && !empty(keterangan_waste) ) {
+                            $.ajax({
+                                url: 'transaksi/Penjualan/cekPinOtorisasi',
+                                data: {
+                                    'pin': pin,
+                                    'keterangan': keterangan_waste
+                                },
+                                type: 'POST',
+                                dataType: 'JSON',
+                                beforeSend: function() { showLoading(); },
+                                success: function(data) {
+                                    hideLoading();
+                                    if ( data.status == 1 ) {
+                                        if ( empty(jenis) ) {
+                                            var pesanan_kode = $('div.button.edit').attr('data-kode');
+                                            var div_menu = $(elm).closest('div.menu');
+                                            var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
 
-                                        // waste.push({'pesanan_kode': pesanan_kode, 'menu_kode': menu_kode, 'jumlah': jumlah});
-                                        var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text();
-                                        waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div_menu).attr('data-kode'), 'jumlah': jumlah};
+                                            // waste.push({'pesanan_kode': pesanan_kode, 'menu_kode': menu_kode, 'jumlah': jumlah});
+                                            var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text();
+                                            waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div_menu).attr('data-kode'), 'jumlah': jumlah, 'keterangan': keterangan_waste};
 
-                                        $.map( $(div_menu).find('.detail'), function (div) {
-                                            var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text()+' | '+$(div).attr('data-kode');
-                                            waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div).attr('data-kode'), 'jumlah': jumlah};
-                                        });
+                                            $.map( $(div_menu).find('.detail'), function (div) {
+                                                var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text()+' | '+$(div).attr('data-kode');
+                                                waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div).attr('data-kode'), 'jumlah': jumlah, 'keterangan': keterangan_waste};
+                                            });
 
-                                        var div_jenis_pesanan = $(elm).closest('div.jenis_pesanan');
+                                            var div_jenis_pesanan = $(elm).closest('div.jenis_pesanan');
 
-                                        $(elm).closest('div.menu').remove();
+                                            $(elm).closest('div.menu').remove();
 
-                                        if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
-                                            $(div_jenis_pesanan).remove();
+                                            if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
+                                                $(div_jenis_pesanan).remove();
+                                            }
+                                        } else {
+                                            jual.modalPaketMenu( $(elm) );
                                         }
                                     } else {
-                                        jual.modalPaketMenu( $(elm) );
-                                    }
-                                } else {
-                                    bootbox.alert(data.message, function() {
-                                        $('.pin').val('');
+                                        bootbox.alert(data.message, function() {
+                                            $('.pin').val('');
 
-                                        jual.verifikasiPinOtorisasiHapusMenu( $(elm), jenis );
-                                    });
+                                            jual.verifikasiPinOtorisasiHapusMenu( $(elm), jenis );
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            bootbox.alert('Harap isi PIN dan Keterangan terlebih dahulu.', function() {
+                                jual.verifikasiPinOtorisasiHapusMenu( $(elm) );
+                            });
+                        }
                     }
                 }
             }
@@ -2101,6 +2110,7 @@ var jual = {
                     className: 'btn-primary',
                     callback: function(){
                         var pin = $('.pin').val();
+                        var keterangan = $('.keterangan').val();
 
                         $.ajax({
                             url: 'transaksi/Penjualan/cekPinOtorisasi',

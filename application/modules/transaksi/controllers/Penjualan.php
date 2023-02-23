@@ -2301,6 +2301,7 @@ class Penjualan extends Public_Controller
                     $m_wmi->pesanan_kode = $kode_pesanan;
                     $m_wmi->user_id = $this->userid;
                     $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
+                    $m_wmi->keterangan = $v_waste['keterangan'];
                     $m_wmi->save();
                 }
             }

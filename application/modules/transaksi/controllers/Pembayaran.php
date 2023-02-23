@@ -22,7 +22,7 @@ class Pembayaran extends Public_Controller
             $m_conf = new \Model\Storage\Conf();
             $now = $m_conf->getDate();
             $today = $now['tanggal'];
-            // $today = '2023-02-15';
+            $today = '2023-02-23';
 
             $start_date = $today.' 00:00:00';
             $end_date = $today.' 23:59:59';
@@ -2147,8 +2147,8 @@ class Pembayaran extends Public_Controller
 
             $printer -> initialize();
             $printer -> text(buatBaris3Kolom('No. Bill', ':', $kode_faktur, 'header'));
-            $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
-            $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
+            $printer -> text(buatBaris3Kolom('Kasir', ':', $this->userdata['detail_user']['nama_detuser'], 'header'));
+            $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
 
             $printer -> initialize();
             $printer -> setJustification(Mike42\Escpos\Printer::JUSTIFY_CENTER);
@@ -3098,7 +3098,8 @@ class Pembayaran extends Public_Controller
                                             and
                                             (dm.menu_kode = 'all' or dm.menu_kode = ji.menu_kode)
                                     where
-                                        dm.diskon_kode = '".$v_dd."'
+                                        dm.diskon_kode = '".$v_dd."' and
+                                        ji.jumlah >= dm.jml_min
                                 ";
                                 $d_dm = $m_dm->hydrateRaw( $sql );
 
@@ -3131,6 +3132,225 @@ class Pembayaran extends Public_Controller
                         }
 
                         if ( $d_diskon->diskon_tipe == 3 ) {
+                            $tot_diskon_by_kode = 0;
+
+                            $hitung = 1;
+                            // $hitung = 0;
+                            // if ( !empty($data_metode_bayar) ) {
+                            //     foreach ($data_metode_bayar as $k_dmb => $v_dmb) {
+                            //         if ( !empty($v_dmb) ) {
+                            //             $m_djk = new \Model\Storage\DiskonJenisKartu_model();
+                            //             $d_djk = $m_djk->where('diskon_kode', $v_dd)->where('jenis_kartu_kode', $v_dmb['kode_jenis_kartu'])->first();
+
+                            //             if ( $d_djk ) {
+                            //                 $hitung = 1;
+
+                            //                 break;
+                            //             }
+                            //         }
+                            //     }
+                            // }
+
+                            if ( $hitung == 1 ) {
+                                if ( $d_diskon->status_ppn == 1 ) {
+                                    $ppn = ($d_diskon->ppn > 0) ? $d_diskon->ppn/100 : 0;
+                                }
+
+                                if ( $d_diskon->status_service_charge == 1 ) {
+                                    $sc = ($d_diskon->service_charge > 0) ? $d_diskon->service_charge/100 : 0;
+                                }
+
+                                $m_dm = new \Model\Storage\DiskonMenu_model();
+                                $sql = "
+                                    select 
+                                        dbd.jumlah_beli as jumlah_min_beli,
+                                        ji_beli.jumlah as jumlah_beli,
+                                        ji_beli.jumlah / dbd.jumlah_beli as jumlah_kelipatan,
+                                        dbd.jumlah_dapat as jumlah_dapat,
+                                        ((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) as jumlah_dapat_diskon,
+                                        ji_dapat.harga,
+                                        ji_dapat.total,
+                                        case
+                                            when dbd.menu_kode_beli = dbd.menu_kode_dapat then
+                                                case
+                                                    when (ji_beli.jumlah % dbd.jumlah_beli) > ((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) then
+                                                        case
+                                                            when dbd.diskon_jenis_dapat = 'persen' then
+                                                                (((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) * ji_dapat.harga) * (dbd.diskon_dapat / 100)
+                                                            else
+                                                                (((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) * ji_dapat.harga) - dbd.diskon_dapat
+                                                        end
+                                                    else
+                                                        case
+                                                            when dbd.diskon_jenis_dapat = 'persen' then
+                                                                ((ji_beli.jumlah % dbd.jumlah_beli) * ji_dapat.harga) * (dbd.diskon_dapat / 100)
+                                                            else
+                                                                ((ji_beli.jumlah % dbd.jumlah_beli) * ji_dapat.harga) - dbd.diskon_dapat
+                                                        end
+                                                end
+                                            else
+                                                case
+                                                    when ji_dapat.jumlah > ((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) then
+                                                        case
+                                                            when dbd.diskon_jenis_dapat = 'persen' then
+                                                                (((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) * ji_dapat.harga) * (dbd.diskon_dapat / 100)
+                                                            else
+                                                                (((ji_beli.jumlah / dbd.jumlah_beli) * dbd.jumlah_dapat) * ji_dapat.harga) - dbd.diskon_dapat
+                                                        end
+                                                    else
+                                                        case
+                                                            when dbd.diskon_jenis_dapat = 'persen' then
+                                                                (ji_dapat.jumlah * ji_dapat.harga) * (dbd.diskon_dapat / 100)
+                                                            else
+                                                                (ji_dapat.jumlah * ji_dapat.harga) - dbd.diskon_dapat
+                                                        end
+                                                end
+                                        end as diskon
+                                    from diskon_beli_dapat dbd 
+                                    right join
+                                        (
+                                            select 
+                                                jm.id as id_jenis_menu,
+                                                jm.nama as nama_jenis_menu,
+                                                ji.menu_kode, 
+                                                ji.menu_nama, 
+                                                ji.kode_jenis_pesanan,
+                                                jp.exclude,
+                                                jp.include,
+                                                ji.harga,
+                                                sum(ji.jumlah) as jumlah, 
+                                                sum(ji.total) as total
+                                                /* case 
+                                                    when jp.exclude = 1 then
+                                                        sum(ji.total)
+                                                    when jp.include = 1 then
+                                                        sum(ji.total) + sum(ji.ppn) + sum(ji.service_charge)
+                                                end as total */
+                                            from jual_item ji
+                                            right join
+                                                (
+                                                    select j.kode_faktur as kode_faktur from jual j where j.kode_faktur = '".$kode_faktur."'
+                                                    UNION ALL
+                                                    select jg.faktur_kode_gabungan as kode_faktur from jual_gabungan jg where jg.faktur_kode = '".$kode_faktur."'
+                                                ) jual
+                                                on
+                                                    jual.kode_faktur = ji.faktur_kode 
+                                            right join
+                                                menu m
+                                                on
+                                                    m.kode_menu = ji.menu_kode
+                                            right join
+                                                jenis_pesanan jp
+                                                on
+                                                    jp.kode = ji.kode_jenis_pesanan
+                                            right join
+                                                jenis_menu jm
+                                                on
+                                                    jm.id = m.jenis_menu_id
+                                            where
+                                                ji.jumlah > 0
+                                            group by
+                                                jm.id,
+                                                jm.nama,
+                                                ji.kode_jenis_pesanan,
+                                                jp.exclude,
+                                                jp.include,
+                                                ji.harga,
+                                                ji.menu_kode, 
+                                                ji.menu_nama
+                                        ) ji_beli
+                                        on
+                                            (dbd.jenis_menu_id_beli = 'all' or dbd.jenis_menu_id_beli = ji_beli.id_jenis_menu)
+                                            and
+                                            (dbd.menu_kode_beli = 'all' or dbd.menu_kode_beli = ji_beli.menu_kode)
+                                    right join
+                                        (
+                                            select 
+                                                jm.id as id_jenis_menu,
+                                                jm.nama as nama_jenis_menu,
+                                                ji.menu_kode, 
+                                                ji.menu_nama, 
+                                                ji.kode_jenis_pesanan,
+                                                jp.exclude,
+                                                jp.include,
+                                                ji.harga,
+                                                sum(ji.jumlah) as jumlah, 
+                                                sum(ji.total) as total
+                                                /* case 
+                                                    when jp.exclude = 1 then
+                                                        sum(ji.total)
+                                                    when jp.include = 1 then
+                                                        sum(ji.total) + sum(ji.ppn) + sum(ji.service_charge)
+                                                end as total */
+                                            from jual_item ji
+                                            right join
+                                                (
+                                                    select j.kode_faktur as kode_faktur from jual j where j.kode_faktur = '".$kode_faktur."'
+                                                    UNION ALL
+                                                    select jg.faktur_kode_gabungan as kode_faktur from jual_gabungan jg where jg.faktur_kode = '".$kode_faktur."'
+                                                ) jual
+                                                on
+                                                    jual.kode_faktur = ji.faktur_kode 
+                                            right join
+                                                menu m
+                                                on
+                                                    m.kode_menu = ji.menu_kode
+                                            right join
+                                                jenis_pesanan jp
+                                                on
+                                                    jp.kode = ji.kode_jenis_pesanan
+                                            right join
+                                                jenis_menu jm
+                                                on
+                                                    jm.id = m.jenis_menu_id
+                                            where
+                                                ji.jumlah > 0
+                                            group by
+                                                jm.id,
+                                                jm.nama,
+                                                ji.kode_jenis_pesanan,
+                                                jp.exclude,
+                                                jp.include,
+                                                ji.harga,
+                                                ji.menu_kode, 
+                                                ji.menu_nama
+                                        ) ji_dapat
+                                        on
+                                            (dbd.jenis_menu_id_dapat = 'all' or dbd.jenis_menu_id_dapat = ji_dapat.id_jenis_menu)
+                                            and
+                                            (dbd.menu_kode_dapat = 'all' or dbd.menu_kode_dapat = ji_dapat.menu_kode)
+                                    where
+                                        dbd.diskon_kode = '".$v_dd."' and
+                                        ji_beli.jumlah >= dbd.jumlah_beli
+                                ";
+                                $d_dm = $m_dm->hydrateRaw( $sql );
+
+                                if ( $d_dm->count() > 0 ) {
+                                    $d_dm = $d_dm->toArray();
+
+                                    $idx = 0;
+                                    foreach ($d_dm as $k_dm => $v_dm) {
+                                        $diskon = $v_dm['diskon'];
+
+                                        $tot_diskon += $diskon;
+                                        $tot_diskon_by_kode += $diskon;
+                                        $tot_belanja -= $diskon;
+
+                                        $idx++;
+                                        if ( count($d_dm) == $idx ) {
+                                            if ( $v_jual['exclude'] == 1 ) {
+                                                $tot_sc = $tot_belanja*$sc;
+                                                $tot_ppn = ($tot_belanja + $tot_sc)*$ppn;
+                                            }
+                                        }
+                                    }
+
+                                    $data_diskon[ $v_dd ] = array(
+                                        'kode' => $v_dd,
+                                        'nominal' => $tot_diskon_by_kode
+                                    );
+                                }
+                            }
                         }
                     }
                 } else {
