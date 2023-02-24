@@ -22,7 +22,7 @@ class Pembayaran extends Public_Controller
             $m_conf = new \Model\Storage\Conf();
             $now = $m_conf->getDate();
             $today = $now['tanggal'];
-            $today = '2023-02-23';
+            // $today = '2023-02-23';
 
             $start_date = $today.' 00:00:00';
             $end_date = $today.' 23:59:59';
