@@ -988,10 +988,14 @@ var bayar = {
         if ( jml_tagihan > jml_bayar ) {
             bootbox.confirm('Pembayaran kurang dari tagihan apakah anda tetap ingin melanjutkan pembayaran ?', function(result) {
                 if ( result ) {
+                    $(elm).attr('disabled', 'disabled');
+                    
                     bayar.execSavePembayaran(elm);
                 }
             });
         } else {
+            $(elm).attr('disabled', 'disabled');
+            
             bayar.execSavePembayaran(elm);
         }
     }, // end - savePembayaran
@@ -1048,6 +1052,8 @@ var bayar = {
                     // }
                 } else {
                     bootbox.alert(data.message);
+
+                    $(elm).removeAttr('disabled');
                 }
             }
         });

@@ -82,7 +82,7 @@
 			<button type="button" class="col-xs-12 btn btn-danger" class="close" data-dismiss="modal"><i class="fa fa-times"></i> BATAL</button>
 		</div>
 		<div class="col-xs-6 no-padding cb_right">
-			<button type="button" class="col-xs-12 btn btn-primary" data-kode="<?php echo isset($data['faktur_kode']) ? $data['faktur_kode'] : null; ?>" data-id="<?php echo isset($data['id']) ? $data['id'] : null; ?>" onclick="bayar.savePembayaran(this)"><i class="fa fa-save"></i> PROSES</button>
+			<button type="button" class="col-xs-12 btn-proses btn btn-primary" data-kode="<?php echo isset($data['faktur_kode']) ? $data['faktur_kode'] : null; ?>" data-id="<?php echo isset($data['id']) ? $data['id'] : null; ?>" onclick="bayar.savePembayaran(this)"><i class="fa fa-save"></i> PROSES</button>
 		</div>
 	</div>
 </div>

@@ -1941,14 +1941,13 @@ class Pembayaran extends Public_Controller
                 $printer -> text(buatBaris3Kolom('Kasir', ':', $data['nama_kasir'], 'header'));
                 $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($data['tgl_trans'], 0, 19), 'header'));
 
-                $printer -> text('------------------------------------------------'."\n");
-
                 $jml_member = 1;
                 foreach ($data['detail'] as $k_det => $v_det) {
                     if ( $jml_member > 1 ) {
                         $printer -> text("\n");
                     }
 
+                    $printer -> text('------------------------------------------------'."\n");
                     $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
                     $printer -> text('------------------------------------------------'."\n");
 
@@ -2170,15 +2169,13 @@ class Pembayaran extends Public_Controller
             $printer -> text("\n");
 
             $printer -> initialize();
-            $printer -> text('------------------------------------------------'."\n");
-
-            $printer -> initialize();
             $jml_member = 1;
             foreach ($data['detail'] as $k_det => $v_det) {
                 if ( $jml_member > 1 ) {
                     $printer -> text("\n");
                 }
 
+                $printer -> text('------------------------------------------------'."\n");
                 $printer -> text(buatBaris3Kolom('Order ID', ':', $v_det['member'], 'header'));
                 $printer -> text('------------------------------------------------'."\n");
 

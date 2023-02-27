@@ -194,16 +194,29 @@
 							</div>
 							<div class="col-xs-12 text-center font10"><hr class="double-dashed"></div>
 							<div class="col-xs-12 font10">
+								<?php $idx = 0; ?>
 								<?php foreach ($data_dh['detail'] as $k_det => $v_det): ?>
-									<table class="table table-nobordered" style="margin-bottom: 0px;">
-										<tbody>
-											<tr>
-												<td class="col-xs-3"><label class="control-label">Order ID</label></td>
-												<td class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></td>
-											</tr>
-										</tbody>
-									</table>
-									<div class="col-xs-12 text-center no-padding font10"><hr class="dashed"></div>
+									<?php 
+										$hide_hr_top = 'hide';
+										$padding_top = '0px';
+										if ( $idx > 0 ) {
+											$padding_top = '15px';
+											$hide_hr_top = '';
+										}
+									?>
+									<?php $idx++; ?>
+									<div class="col-xs-12 no-padding" style="margin-top: <?php echo $padding_top; ?>;">
+										<div class="col-xs-12 text-center no-padding font10 <?php echo $hide_hr_top; ?>"><hr class="dashed"></div>
+										<table class="table table-nobordered" style="margin-bottom: 0px;">
+											<tbody>
+												<tr>
+													<td class="col-xs-3"><label class="control-label">Order ID</label></td>
+													<td class="col-xs-9"><label class="control-label">: <?php echo $v_det['member']; ?></label></td>
+												</tr>
+											</tbody>
+										</table>
+										<div class="col-xs-12 text-center no-padding font10"><hr class="dashed"></div>
+									</div>
 									<?php foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp): ?>
 										<table class="table table-nobordered" style="margin-bottom: 0px;">
 											<tbody>
