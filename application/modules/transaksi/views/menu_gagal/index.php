@@ -9,7 +9,11 @@
 			<?php echo $riwayatForm; ?>
 		</div>
 		<div class="col-xs-12 div-tab non-active" id="action">
-			<?php echo $addForm; ?>
+			<?php if ( $akses['a_submit'] == 1 ): ?>
+				<?php echo $addForm; ?>
+			<?php else: ?>
+				Detail Menu Gagal
+			<?php endif ?>
 		</div>
 	</div>
 </div>

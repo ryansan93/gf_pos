@@ -664,6 +664,13 @@ class Penjualan extends Public_Controller
             $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->with(['pesanan_item'])->first()->toArray();
 
             $m_jual = new \Model\Storage\Jual_model();
+
+            $kode_faktur_old = null;
+            $d_jual_old = $m_jual->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
+            if ( $d_jual_old ) {
+                $kode_faktur_old = $d_jual_old->kode_faktur;
+            }
+
             $now = $m_jual->getDate();
 
             $kode_faktur = $m_jual->getNextKode('FAK');
@@ -714,35 +721,6 @@ class Penjualan extends Public_Controller
                 }
             }
 
-            // foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
-            //     foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
-            //         $m_juali = new \Model\Storage\JualItem_model();
-
-            //         $kode_faktur_item = $m_juali->getNextKode('FKI');
-            //         $m_juali->kode_faktur_item = $kode_faktur_item;
-            //         $m_juali->faktur_kode = $kode_faktur;
-            //         $m_juali->kode_jenis_pesanan = $v_lp['kode_jp'];
-            //         $m_juali->menu_nama = $v_lm['nama_menu'];
-            //         $m_juali->menu_kode = $v_lm['kode_menu'];
-            //         $m_juali->jumlah = $v_lm['jumlah'];
-            //         $m_juali->harga = $v_lm['harga'];
-            //         $m_juali->total = $v_lm['total'];
-            //         $m_juali->request = $v_lm['request'];
-            //         $m_juali->save();
-
-            //         if ( !empty($v_lm['detail_menu']) ) {
-            //             foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
-            //                 $m_jualid = new \Model\Storage\JualItemDetail_model();
-            //                 $m_jualid->faktur_item_kode = $kode_faktur_item;
-            //                 $m_jualid->menu_nama = $v_dm['nama_menu'];
-            //                 $m_jualid->menu_kode = $v_dm['kode_menu'];
-            //                 $m_jualid->jumlah = $v_dm['jumlah'];
-            //                 $m_jualid->save();
-            //             }
-            //         }
-            //     }
-            // }
-
             if ( !empty($params['list_diskon']) ) {
                 foreach ($params['list_diskon'] as $k_ld => $v_ld) {
                     $m_juald = new \Model\Storage\JualDiskon_model();
@@ -751,6 +729,19 @@ class Penjualan extends Public_Controller
                     $m_juald->diskon_nama = $v_ld['nama_diskon'];
                     $m_juald->save();
                 }
+            }
+
+            if ( !empty($kode_faktur_old) ) {
+                $m_jg = new \Model\Storage\JualGabungan_model();
+                $m_jg->where('faktur_kode', $kode_faktur_old)->update(
+                    array('faktur_kode' => $kode_faktur)
+                );
+                $m_jg->where('faktur_kode_gabungan', $kode_faktur_old)->update(
+                    array(
+                        'faktur_kode_gabungan' => $kode_faktur,
+                        'jml_tagihan' => $d_pesanan['grand_total']
+                    )
+                );
             }
 
             $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
@@ -1393,7 +1384,7 @@ class Penjualan extends Public_Controller
                                                     $printer -> text("\n");
                                                     $printer -> text(buatBaris3Kolom('Tanggal', ':', substr($now['waktu'], 0, 19), 'header'));
                                                     $printer -> text(buatBaris3Kolom('No. Meja', ':', $this->kodebranch.'\\'.$data_jual['nama_meja'], 'header'));
-                                                    $printer -> text(buatBaris3Kolom('Waitress', ':', $data_jual['nama_kasir'], 'header'));
+                                                    $printer -> text(buatBaris3Kolom('Waitress', ':', $this->userdata['detail_user']['nama_detuser'], 'header'));
                                                     // $printer -> text(buatBaris3Kolom('Kategori', ':', $v_km['nama'], 'header'));
 
                                                     $printer -> initialize();

@@ -139,6 +139,7 @@ class MenuGagal extends Public_Controller
 
     public function riwayatForm( $kodeBranch )
     {
+        $content['akses'] = $this->hakAkses;
         $content['branch'] = $this->getBranch( $kodeBranch );
         $html = $this->load->view($this->pathView . 'riwayatForm', $content, TRUE);
 
@@ -293,5 +294,81 @@ class MenuGagal extends Public_Controller
         }
 
         display_json( $this->result );
+    }
+
+    public function mappingDataExportPdf($params)
+    {
+        $tanggal = $params['tanggal'];
+        $branch_kode = $params['branch_kode'];
+
+        $m_conf = new \Model\Storage\Conf();
+        $sql = "
+            select 
+                wmi.pesanan_kode as kode_pesanan,
+                m.nama as nama_menu,
+                wmi.jumlah,
+                wmi.nama_user,
+                wmi.keterangan
+            from waste_menu_item wmi
+            right join
+                menu m
+                on
+                    m.kode_menu = wmi.menu_kode
+            right join
+                waste_menu wm
+                on
+                    wm.id = wmi.id_header
+            where
+                wm.tanggal = '".$tanggal."' and
+                wm.branch_kode = '".$branch_kode."'
+        ";
+        $d_wm = $m_conf->hydrateRaw( $sql );
+
+        $data = null;
+        if ( $d_wm->count() > 0 ) {
+            $data = $d_wm->toArray();
+        }
+
+        return $data;;
+    }
+
+    public function excryptParamsExportPdf()
+    {
+        $params = $this->input->post('params');
+
+        try {
+            $paramsEncrypt = exEncrypt( json_encode($params) );
+
+            $this->result['status'] = 1;
+            $this->result['content'] = array('data' => $paramsEncrypt);
+        } catch (Exception $e) {
+            $this->result['message'] = $e->getMessage();
+        }
+
+        display_json( $this->result );
+    }
+
+    public function exportPdf($_params)
+    {
+        $this->load->library('PDFGenerator');
+
+        $_data_params = json_decode( exDecrypt( $_params ), true );
+
+        $params = array(
+            'tanggal' => $_data_params['date'],
+            'branch_kode' => $_data_params['branch_kode'][0]
+        );
+
+        $data = $this->mappingDataExportPdf( $params );
+
+        $content['branch'] = $_data_params['branch_kode'][0];
+        $content['tanggal'] = $_data_params['date'];
+        $content['nama_user'] = $this->userdata['detail_user']['nama_detuser'];
+        $content['data'] = $data;
+        $html = $this->load->view($this->pathView . 'exportPdf', $content, true);
+
+        // echo $html;
+
+        $this->pdfgenerator->generate($html, "MENU GAGAL", 'a4', 'landscape');
     }
 }

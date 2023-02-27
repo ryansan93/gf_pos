@@ -22,7 +22,7 @@ class Pembayaran extends Public_Controller
             $m_conf = new \Model\Storage\Conf();
             $now = $m_conf->getDate();
             $today = $now['tanggal'];
-            // $today = '2023-02-23';
+            // $today = '2023-02-25';
 
             $start_date = $today.' 00:00:00';
             $end_date = $today.' 23:59:59';
@@ -62,7 +62,18 @@ class Pembayaran extends Public_Controller
         $data = null;
 
         $m_bayar = new \Model\Storage\Bayar_model();
-        $d_bayar = $m_bayar->whereBetween('tgl_trans', [$start_date, $end_date])->where('mstatus', 1)->get();
+        // $d_bayar = $m_bayar->whereBetween('tgl_trans', [$start_date, $end_date])->where('mstatus', 1)->get();
+        $sql = "
+            select byr1.* from bayar byr1
+            right join
+                ( select max(id) as id, faktur_kode from bayar group by faktur_kode ) byr2
+                on
+                    byr1.id = byr2.id
+            where 
+                byr1.mstatus = 1 and
+                byr1.tgl_trans between '".$start_date."' and '".$end_date."'
+        ";
+        $d_bayar = $m_bayar->hydrateRaw( $sql );
 
         if ( $d_bayar->count() > 0 ) {
             $d_bayar = $d_bayar->toArray();
@@ -3732,7 +3743,7 @@ class Pembayaran extends Public_Controller
 
     public function tes()
     {
-        cetak_r( $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'] ) );
+        cetak_r( $this->getDataPenjualanAfterSave( 'FAK-2302230079', 400709 ) );
         // phpinfo();
 
         // if (!extension_loaded('imagick')){

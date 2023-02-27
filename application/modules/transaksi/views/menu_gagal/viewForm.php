@@ -20,8 +20,9 @@
 		<table class="table table-bordered tbl_menu" style="margin-bottom: 0px;">
 			<thead>
 				<tr>
-					<th class="col-xs-8">Menu</th>
-					<th class="col-xs-4">Jumlah</th>
+					<th class="col-xs-4">Menu</th>
+					<th class="col-xs-2">Jumlah</th>
+					<th class="col-xs-6">Keterangan</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,6 +33,9 @@
 						</td>
 						<td class="text-right">
 							<?php echo angkaRibuan($value['jumlah']); ?>
+						</td>
+						<td>
+							<?php echo !empty($value['keterangan']) ? $value['keterangan'] : '-'; ?>
 						</td>
 					</tr>
 				<?php endforeach ?>

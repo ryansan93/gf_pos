@@ -37,7 +37,7 @@ var mg = {
 		$("[name=tglInput]").datetimepicker({
 			locale: 'id',
             format: 'DD MMM Y',
-            minDate: new Date().setHours(0,0,0,0),
+            // minDate: new Date().setHours(0,0,0,0),
             useCurrent: false
 		});
 
@@ -342,6 +342,47 @@ var mg = {
 			}
 		});
 	}, // end - delete
+
+	exportPdf: function(elm) {
+		var div_active = $('div.div-tab.active');
+		var err = 0
+
+		$.map( $(div_active).find('[data-required=1]'), function(ipt) {
+			if ( empty($(ipt).val()) ) {
+				$(ipt).parent().addClass('has-error');
+				err++;
+			} else {
+				$(ipt).parent().removeClass('has-error');
+			}
+		});
+
+		if ( err > 0 ) {
+			bootbox.alert('Harap lengkapi data terlebih dahulu.');
+		} else {
+			var params = {
+				'date': dateSQL($(div_active).find('#tglInput').data('DateTimePicker').date()),
+	            'branch_kode': $(div_active).find('.branch').select2('val')
+			};
+
+			$.ajax({
+	            url: 'transaksi/MenuGagal/excryptParamsExportPdf',
+	            data: {
+	                'params': params
+	            },
+	            type: 'POST',
+	            dataType: 'JSON',
+	            beforeSend: function() { showLoading(); },
+	            success: function(data) {
+	                hideLoading();
+	                if ( data.status == 1 ) {
+	                	window.open('transaksi/MenuGagal/exportPdf/'+data.content.data, 'blank');
+	                } else {
+	                    bootbox.alert(data.message);
+	                }
+	            }
+	        });
+		}
+	}, // end - exportPdf
 };
 
 mg.startUp();
