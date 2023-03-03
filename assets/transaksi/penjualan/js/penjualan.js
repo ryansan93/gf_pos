@@ -1374,6 +1374,8 @@ var jual = {
     }, // end - modalPilihPrivilege
 
     getPesanan: function(action) {
+        dataPenjualan = null;
+
         var list_pesanan = $.map( $('.list_pesanan').find('.jenis_pesanan'), function(div_jp) {
             var list_menu = $.map( $(div_jp).find('.menu'), function(div_menu) {
                 var div_menu_utama = $(div_menu).find('.menu_utama');
@@ -1472,6 +1474,8 @@ var jual = {
             'privilege': privilege,
             'waste': _waste
         };
+
+        console.log( dataPenjualan );
 
         action(dataPenjualan);
     }, // end - getPesanan
@@ -2366,7 +2370,7 @@ var jual = {
     }, // end - batalEdit
 
     editPesanan: function(elm, kasir) {
-        kodePesanan = $(elm).data('kode');
+        kodePesanan = $(elm).attr('data-kode');
 
         bootbox.confirm('Apakah anda yakin ingin meng-ubah transaksi ?', function(result) {
             if ( result ) {
