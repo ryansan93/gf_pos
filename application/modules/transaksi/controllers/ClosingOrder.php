@@ -263,7 +263,7 @@ class ClosingOrder extends Public_Controller
                 j.branch = '".$branch_kode."' and
                 j.mstatus = 1 and
                 j.lunas = 0 and
-                j.hutang = 0 and
+                (j.hutang = 0 or j.hutang = 1) and
                 j.tgl_trans between '".$start_date."' and '".$end_date."'
         ";
         $nilai_pending = 0;
@@ -277,14 +277,19 @@ class ClosingOrder extends Public_Controller
 
         $sql_cl = "
             select
-                sum(j.grand_total) as total
-            from jual j
+                sum(bh.bayar) as total
+            from bayar byr
+            right join
+                bayar_hutang bh
+                on
+                    byr.id = bh.id_header
+            right join
+                jual j
+                on
+                    j.kode_faktur = bh.faktur_kode
             where
                 j.branch = '".$branch_kode."' and
-                j.mstatus = 1 and
-                j.lunas = 0 and
-                j.hutang = 1 and
-                j.tgl_trans between '".$start_date."' and '".$end_date."'
+                byr.tgl_trans between '".$start_date."' and '".$end_date."'
         ";
         $nilai_cl = 0;
 
@@ -790,6 +795,124 @@ class ClosingOrder extends Public_Controller
                 }
             }
 
+            $m_jual = new \Model\Storage\Jual_model();
+            $tanggal = substr($now['waktu'], 0, 10);
+            $start_date = $tanggal.' 00:00:01';
+            $end_date = $tanggal.' 23:59:59';
+            $d_jual = $m_jual->whereBetween('tgl_trans', [$start_date, $end_date])->where('branch', $this->kodebranch)->where('mstatus', 1)->where('lunas', 0)->where('hutang', 0)->get();
+
+            if ( $d_jual->count() > 0 ) {
+                $d_jual = $d_jual->toArray();
+
+                foreach ($d_jual as $k_jual => $v_jual) {
+                    $m_jual->where('kode_faktur', $v_jual['kode_faktur'])->update(
+                        array(
+                            'hutang' => 1
+                        )
+                    );
+
+                    $m_conf = new \Model\Storage\Conf();
+                    $sql = "
+                        select
+                            _data.kode_faktur,
+                            _data.member,
+                            _data.kode_member,
+                            sum(_data.service_charge) as service_charge,
+                            sum(_data.ppn) as ppn,
+                            sum(_data.total) as total
+                        from
+                        (
+                            select 
+                                j.kode_faktur, 
+                                j.tgl_trans, 
+                                j.member,
+                                j.kode_member,
+                                ji.menu_nama,
+                                ji.menu_kode,
+                                ji.jumlah,
+                                ji.harga,
+                                ji.request,
+                                case
+                                    when jp.exclude = 1 then
+                                        ji.service_charge
+                                    when jp.include = 1 then
+                                        0
+                                end as service_charge,
+                                case
+                                    when jp.exclude = 1 then
+                                        ji.ppn
+                                    when jp.include = 1 then
+                                        0
+                                end as ppn,
+                                case
+                                    when jp.exclude = 1 then
+                                        ji.total
+                                    when jp.include = 1 then
+                                        ji.total
+                                end as total
+                            from 
+                                jual_item ji
+                            right join
+                                jenis_pesanan jp
+                                on
+                                    jp.kode = ji.kode_jenis_pesanan
+                            right join
+                                jual j
+                                on
+                                    ji.faktur_kode = j.kode_faktur
+                            where
+                                j.kode_faktur = '".$v_jual['kode_faktur']."'
+                        ) _data
+                        group by
+                            _data.kode_faktur,
+                            _data.member,
+                            _data.kode_member
+                    ";
+                    $d_jual = $m_conf->hydrateRaw( $sql );
+
+                    if ( $d_jual->count() > 0 ) {
+                        $d_jual = $d_jual->toArray()[0];
+
+                        $m_bayar = new \Model\Storage\Bayar_model();
+                        $now = $m_bayar->getDate();
+
+                        $tagihan = $d_jual['total'] + $d_jual['service_charge'] + $d_jual['ppn'];
+
+                        $m_bayar->tgl_trans = $now['waktu'];
+                        $m_bayar->faktur_kode = $d_jual['kode_faktur'];
+                        $m_bayar->jml_tagihan = $tagihan;
+                        $m_bayar->jml_bayar = 0;
+                        $m_bayar->ppn = $d_jual['ppn'];
+                        $m_bayar->service_charge = $d_jual['service_charge'];
+                        $m_bayar->diskon = 0;
+                        $m_bayar->total = $tagihan;
+                        $m_bayar->member_kode = $d_jual['kode_member'];
+                        $m_bayar->member = $d_jual['member'];
+                        $m_bayar->kasir = $this->userid;
+                        $m_bayar->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
+                        $m_bayar->mstatus = 1;
+                        $m_bayar->save();
+
+                        $id_header = $m_bayar->id;
+
+                        $m_jk = new \Model\Storage\JenisKartu_model();
+                        $d_jk = $m_jk->where('cl', 1)->first();
+
+                        $m_bayard = new \Model\Storage\BayarDet_model();
+                        $m_bayard->id_header = $id_header;
+                        $m_bayard->jenis_bayar = $d_jk->nama;
+                        $m_bayard->kode_jenis_kartu = $d_jk->kode_jenis_kartu;
+                        $m_bayard->nominal = 0;
+                        $m_bayard->no_kartu = null;
+                        $m_bayard->nama_kartu = null;
+                        $m_bayard->save();
+
+                        $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                        Modules::run( 'base/event/save', $m_bayar, $deskripsi_log_gaktifitas, $id_header );
+                    }
+                }
+            }
+
             $deskripsi = 'di-simpan oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/save', $m_clo, $deskripsi );
 
@@ -1114,5 +1237,15 @@ class ClosingOrder extends Public_Controller
         }
 
         display_json( $this->result );
+    }
+
+    public function tes()
+    {
+        $m_clo = new \Model\Storage\ClosingOrder_model();
+        $now = $m_clo->getDate();
+
+        $tanggal = substr( $now['waktu'], 0, 10 );
+
+        cetak_r( $tanggal );
     }
 }
