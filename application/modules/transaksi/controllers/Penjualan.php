@@ -665,12 +665,6 @@ class Penjualan extends Public_Controller
 
             $m_jual = new \Model\Storage\Jual_model();
 
-            $kode_faktur_old = null;
-            $d_jual_old = $m_jual->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
-            if ( $d_jual_old ) {
-                $kode_faktur_old = $d_jual_old->kode_faktur;
-            }
-
             $now = $m_jual->getDate();
 
             $kode_faktur = $m_jual->getNextKode('FAK');
@@ -731,7 +725,10 @@ class Penjualan extends Public_Controller
                 }
             }
 
-            if ( !empty($kode_faktur_old) ) {
+            $d_jual_old = $m_jual->whereNotIn('kode_faktur', $kode_faktur)->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
+            if ( $d_jual_old ) {
+                $kode_faktur_old = $d_jual_old->kode_faktur;
+
                 $m_jg = new \Model\Storage\JualGabungan_model();
                 $m_jg->where('faktur_kode', $kode_faktur_old)->update(
                     array('faktur_kode' => $kode_faktur)
