@@ -725,7 +725,7 @@ class Penjualan extends Public_Controller
                 }
             }
 
-            $d_jual_old = $m_jual->whereNotIn('kode_faktur', $kode_faktur)->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
+            $d_jual_old = $m_jual->whereNotIn('kode_faktur', [$kode_faktur])->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
             if ( $d_jual_old ) {
                 $kode_faktur_old = $d_jual_old->kode_faktur;
 
