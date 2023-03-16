@@ -2063,6 +2063,9 @@ class Pembayaran extends Public_Controller
         $params = $this->input->post('params');
 
         try {
+            $m_conf = new \Model\Storage\Conf();
+            $now = $m_conf->getDate();
+
             $data = $this->getDataPenjualanAfterSave( $params['faktur_kode'], null );
 
             function buatBaris3Kolom($kolom1, $kolom2, $kolom3, $jenis) {
