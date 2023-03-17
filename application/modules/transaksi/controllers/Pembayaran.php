@@ -346,26 +346,30 @@ class Pembayaran extends Public_Controller
             $data_split = isset($params['data_split']) ? $params['data_split'] : null;
 
             // HAPUS SPLIT BILL
-            $m_jual = new \Model\Storage\Jual_model();
-            $d_jual = $m_jual->select('kode_faktur')->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->get();
+            // $m_jual = new \Model\Storage\Jual_model();
+            // $d_jual = $m_jual->select('kode_faktur')->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->get();
 
-            if ( $d_jual->count() > 0 ) {
-                $d_jual = $d_jual->toArray();
+            // if ( $d_jual->count() > 0 ) {
+            //     $d_jual = $d_jual->toArray();
 
-                $m_juali = new \Model\Storage\JualItem_model();
-                $d_juali = $m_juali->select('kode_faktur_item')->whereIn('faktur_kode', $d_jual)->get();
+            //     $m_juali = new \Model\Storage\JualItem_model();
+            //     $d_juali = $m_juali->select('kode_faktur_item')->whereIn('faktur_kode', $d_jual)->get();
 
-                if ( $d_juali->count() > 0 ) {
-                    $d_juali = $d_juali->toArray();
+            //     if ( $d_juali->count() > 0 ) {
+            //         $d_juali = $d_juali->toArray();
 
-                    $m_jualid = new \Model\Storage\JualItemDetail_model();
-                    $m_jualid->whereIn('faktur_item_kode', $d_juali)->delete();
+            //         $m_jualid = new \Model\Storage\JualItemDetail_model();
+            //         $m_jualid->whereIn('faktur_item_kode', $d_juali)->delete();
 
-                    $m_juali->whereIn('faktur_kode', $d_jual)->delete();
-                }
+            //         $m_juali->whereIn('faktur_kode', $d_jual)->delete();
+            //     }
 
-                $m_jual->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->delete();
-            }
+            //     $m_jual->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->update(
+            //         array(
+            //             'mstatus' => 0
+            //         )
+            //     );
+            // }
             // END - HAPUS SPLIT BILL
 
             // FAKTUR MAIN
