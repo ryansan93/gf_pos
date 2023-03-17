@@ -2295,13 +2295,15 @@ class Penjualan extends Public_Controller
             }
 
             $m_jual = new \Model\Storage\Jual_model();
-            $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->get();
+            $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->get();
 
-            if ( $d_jual->count() > 0 ) {
-                $d_jual = $d_jual->toArray();
+            if ( $d_jual->count() < 2 ) {
+                if ( $d_jual->count() > 0 ) {
+                    $d_jual = $d_jual->toArray();
 
-                foreach ($d_jual as $k_jual => $v_jual) {
-                    $this->execDeletePenjualan( $v_jual['kode_faktur'] );
+                    foreach ($d_jual as $k_jual => $v_jual) {
+                        $this->execDeletePenjualan( $v_jual['kode_faktur'] );
+                    }
                 }
             }
 
@@ -2312,7 +2314,9 @@ class Penjualan extends Public_Controller
                 )
             );
 
-            $this->execSavePenjualan( $params, $kode_pesanan );
+            if ( $d_jual->count() < 2 ) {
+                $this->execSavePenjualan( $params, $kode_pesanan );
+            }
 
             $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
