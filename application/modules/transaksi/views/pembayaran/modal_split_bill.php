@@ -10,34 +10,36 @@
 					<table class="table table-nobordered" style="margin-bottom: 0px;">
 						<tbody>
 							<?php foreach ($data_utama['jual_item'] as $k_ji => $v_ji): ?>
-								<tr data-kode="<?php echo $v_ji['pesanan_item_kode']; ?>" data-kodejp="<?php echo $v_ji['kode_jenis_pesanan']; ?>">
-									<td class="col-xs-1 jumlah"><?php echo angkaRibuan($v_ji['jumlah']); ?></td>
-									<td class="col-xs-10">
-										<span class="menu_nama" data-kode="<?php echo $v_ji['menu_kode']; ?>"><?php echo $v_ji['menu_nama']; ?></span>
-										<br>
-										<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
-										<br>
-										<?php if ( !empty($v_ji['jual_item_detail']) ): ?>
-											<?php foreach ($v_ji['jual_item_detail'] as $k_jid => $v_jid): ?>
-												<div class="col-md-11 detail no-padding" style="font-size:10px;" data-kode="<?php echo $v_jid['menu_kode'] ?>">
-								                    <div class="col-md-12 no-padding" style="padding-left: 15px;">
-								                    	<span class="nama_menu"><?php echo $v_jid['menu_nama'] ?></span>
+								<?php if ( $v_ji['jumlah'] > 0 ): ?>
+									<tr data-kode="<?php echo $v_ji['pesanan_item_kode']; ?>" data-kodejp="<?php echo $v_ji['kode_jenis_pesanan']; ?>">
+										<td class="col-xs-1 jumlah"><?php echo angkaRibuan($v_ji['jumlah']); ?></td>
+										<td class="col-xs-10">
+											<span class="menu_nama" data-kode="<?php echo $v_ji['menu_kode']; ?>"><?php echo $v_ji['menu_nama']; ?></span>
+											<br>
+											<b>@ <span class="harga"><?php echo angkaRibuan($v_ji['harga']); ?></span> | TOTAL : <span class="total" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><?php echo angkaRibuan($v_ji['total']); ?></span></b>
+											<br>
+											<?php if ( !empty($v_ji['jual_item_detail']) ): ?>
+												<?php foreach ($v_ji['jual_item_detail'] as $k_jid => $v_jid): ?>
+													<div class="col-md-11 detail no-padding" style="font-size:10px;" data-kode="<?php echo $v_jid['menu_kode'] ?>">
+									                    <div class="col-md-12 no-padding" style="padding-left: 15px;">
+									                    	<span class="nama_menu"><?php echo $v_jid['menu_nama'] ?></span>
+									                    </div>
 								                    </div>
-							                    </div>
-											<?php endforeach ?>											
-										<?php endif ?>
-										<?php if ( !empty($v_ji['request']) ): ?>
-											<div class="col-md-11 request no-padding" style="font-size:10px;">
-								                <div class="col-md-12 no-padding" style="padding-left: 15px;">
-								                	<span class="request"><?php echo strtoupper($v_ji['request']); ?></span>
+												<?php endforeach ?>											
+											<?php endif ?>
+											<?php if ( !empty($v_ji['request']) ): ?>
+												<div class="col-md-11 request no-padding" style="font-size:10px;">
+									                <div class="col-md-12 no-padding" style="padding-left: 15px;">
+									                	<span class="request"><?php echo strtoupper($v_ji['request']); ?></span>
+									                </div>
 								                </div>
-							                </div>
-							            <?php endif ?>
-									</td>
-									<td class="col-xs-1">
-										<button class="col-xs-12 btn btn-primary btn_apply" style="padding: 0px 12px;"><i class="fa fa-plus"></i></button>
-									</td>
-								</tr>
+								            <?php endif ?>
+										</td>
+										<td class="col-xs-1">
+											<button class="col-xs-12 btn btn-primary btn_apply" style="padding: 0px 12px;"><i class="fa fa-plus"></i></button>
+										</td>
+									</tr>
+								<?php endif ?>
 							<?php endforeach ?>
 						</tbody>
 					</table>

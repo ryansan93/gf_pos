@@ -406,9 +406,6 @@ var bayar = {
                 $(tr_split).find('.total').text( numeral.formatInt(total) );
                 $(tr_split).find('.total').attr( 'data-ppn', total_ppn);
                 $(tr_split).find('.total').attr( 'data-sc', total_sc);
-                if ( sisa == 0 ) {
-                    $(tr_split).addClass('hide');
-                }
 
                 var tr_split_clone = $(tr_split).clone();
                 $(tr_split_clone).removeClass('hide');
@@ -417,11 +414,11 @@ var bayar = {
                 $(tr_split_clone).find('button').addClass('btn-danger');
                 $(tr_split_clone).find('button').removeClass('btn_apply');
                 $(tr_split_clone).find('button').addClass('btn_remove');
-                $(tr_split_clone).find('button').click(function() {
-                    bayar.removeItem( $(this) );
-                });
                 $(tr_split_clone).find('button i').removeClass('fa-plus');
                 $(tr_split_clone).find('button i').addClass('fa-minus');
+                $(tr_split_clone).find('.btn_remove').click(function() {
+                    bayar.removeItem( $(this) );
+                });
 
                 var total_split = harga * jumlah_pindah;
                 var total_split_ppn = ppn * jumlah_pindah;
@@ -431,6 +428,11 @@ var bayar = {
                 $(tr_split_clone).find('.total').attr( 'data-sc', total_split_sc);
 
                 $('div.active').find('table tbody').append( $(tr_split_clone) );
+
+                if ( sisa == 0 ) {
+                    // $(tr_split).addClass('hide');
+                    $(tr_split).remove();
+                }
             }
         } else {
             $(modal).find('input').parent().addClass('has-error');
@@ -447,28 +449,44 @@ var bayar = {
         var pesanan_item_kode = $(tr).data('kode');
 
         var tr_main = $(div).find('tr[data-kode="'+pesanan_item_kode+'"]');
-        var jumlah = numeral.unformat($(tr_main).find('.jumlah').text());
 
-        var ppn = ($(tr_split).find('.total').attr('data-ppn') > 0) ? $(tr_split).find('.total').attr('data-ppn') / jumlah : 0;
-        var sc = ($(tr_split).find('.total').attr('data-sc') > 0) ? $(tr_split).find('.total').attr('data-sc') / jumlah : 0;
+        if ( $(tr_main).length > 0 ) {
+            var jumlah = numeral.unformat($(tr_main).find('.jumlah').text());
 
-        var total_jumlah = jumlah + jumlah_remove;
+            var ppn = ($(tr_split).find('.total').attr('data-ppn') > 0) ? $(tr_split).find('.total').attr('data-ppn') / jumlah : 0;
+            var sc = ($(tr_split).find('.total').attr('data-sc') > 0) ? $(tr_split).find('.total').attr('data-sc') / jumlah : 0;
 
-        if ( total_jumlah > 0 ) {
-            $(tr_main).removeClass('hide');
+            var total_jumlah = jumlah + jumlah_remove;
 
-            var harga = numeral.unformat($(tr_main).find('.harga').text());
-            var total = harga * total_jumlah;
-            var total_ppn = ppn * total_jumlah;
-            var total_sc = sc * total_jumlah;
+            if ( total_jumlah > 0 ) {
+                var harga = numeral.unformat($(tr_main).find('.harga').text());
+                var total = harga * total_jumlah;
+                var total_ppn = ppn * total_jumlah;
+                var total_sc = sc * total_jumlah;
 
-            $(tr_main).find('.jumlah').text(numeral.formatInt(total_jumlah));
-            $(tr_main).find('.total').text(numeral.formatInt(total));
-            $(tr_main).find('.total').attr( 'data-ppn', total_ppn);
-            $(tr_main).find('.total').attr( 'data-sc', total_sc);
+                $(tr_main).find('.jumlah').text(numeral.formatInt(total_jumlah));
+                $(tr_main).find('.total').text(numeral.formatInt(total));
+                $(tr_main).find('.total').attr( 'data-ppn', total_ppn);
+                $(tr_main).find('.total').attr( 'data-sc', total_sc);
+            }
+        } else {
+            var tr_clone = $(tr).clone();
 
-            $(tr).remove();
+            $(tr_clone).find('button').addClass('btn-primary');
+            $(tr_clone).find('button').removeClass('btn-danger');
+            $(tr_clone).find('button').addClass('btn_apply');
+            $(tr_clone).find('button').removeClass('btn_remove');
+            $(tr_clone).find('button i').addClass('fa-plus');
+            $(tr_clone).find('button i').removeClass('fa-minus');
+
+            $(tr_clone).find('.btn_apply').click(function() {
+                bayar.modalJumlahSplit( $(this) );
+            });
+
+            $(div).find('table tbody').append( $(tr_clone) );
         }
+
+        $(tr).remove();
     }, // end - removeItem
 
     saveSplitBill: function(elm) {

@@ -227,7 +227,8 @@ class Pembayaran extends Public_Controller
                                     'member_group' => $member_group,
                                     'pelanggan' => $v_jual['member'],
                                     'kasir' => $v_data['nama_user'],
-                                    'total' => $v_jual['grand_total']
+                                    'total' => $v_jual['grand_total'],
+                                    'utama' => $v_jual['utama']
                                 );
                             }
                         }
@@ -269,7 +270,7 @@ class Pembayaran extends Public_Controller
                     $kode_faktur = $value['kode_faktur'];
                 }
 
-                $data[] = array(
+                $data[ $value['kode_faktur'] ] = array(
                     'lunas' => $value['lunas'],
                     'hutang' => $value['hutang'],
                     'kode_faktur' => $value['kode_faktur'],
@@ -345,31 +346,33 @@ class Pembayaran extends Public_Controller
             $data_main = isset($params['data_main']) ? $params['data_main'] : null;
             $data_split = isset($params['data_split']) ? $params['data_split'] : null;
 
+            $data_faktur_utama = null;
+
             // HAPUS SPLIT BILL
-            // $m_jual = new \Model\Storage\Jual_model();
-            // $d_jual = $m_jual->select('kode_faktur')->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->get();
+            $m_jual = new \Model\Storage\Jual_model();
+            $d_jual = $m_jual->select('kode_faktur')->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->get();
 
-            // if ( $d_jual->count() > 0 ) {
-            //     $d_jual = $d_jual->toArray();
+            if ( $d_jual->count() > 0 ) {
+                $d_jual = $d_jual->toArray();
 
-            //     $m_juali = new \Model\Storage\JualItem_model();
-            //     $d_juali = $m_juali->select('kode_faktur_item')->whereIn('faktur_kode', $d_jual)->get();
+                // $m_juali = new \Model\Storage\JualItem_model();
+                // $d_juali = $m_juali->select('kode_faktur_item')->whereIn('faktur_kode', $d_jual)->get();
 
-            //     if ( $d_juali->count() > 0 ) {
-            //         $d_juali = $d_juali->toArray();
+                // if ( $d_juali->count() > 0 ) {
+                //     $d_juali = $d_juali->toArray();
 
-            //         $m_jualid = new \Model\Storage\JualItemDetail_model();
-            //         $m_jualid->whereIn('faktur_item_kode', $d_juali)->delete();
+                //     $m_jualid = new \Model\Storage\JualItemDetail_model();
+                //     $m_jualid->whereIn('faktur_item_kode', $d_juali)->delete();
 
-            //         $m_juali->whereIn('faktur_kode', $d_jual)->delete();
-            //     }
+                //     $m_juali->whereIn('faktur_kode', $d_jual)->delete();
+                // }
 
-            //     $m_jual->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->update(
-            //         array(
-            //             'mstatus' => 0
-            //         )
-            //     );
-            // }
+                $m_jual->where('pesanan_kode', $pesanan_kode)->where('utama', 0)->update(
+                    array(
+                        'mstatus' => 0
+                    )
+                );
+            }
             // END - HAPUS SPLIT BILL
 
             // FAKTUR MAIN
@@ -441,6 +444,8 @@ class Pembayaran extends Public_Controller
 
                 $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->first();
 
+                $data_faktur_utama = $d_jual;
+
                 $deskripsi_log_gaktifitas = 'di-split oleh ' . $this->userdata['detail_user']['nama_detuser'];
                 Modules::run( 'base/event/update', $d_jual, $deskripsi_log_gaktifitas, $kode_faktur );
             }
@@ -470,6 +475,7 @@ class Pembayaran extends Public_Controller
                     $m_jual->pesanan_kode = $pesanan_kode;
                     $m_jual->utama = 0;
                     $m_jual->hutang = 0;
+                    $m_jual->print_cl = $data_faktur_utama->print_cl;
                     $m_jual->save();
 
                     foreach ($v_ds['jual_item'] as $k_ji => $v_ji) {

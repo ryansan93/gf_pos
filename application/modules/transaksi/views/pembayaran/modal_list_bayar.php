@@ -65,12 +65,14 @@
 													<?php endif ?>
 													<?php if ( $akses_waitress['a_edit'] == 1 ): ?>
 														<td class="col-lg-1 text-center">
-															<button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="jual.edit(this)" data-kode="<?php echo $value['kode_pesanan']; ?>"><i class="fa fa-edit"></i></button>
+															<button type="button" class="btn btn-primary" style="padding: 1px 0px; width: 100%;" onclick="jual.edit(this)" data-kode="<?php echo $value['kode_pesanan']; ?>" data-kodefaktur="<?php echo $value['kode_faktur']; ?>"><i class="fa fa-edit"></i></button>
 														</td>
 													<?php endif ?>
 													<?php if ( $akses_waitress['a_delete'] == 1 ): ?>
 														<td class="col-lg-1 text-center">
-															<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.verifikasiPinOtorisasi('<?php echo $value['kode_pesanan']; ?>', null, null)"><i class="fa fa-trash"></i></button>
+															<?php if ( $value['utama'] == 1 ): ?>
+																<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.verifikasiPinOtorisasi('<?php echo $value['kode_pesanan']; ?>', null, null)"><i class="fa fa-trash"></i></button>
+															<?php endif ?>
 														</td>
 													<?php endif ?>
 												</tr>

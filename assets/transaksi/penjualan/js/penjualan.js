@@ -1475,8 +1475,6 @@ var jual = {
             'waste': _waste
         };
 
-        console.log( dataPenjualan );
-
         action(dataPenjualan);
     }, // end - getPesanan
 
@@ -1534,7 +1532,7 @@ var jual = {
                     // jual.resetPesanan();
                     // jual.resetDiskon();
 
-                    jual.printCheckList(kode_pesanan);
+                    jual.printCheckList(kode_pesanan, data.content.kode_faktur);
                 } else {
                     bootbox.alert(data.message);
                 }
@@ -1542,11 +1540,16 @@ var jual = {
         });
     }, // end - savePenjualan
 
-    printCheckList: function ( kode_pesanan ) {
+    printCheckList: function ( kode_pesanan, kode_faktur ) {
+        var params = {
+            'kode_pesanan': kode_pesanan,
+            'kode_faktur': kode_faktur
+        };
+
         $.ajax({
             url: 'transaksi/Penjualan/printCheckList',
             data: {
-                'params': kode_pesanan
+                'params': params
             },
             type: 'POST',
             dataType: 'JSON',
@@ -2296,7 +2299,8 @@ var jual = {
         var pesanan_kode = $(elm).data('kode');
 
         var params = {
-            'pesanan_kode': pesanan_kode
+            'pesanan_kode': pesanan_kode,
+            'faktur_kode': $(elm).data('kodefaktur'),
         };
 
         $.ajax({
@@ -2321,6 +2325,7 @@ var jual = {
                     $(dcontent).html( data.content.html );
 
                     kodePesanan = data.content.pesanan_kode;
+                    kodeFaktur = data.content.faktur_kode;
                     jenis_pesanan = data.content.jenis_pesanan;
                     jenis_harga_exclude = data.content.jenis_harga_exclude;
                     jenis_harga_include = data.content.jenis_harga_include;
@@ -2354,6 +2359,7 @@ var jual = {
                     // });
 
                     $('.edit_pesanan').find('.button').attr('data-kode', kodePesanan);
+                    $('.edit_pesanan').find('.button').attr('data-kodefaktur', kodeFaktur);
 
                     jual.hitDiskon();
                     jual.hitSubTotal();
@@ -2371,6 +2377,7 @@ var jual = {
 
     editPesanan: function(elm, kasir) {
         kodePesanan = $(elm).attr('data-kode');
+        kodeFaktur = $(elm).attr('data-kodefaktur');
 
         bootbox.confirm('Apakah anda yakin ingin meng-ubah transaksi ?', function(result) {
             if ( result ) {
@@ -2378,6 +2385,7 @@ var jual = {
                     $('.modal').modal('hide');
 
                     data['pesanan_kode'] = kodePesanan;
+                    data['faktur_kode'] = kodeFaktur;
 
                     $.ajax({
                         url: 'transaksi/Penjualan/editPesanan',
@@ -2393,7 +2401,7 @@ var jual = {
                                 // ws.send(JSON.stringify("pesan"));
 
                                 if ( empty(kasir) || kasir == 0 ) {
-                                    jual.printCheckList(kodePesanan);
+                                    jual.printCheckList(kodePesanan, data.content.kode_faktur);
                                 } else {
                                     sak.cekSaldoAwalKasir();
                                     // jual.modalJenisPesanan();
