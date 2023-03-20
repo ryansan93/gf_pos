@@ -1511,8 +1511,6 @@ class Penjualan extends Public_Controller
 
                                         $d_data = $this->mappingDataCheckList( $kode_pesanan, $v_km['id'], $data_jual['kode_branch'], $kode_faktur );
 
-                                        cetak_r( $d_data );
-
                                         if ( !empty($d_data) ) {
                                             for ($i=0; $i < $jml_print; $i++) { 
                                                 if ( $printer_id != $v_p['id'] ) {
