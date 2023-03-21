@@ -2241,6 +2241,7 @@ class Penjualan extends Public_Controller
                     $d_ppn = $m_ppn->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->where('tgl_berlaku', '<=', $now['tanggal'])->orderBy('id', 'desc')->first();
 
                     $total = 0;
+                    $total_service_charge = 0;
                     $total_ppn = 0;
                     $total_show = 0;
                     if ( $d_jp ) {
