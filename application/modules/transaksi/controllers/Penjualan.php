@@ -2240,20 +2240,22 @@ class Penjualan extends Public_Controller
                     $m_ppn = new \Model\Storage\Ppn_model();
                     $d_ppn = $m_ppn->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->where('tgl_berlaku', '<=', $now['tanggal'])->orderBy('id', 'desc')->first();
 
-                    if ( $d_jp->exclude == 1 ) {
-                        $total = $d_hm->harga * $v_ji['jumlah'];
-                        $total_show = $total;
-                        $total_service_charge = ($d_menu->service_charge == 1 && $d_sc->nilai > 0) ? $total * ($d_sc->nilai / 100) : 0;
-                        $total_ppn = ($d_menu->ppn == 1 && $d_ppn->nilai > 0) ? ($total + $total_service_charge) * ($d_ppn->nilai / 100) : 0;
-                    } else if ( $d_jp->include == 1 ) {
-                        $total_include = $d_hm->harga * $v_ji['jumlah'];
-                        $total_show = $total_include;
+                    if ( $d_jp ) {
+                        if ( $d_jp->exclude == 1 ) {
+                            $total = $d_hm->harga * $v_ji['jumlah'];
+                            $total_show = $total;
+                            $total_service_charge = ($d_menu->service_charge == 1 && $d_sc->nilai > 0) ? $total * ($d_sc->nilai / 100) : 0;
+                            $total_ppn = ($d_menu->ppn == 1 && $d_ppn->nilai > 0) ? ($total + $total_service_charge) * ($d_ppn->nilai / 100) : 0;
+                        } else if ( $d_jp->include == 1 ) {
+                            $total_include = $d_hm->harga * $v_ji['jumlah'];
+                            $total_show = $total_include;
 
-                        $pembagi = (100 + $d_sc->nilai) + ((100 + $d_sc->nilai) * ($d_ppn->nilai/100));
-                        $total = $total_include / ($pembagi / 100);
+                            $pembagi = (100 + $d_sc->nilai) + ((100 + $d_sc->nilai) * ($d_ppn->nilai/100));
+                            $total = $total_include / ($pembagi / 100);
 
-                        $total_service_charge = $total * ($d_sc->nilai/100);
-                        $total_ppn = ($total + $total_service_charge) * ($d_ppn->nilai/100);
+                            $total_service_charge = $total * ($d_sc->nilai/100);
+                            $total_ppn = ($total + $total_service_charge) * ($d_ppn->nilai/100);
+                        }
                     }
 
                     $key_ji = $k_ji;
