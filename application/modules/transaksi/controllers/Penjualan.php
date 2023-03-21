@@ -2240,6 +2240,9 @@ class Penjualan extends Public_Controller
                     $m_ppn = new \Model\Storage\Ppn_model();
                     $d_ppn = $m_ppn->where('branch_kode', $this->kodebranch)->where('mstatus', 1)->where('tgl_berlaku', '<=', $now['tanggal'])->orderBy('id', 'desc')->first();
 
+                    $total = 0;
+                    $total_ppn = 0;
+                    $total_show = 0;
                     if ( $d_jp ) {
                         if ( $d_jp->exclude == 1 ) {
                             $total = $d_hm->harga * $v_ji['jumlah'];
