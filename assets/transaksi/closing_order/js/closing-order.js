@@ -1,5 +1,6 @@
 var clo = {
 	startUp: function () {
+        // $('.main').css({'overflow-y': 'scroll'});
 	}, // end - startUp
 
 	saveEndShift: function () {

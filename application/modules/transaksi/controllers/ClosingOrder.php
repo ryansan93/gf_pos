@@ -247,7 +247,7 @@ class ClosingOrder extends Public_Controller
         //         j.tgl_trans between '".$start_date."' and '".$end_date."'
         // ";
         $sql_sales_total = "
-            select sum(grand_total + total) from (
+            select sum(grand_total + total) as total from (
                 select
                     j.kode_faktur,
                     j.grand_total,
@@ -291,7 +291,7 @@ class ClosingOrder extends Public_Controller
         //         j.tgl_trans between '".$start_date."' and '".$end_date."'
         // ";
         $sql_pending = "
-            select sum(grand_total + total) from (
+            select sum(grand_total + total) as total from (
                 select
                     j.kode_faktur,
                     j.grand_total,
