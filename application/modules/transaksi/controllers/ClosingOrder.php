@@ -237,14 +237,33 @@ class ClosingOrder extends Public_Controller
         $start_date = $now['tanggal'].' 00:00:00';
         $end_date = $now['tanggal'].' 23:59:59';
 
+        // $sql_sales_total = "
+        //     select
+        //         sum(j.grand_total) as total
+        //     from jual j
+        //     where
+        //         j.branch = '".$branch_kode."' and
+        //         j.mstatus = 1 and
+        //         j.tgl_trans between '".$start_date."' and '".$end_date."'
+        // ";
         $sql_sales_total = "
-            select
-                sum(j.grand_total) as total
-            from jual j
-            where
-                j.branch = '".$branch_kode."' and
-                j.mstatus = 1 and
-                j.tgl_trans between '".$start_date."' and '".$end_date."'
+            select sum(grand_total + total) from (
+                select
+                    j.kode_faktur,
+                    j.grand_total,
+                    ISNULL(jg.total, 0) as total
+                from jual j
+                left join
+                    (
+                        select ISNULL(sum(jml_tagihan), 0) as total, faktur_kode from jual_gabungan group by faktur_kode
+                    ) jg
+                    on
+                        j.kode_faktur = jg.faktur_kode
+                where
+                    j.branch = '".$branch_kode."' and
+                    j.mstatus = 1 and
+                    j.tgl_trans between '".$start_date."' and '".$end_date."'
+            ) _data
         ";
         $nilai_sales_total = 0;
 
@@ -255,16 +274,42 @@ class ClosingOrder extends Public_Controller
             $nilai_sales_total = $d_sales_total[0]['total'];
         }
 
+        // $sql_pending = "
+        //     select
+        //         (sum(j.grand_total) + sum(jg.total)) as total
+        //     from jual j
+        //     left join
+        //         (
+        //             select sum(jml_tagihan) as total, faktur_kode from jual_gabungan group by faktur_kode
+        //         ) jg
+        //         on
+        //             j.kode_faktur = jg.faktur_kode
+        //     where
+        //         j.branch = '".$branch_kode."' and
+        //         j.mstatus = 1 and
+        //         (j.hutang = 0 or j.hutang = 1) and
+        //         j.tgl_trans between '".$start_date."' and '".$end_date."'
+        // ";
         $sql_pending = "
-            select
-                sum(j.grand_total) as total
-            from jual j
-            where
-                j.branch = '".$branch_kode."' and
-                j.mstatus = 1 and
-                j.lunas = 0 and
-                (j.hutang = 0 or j.hutang = 1) and
-                j.tgl_trans between '".$start_date."' and '".$end_date."'
+            select sum(grand_total + total) from (
+                select
+                    j.kode_faktur,
+                    j.grand_total,
+                    ISNULL(jg.total, 0) as total
+                from jual j
+                left join
+                    (
+                        select ISNULL(sum(jml_tagihan), 0) as total, faktur_kode from jual_gabungan group by faktur_kode
+                    ) jg
+                    on
+                        j.kode_faktur = jg.faktur_kode
+                where
+                    j.branch = '".$branch_kode."' and
+                    j.mstatus = 1 and
+                    j.lunas = 0 and
+                    (j.hutang = 0 or j.hutang = 1) and
+                    j.tgl_trans between '".$start_date."' and '".$end_date."'
+            ) _data
         ";
         $nilai_pending = 0;
 

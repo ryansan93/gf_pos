@@ -2219,14 +2219,14 @@ class Penjualan extends Public_Controller
                 $pesanan_item = null;
                 foreach ($d_jual['jual_item'] as $k_ji => $v_ji) {
                     $jenis_pesanan = $v_ji['kode_jenis_pesanan'];
-                    $nama_jenis_pesanan = $v_ji['jenis_pesanan'][0]['nama'];
+                    $nama_jenis_pesanan = isset($v_ji['jenis_pesanan'][0]) ? $v_ji['jenis_pesanan'][0]['nama'] : null;
 
                     $m_jp = new \Model\Storage\JenisPesanan_model();
                     $d_jp = $m_jp->where('kode', $jenis_pesanan)->first();
 
                     $key_jp = $v_ji['kode_jenis_pesanan'];
                     $pesanan_item[$key_jp]['kode'] = $v_ji['kode_jenis_pesanan'];
-                    $pesanan_item[$key_jp]['nama'] = $v_ji['jenis_pesanan'][0]['nama'];
+                    $pesanan_item[$key_jp]['nama'] = isset($v_ji['jenis_pesanan'][0]) ? $v_ji['jenis_pesanan'][0]['nama'] : null;
 
                     $m_hm = new \Model\Storage\HargaMenu_model();
                     $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();

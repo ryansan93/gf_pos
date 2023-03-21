@@ -3638,24 +3638,58 @@ class Pembayaran extends Public_Controller
                 $d_jual_hutang = $d_jual_hutang->toArray();
 
                 foreach ($d_jual_hutang as $key => $value) {
-                    $sql = "select sum(bayar) as total_bayar from bayar_hutang bh 
-                        left join
+                    // $sql = "select sum(bayar) as total_bayar from bayar_hutang bh 
+                    //     left join
+                    //         (
+                    //             select * from bayar where mstatus = 1
+                    //         ) b 
+                    //         on
+                    //             bh.id_header = b.id
+                    //     where
+                    //         b.mstatus = 1 and
+                    //         bh.faktur_kode = '".$value['kode_faktur']."'
+                    // ";
+                    
+                    $sql = "
+                        select 
+                            b.faktur_kode,
+                            sum(byr.jml_bayar) as total_bayar,
+                            sum(byr.diskon) as total_diskon
+                        from bayar byr
+                        right join
                             (
-                                select * from bayar where mstatus = 1
+                                select * from (
+                                    select b.id, b.faktur_kode from bayar b where b.mstatus = 1
+
+                                    union all
+
+                                    select b.id, bh.faktur_kode as faktur_kode from bayar_hutang bh
+                                    right join
+                                        bayar b
+                                        on
+                                            bh.id_header = b.id
+                                    where
+                                        b.mstatus = 1
+                                ) _data
+                                group by
+                                    _data.id,
+                                    _data.faktur_kode
                             ) b 
                             on
-                                bh.id_header = b.id
+                                byr.id = b.id
                         where
-                            b.mstatus = 1 and
-                            bh.faktur_kode = '".$value['kode_faktur']."'
+                            b.faktur_kode = '".$value['kode_faktur']."'
+                        group by
+                            b.faktur_kode
                     ";
 
                     $m_bayar_hutang = new \Model\Storage\BayarHutang_model();
                     $d_bayar_hutang = $m_bayar_hutang->hydrateRaw($sql);
 
                     $total_bayar = 0;
-                    $total_diskon = $value['total_diskon'];
+                    $total_diskon = 0;
                     if ( $d_bayar_hutang->count() > 0 ) {
+                        $total_diskon = $d_bayar_hutang->toArray()[0]['total_diskon'];
                         $total_bayar = $d_bayar_hutang->toArray()[0]['total_bayar'];
                     }
 
