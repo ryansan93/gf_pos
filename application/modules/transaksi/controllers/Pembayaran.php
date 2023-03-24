@@ -2703,6 +2703,23 @@ class Pembayaran extends Public_Controller
                     $m_jual_gabungan->faktur_kode_gabungan = $value['kode_faktur'];
                     $m_jual_gabungan->jml_tagihan = $value['total'];
                     $m_jual_gabungan->save();
+
+                    $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+                    $d_jual_gabungan = $m_jual_gabungan->where('faktur_kode', $value['kode_faktur'])->get();
+
+                    if ( $d_jual_gabungan->count() > 0 ) {
+                        $d_jual_gabungan = $d_jual_gabungan->toArray();
+
+                        foreach ($d_jual_gabungan as $k_jg => $v_jg) {
+                            $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+                            $m_jual_gabungan->faktur_kode = $data_utama['kode_faktur'];
+                            $m_jual_gabungan->faktur_kode_gabungan = $v_jg['faktur_kode_gabungan'];
+                            $m_jual_gabungan->jml_tagihan = $v_jg['jml_tagihan'];
+                            $m_jual_gabungan->save();
+                        }
+
+                        $m_jual_gabungan->where('faktur_kode', $value['kode_faktur'])->delete();
+                    }
                 }
             } 
             // else {
