@@ -89,11 +89,11 @@
 													<div class="col-xs-12 no-padding"><?php echo strtoupper(tglIndonesia($value['tgl_pesan'], '-', ' ')); ?></div>
 													<div class="col-xs-12 no-padding"><?php echo $value['faktur_kode']; ?></div>
 												</td>
-												<td class="text-right hutang" data-val="<?php echo $value['hutang']; ?>"><?php echo angkaRibuan($value['hutang']) ?></td>
-												<td class="text-right bayar" data-val="<?php echo $value['sudah_bayar']; ?>"><?php echo angkaRibuan($value['sudah_bayar']) ?></td>
+												<td class="text-right hutang" data-val="<?php echo $value['hutang']; ?>"><?php echo angkaDecimal($value['hutang']) ?></td>
+												<td class="text-right bayar" data-val="<?php echo $value['sudah_bayar']; ?>"><?php echo angkaDecimal($value['sudah_bayar']) ?></td>
 												<td>
 													<!-- <div class="col-xs-12 no-padding"> -->
-														<input type="text" class="text-right form-control nominal_bayar_hutang" placeholder="Nominal" data-tipe="integer" style="padding: 6px;" maxlength="11" onkeyup="bayar.cekNominalBayarHutang(this)" data-val="<?php echo ($value['hutang'] - $value['sudah_bayar']); ?>" value="<?php echo angkaRibuan($value['bayar']) ?>">
+														<input type="text" class="text-right form-control nominal_bayar_hutang" placeholder="Nominal" data-tipe="integer" style="padding: 6px;" maxlength="11" onkeyup="bayar.cekNominalBayarHutang(this)" data-val="<?php echo ($value['hutang'] - $value['sudah_bayar']); ?>" value="<?php echo angkaDecimal($value['bayar']) ?>">
 													<!-- </div> -->
 												</td>
 											</tr>
@@ -101,8 +101,8 @@
 										<?php endforeach ?>
 										<tr>
 											<td class="text-right"><b>Total</b></td>
-											<td class="text-right"><b><?php echo angkaRibuan($total_hutang) ?></b></td>
-											<td class="text-right"><b><?php echo angkaRibuan($total_bayar) ?></b></td>
+											<td class="text-right"><b><?php echo angkaDecimal($total_hutang) ?></b></td>
+											<td class="text-right"><b><?php echo angkaDecimal($total_bayar) ?></b></td>
 											<td></td>
 										</tr>
 									</tbody>
@@ -129,19 +129,19 @@
 					<div class="col-xs-4 no-padding cb_left">
 						<div class="col-xs-12 no-padding"><label class="control-label">TAGIHAN BILL</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right tagihan" placeholder="TAGIHAN" data-tipe="integer" value="<?php echo angkaRibuan($data_bayar->total); ?>" readonly>
+							<input type="text" class="form-control text-right tagihan" placeholder="TAGIHAN" data-tipe="integer" value="<?php echo angkaDecimal($data_bayar->total); ?>" readonly>
 						</div>
 					</div>
 					<div class="col-xs-4 no-padding cb_left cb_right">
 						<div class="col-xs-12 no-padding"><label class="control-label">DISKON</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="<?php echo angkaRibuan($data_bayar->diskon); ?>" readonly>
+							<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="<?php echo angkaDecimal($data_bayar->diskon); ?>" readonly>
 						</div>
 					</div>
 					<div class="col-xs-4 no-padding cb_right">
 						<div class="col-xs-12 no-padding"><label class="control-label">TOTAL TAGIHAN</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right total_tagihan" placeholder="TOTAL TAGIHAN" data-tipe="integer" value="<?php echo angkaRibuan($data_bayar->jml_tagihan); ?>" readonly>
+							<input type="text" class="form-control text-right total_tagihan" placeholder="TOTAL TAGIHAN" data-tipe="integer" value="<?php echo angkaDecimal($data_bayar->jml_tagihan); ?>" readonly>
 						</div>
 					</div>
 				</div>
@@ -149,19 +149,19 @@
 					<div class="col-xs-4 no-padding cb_left">
 						<div class="col-xs-12 no-padding"><label class="control-label">TOTAL BAYAR</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaRibuan($bayar); ?>" readonly>
+							<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaDecimal($bayar); ?>" readonly>
 						</div>
 					</div>
 					<div class="col-xs-4 no-padding cb_left cb_right">
 						<div class="col-xs-12 no-padding"><label class="control-label">KEMBALIAN</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaRibuan($kembalian); ?>" readonly>
+							<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaDecimal($kembalian); ?>" readonly>
 						</div>
 					</div>
 					<div class="col-xs-4 no-padding cb_right">
 						<div class="col-xs-12 no-padding"><label class="control-label">SISA TAGIHAN</label></div>
 						<div class="col-xs-12 no-padding">
-							<input type="text" class="form-control text-right sisa_tagihan" placeholder="SISA TAGIHAN" data-tipe="integer" value="<?php echo angkaRibuan($sisa_tagihan); ?>" readonly>
+							<input type="text" class="form-control text-right sisa_tagihan" placeholder="SISA TAGIHAN" data-tipe="integer" value="<?php echo angkaDecimal($sisa_tagihan); ?>" readonly>
 						</div>
 					</div>
 				</div>
@@ -230,10 +230,10 @@
 								<table class="table table-nobordered" style="margin-bottom: 0px;">
 									<tbody>
 										<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji): ?>
-											<tr>
-												<td class="col-xs-1"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
+											<tr class="menu">
+												<td class="col-xs-1 jumlah" data-jumlah="<?php echo $v_ji['jumlah']; ?>"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
 												<td class="col-xs-7"><label class="control-label"><?php echo $v_ji['nama']; ?></label></td>
-												<td class="col-xs-4 text-right"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
+												<td class="col-xs-4 text-right total" data-harga="<?php echo $v_ji['harga']; ?>" data-hj="<?php echo $v_ji['harga_jual']; ?>" data-exclude="<?php echo $v_ji['exclude']; ?>" data-include="<?php echo $v_ji['include']; ?>" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
 											</tr>
 										<?php endforeach ?>
 									</tbody>

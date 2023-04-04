@@ -5,6 +5,11 @@ var login = {
 
     settingUp: function () {
         $('#username').select2();
+
+        $('[data-tipe=angka]').each(function(){
+            $(this).priceFormat(Config[$(this).data('tipe')]);
+            // priceFormat( $(this) );
+        });
     }, // end - settingUp
 
     login: function() {

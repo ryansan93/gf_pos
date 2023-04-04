@@ -4,6 +4,7 @@ var nama_member = null;
 var kode_member = null;
 var tr_split = null;
 var dataDiskon = [];
+var dataDiskonOld = [];
 var dataDiskonSave = null;
 var fakturPrint = [];
 var idxFaktur = 0;
@@ -89,7 +90,8 @@ var bayar = {
                         });
 
                         $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                            $(this).priceFormat(Config[$(this).data('tipe')]);
+                            // $(this).priceFormat(Config[$(this).data('tipe')]);
+                            priceFormat( $(this) );
                         });
 
                         var modal_body = $(this).find('.modal-body');
@@ -138,7 +140,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -183,7 +186,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -222,7 +226,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -256,7 +261,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -366,7 +372,8 @@ var bayar = {
                     });
 
                     $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                        $(this).priceFormat(Config[$(this).data('tipe')]);
+                        // $(this).priceFormat(Config[$(this).data('tipe')]);
+                        priceFormat( $(this) );
                     });
 
                     tr_split = $(elm).closest('tr');
@@ -403,7 +410,7 @@ var bayar = {
                 var total = harga * sisa;
                 var total_ppn = ppn * sisa;
                 var total_sc = sc * sisa;
-                $(tr_split).find('.total').text( numeral.formatInt(total) );
+                $(tr_split).find('.total').text( numeral.formatDec(total) );
                 $(tr_split).find('.total').attr( 'data-ppn', total_ppn);
                 $(tr_split).find('.total').attr( 'data-sc', total_sc);
 
@@ -423,7 +430,7 @@ var bayar = {
                 var total_split = harga * jumlah_pindah;
                 var total_split_ppn = ppn * jumlah_pindah;
                 var total_split_sc = sc * jumlah_pindah;
-                $(tr_split_clone).find('.total').text( numeral.formatInt(total_split) );
+                $(tr_split_clone).find('.total').text( numeral.formatDec(total_split) );
                 $(tr_split_clone).find('.total').attr( 'data-ppn', total_split_ppn);
                 $(tr_split_clone).find('.total').attr( 'data-sc', total_split_sc);
 
@@ -465,7 +472,7 @@ var bayar = {
                 var total_sc = sc * total_jumlah;
 
                 $(tr_main).find('.jumlah').text(numeral.formatInt(total_jumlah));
-                $(tr_main).find('.total').text(numeral.formatInt(total));
+                $(tr_main).find('.total').text(numeral.formatDec(total));
                 $(tr_main).find('.total').attr( 'data-ppn', total_ppn);
                 $(tr_main).find('.total').attr( 'data-sc', total_sc);
             }
@@ -678,7 +685,7 @@ var bayar = {
             if ( $(ipt_check).is(':checked') ) {
                 total_tagihan += sisa_hutang;
                 if ( empty($(tr).find('input').val()) ) {
-                    $(tr).find('input').val( numeral.formatInt(sisa_hutang) );
+                    $(tr).find('input').val( numeral.formatDec(sisa_hutang) );
                 }
                 $(tr).find('input').removeAttr('readonly');
                 $(tr).find('input').attr( 'data-val', sisa_hutang );
@@ -690,7 +697,7 @@ var bayar = {
                     'bayar': numeral.unformat($(tr).find('input.nominal_bayar_hutang').val())
                 };
 
-                $('.faktur_hutang[data-faktur="'+faktur_kode+'"]').find('.bayar').text( numeral.formatInt(numeral.unformat($(tr).find('input.nominal_bayar_hutang').val())) );
+                $('.faktur_hutang[data-faktur="'+faktur_kode+'"]').find('.bayar').text( numeral.formatDec(numeral.unformat($(tr).find('input.nominal_bayar_hutang').val())) );
 
                 dataHutangBayar.push( _dataHutangBayar );
             } else {
@@ -704,7 +711,7 @@ var bayar = {
 
         total_tagihan += tagihan;
 
-        $('input.total_tagihan').val( numeral.formatInt(total_tagihan) );
+        $('input.total_tagihan').val( numeral.formatDec(total_tagihan) );
 
         bayar.hitungTotalBayar();
     }, // end - hitungTotalTagihan
@@ -723,12 +730,21 @@ var bayar = {
         });
 
         var kembalian = 0;
-        var total_belanja = numeral.unformat( $('.tot_belanja').find('label').text() );
+        // var total_belanja = numeral.unformat( $('.tot_belanja').find('label').text() );
+
+        var total_belanja = 0;
+        $.map( $('tr.menu'), function (tr) {
+            var _total = numeral.unformat( $(tr).find('td.total label').text() );
+
+            total_belanja += parseFloat(_total);
+        });
+        $('.tot_belanja').find('label').text( numeral.formatDec(total_belanja) );
+
         var total_ppn = numeral.unformat( $('.ppn').find('label').text() );
         var total_service_charge = numeral.unformat( $('.service_charge').find('label').text() );
         var total_diskon = numeral.unformat( $('.diskon').val() );
         var tagihan = (total_belanja + total_ppn + total_service_charge );
-        $('.tagihan').val( numeral.formatInt(tagihan) );
+        $('.tagihan').val( numeral.formatDec(tagihan) );
         var total_tagihan = tagihan - total_diskon;
 
         total_tagihan = (total_tagihan > 0 ) ? total_tagihan : 0;
@@ -737,7 +753,7 @@ var bayar = {
 
         $('.data .hutang').attr('data-val', hutang);
         $('.data .hutang').text( numeral.formatDec(hutang) );
-        $('.total_tagihan').val( numeral.formatInt(total_tagihan) );
+        $('.total_tagihan').val( numeral.formatDec(total_tagihan) );
 
         $('.nota_diskon').attr('data-val', total_diskon);
         $('.nota_diskon').text( '('+numeral.formatDec(total_diskon)+')' );
@@ -748,27 +764,26 @@ var bayar = {
         if ( dataMetodeBayar.length > 0 ) {
             for (var i = 0; i < dataMetodeBayar.length; i++) {
                 if ( !empty(dataMetodeBayar[i]) ) {
-                    total_bayar += parseInt(dataMetodeBayar[i].jumlah);
+                    total_bayar += parseFloat(dataMetodeBayar[i].jumlah);
                 }
             }
         }
 
-
         var _total_bayar = (total_bayar < 0) ? 0 : total_bayar;
         kembalian = (total_bayar < 0) ? 0 : ((total_bayar - total_tagihan < 0) ? 0 : total_bayar - total_tagihan);
 
-        $('.total_bayar').val( numeral.formatInt(_total_bayar) );
+        $('.total_bayar').val( numeral.formatDec(_total_bayar) );
         $('div.data').find('.jml_bayar').text( numeral.formatDec(_total_bayar) );
         $('div.data').find('.jml_bayar').attr('data-val', _total_bayar);
 
         if ( kembalian > 0 ) {
             // $('.kembalian').val( numeral.formatInt(kembalian) );
-            $('input.kembalian').val( numeral.formatInt(kembalian) );
+            $('input.kembalian').val( numeral.formatDec(kembalian) );
             $('.data .kembalian').text( numeral.formatDec(kembalian) );
             $('.data .kembalian').attr('data-val', kembalian);
         } else {
-            // $('.kembalian').val( numeral.formatInt(0) );
-            $('input.kembalian').val( numeral.formatInt(0) );
+            // $('.kembalian').val( numeral.formatDec(0) );
+            $('input.kembalian').val( numeral.formatDec(0) );
             $('.data .kembalian').text( numeral.formatDec(0) );
             $('.data .kembalian').attr('data-val', 0);
         }
@@ -784,7 +799,7 @@ var bayar = {
 
         sisa_tagihan = (total_tagihan <= total_bayar) ? 0 : total_tagihan - total_bayar;
 
-        $('input.sisa_tagihan').val( numeral.formatInt(sisa_tagihan) );
+        $('input.sisa_tagihan').val( numeral.formatDec(sisa_tagihan) );
 
         bayar.hitKategoriPembayaran();
     }, // end - hitungSisaTagihan
@@ -792,7 +807,7 @@ var bayar = {
     cekNominalBayarHutang: function(elm) {
         var nominal_bayar_hutang = numeral.unformat($(elm).val());
 
-        $(elm).attr( 'value', numeral.formatInt( nominal_bayar_hutang ) );
+        $(elm).attr( 'value', numeral.formatDec( nominal_bayar_hutang ) );
 
         var hutang = $(elm).attr('data-val');
         var jenis_kartu = $(elm).attr('data-jk');
@@ -804,18 +819,18 @@ var bayar = {
 
             if ( jumlah > saldo ) {
                 bootbox.alert('Nominal yang anda masukkan melebihi saldo, harap cek kembali nominal yang anda inputkan.', function() {
-                    $(elm).val( numeral.formatInt(0) );
+                    $(elm).val( numeral.formatDec(0) );
                 });
             } else {
                 var sisa_saldo = saldo - jumlah;
 
-                $(div_saldo_member).find('input.sisa_saldo').val( numeral.formatInt(sisa_saldo) );
+                $(div_saldo_member).find('input.sisa_saldo').val( numeral.formatDec(sisa_saldo) );
             }
         } else {
             // if ( !empty(jenis_kartu) ) {
                 if ( nominal_bayar_hutang > hutang ) {
-                    bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatInt(hutang)+',00</b>', function() {
-                        $(elm).val( numeral.formatInt(hutang) );
+                    bootbox.alert('Nominal yang anda masukkan melebihi hutang sejumlah <b>Rp. '+numeral.formatDec(hutang)+',00</b>', function() {
+                        $(elm).val( numeral.formatDec(hutang) );
                     });
                 } else {
                     bayar.hitungTotalTagihan();
@@ -872,7 +887,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $("input.jml_bayar").focus();
@@ -946,6 +962,7 @@ var bayar = {
         var data = {
             'faktur_kode': $(elm).data('kode'),
             'id': $(elm).data('id'),
+            'harga_hpp': $(elm).attr('data-hargahpp'),
             'diskon': numeral.unformat($('.diskon').val()),
             'jml_tagihan': numeral.unformat($('.total_tagihan').val()),
             'jml_bayar': numeral.unformat($('.total_bayar').val()),
@@ -972,7 +989,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -1024,6 +1042,7 @@ var bayar = {
         var data = {
             'faktur_kode': $(elm).data('kode'),
             'id': $(elm).data('id'),
+            'harga_hpp': $(elm).attr('data-hargahpp'),
             'tot_belanja': numeral.unformat($('.tot_belanja').find('label').text()),
             'ppn': numeral.unformat($('.ppn').find('label').text()),
             'service_charge': numeral.unformat($('.service_charge').find('label').text()),
@@ -1156,7 +1175,25 @@ var bayar = {
     }, // end - penjualanForm
 
     batal: function() {
-        bayar.penjualanForm();
+        var kode_faktur = $('div.kode_faktur').attr('data-val');
+        var harga_hpp = 0;
+        if ( dataDiskonOld.length > 0 ) {
+            for (var i = 0; i < dataDiskonOld.length; i++) {
+                if ( !empty(dataDiskonOld[i]) ) {
+                    if ( dataDiskonOld[i].harga_hpp == 1 ) {
+                        harga_hpp = 1;
+                    }
+                }
+            }
+        }
+
+        bayar.updatePenjualan(kode_faktur, harga_hpp, 'batal');
+
+        // if ( jml_diskon == 0 ) {
+        //     bayar.penjualanForm();
+        // } else {
+        //     bootbox.alert('Masih ada diskon yang terpasang.');
+        // }
     }, // end - batal
 
     saveHutang: function(elm) {
@@ -1250,7 +1287,14 @@ var bayar = {
 
                     if ( !empty(data.content.dataDiskon) ) {
                         for (var i = 0; i < data.content.dataDiskon.length; i++) {
-                            dataDiskon[ i ] = data.content.dataDiskon[i].diskon_kode;
+                            dataDiskon[ i ] = {
+                                'diskon_kode': data.content.dataDiskon[i].diskon_kode,
+                                'harga_hpp': data.content.dataDiskon[i].harga_hpp
+                            };
+                            dataDiskonOld[ i ] = {
+                                'diskon_kode': data.content.dataDiskon[i].diskon_kode,
+                                'harga_hpp': data.content.dataDiskon[i].harga_hpp
+                            };
                         }
 
                         dataDiskonSave = data.content.dataDiskon;
@@ -1329,7 +1373,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -1472,7 +1517,8 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -1512,12 +1558,21 @@ var bayar = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
 
-                $('.tbl_diskon').find('tr.data').attr('data-aktif', 0);
+                if ( dataDiskon.length > 0 ) {
+                    for (var i = 0; i < dataDiskon.length; i++) {
+                        if ( !empty(dataDiskon[i]) ) {
+                            $('.tbl_diskon').find('tr.data[data-kode='+dataDiskon[i].diskon_kode+']').attr('data-aktif', 1);
+                        }
+                    }
+                }
+
+                // $('.tbl_diskon').find('tr.data').attr('data-aktif', 0);
             });
         },'html');
     }, // end - modalDiskon
@@ -1540,31 +1595,68 @@ var bayar = {
         dataDiskonSave = null;
 
         var idx = 0;
-        $.map( $('.tbl_diskon').find('tr.data[data-aktif=1]'), function (tr) {
-            dataDiskon[ idx ] = $(tr).attr('data-kode');
+        $.map( $('.tbl_diskon').find('tr.data[data-aktif="1"]'), function (tr) {
+            dataDiskon[ idx ] = {
+                'diskon_kode': $(tr).attr('data-kode'),
+                'harga_hpp': $(tr).attr('data-hargahpp')
+            };
 
             idx++;
         });
 
+        var harga_hpp = 0;
+        if ( $('.tbl_diskon').find('tr.data[data-aktif="1"][data-hargahpp="1"]').length > 0 ) {
+            harga_hpp = 1;
+        }
+
+        bayar.updatePenjualan( kodeFaktur, harga_hpp );
+
         if ( dataDiskon.length > 0 ) {
-            bayar.getDataDiskon( kodeFaktur );
+            // bayar.getDataDiskon( kodeFaktur );
         } else {
             bayar.hitungTotalBayar();
         }
 
         $('.modal').modal('hide');
+        $('.modal').remove();
     }, // end - applyDiskon
 
+    updatePenjualan: function (kodeFaktur, harga_hpp, batal = null) {
+        var url = window.location.href;
+        var _url = url.split("/")[6];
+
+        var params = {
+            'kode_faktur': kodeFaktur,
+            'harga_hpp': harga_hpp,
+            'url': _url
+        };
+
+        $.ajax({
+            url: 'transaksi/Pembayaran/updatePenjualan',
+            data: {
+                'params': params
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading(); },
+            success: function(data) {
+                hideLoading();
+
+                if ( data.status == 1 ) {
+                    if ( empty(batal) ) {
+                        $('div.main').html( data.html );
+                        bayar.getDataDiskon( kodeFaktur );
+                    } else {
+                        bayar.penjualanForm();
+                    }
+                } else {
+                    bootbox.alert(data.message);
+                }
+            }
+        });
+    }, // end - updatePenjualan
+
     getDataDiskon: function (kodeFaktur) {
-        // var metodeBayar = [];
-        // for (var i = 0; i < dataMetodeBayar.length; i++) {
-        //     metodeBayar[i] = {
-
-        //     }dataMetodeBayar[i].kode_jenis_kartu;
-        //     // if ( !empty(dataMetodeBayar[i].kode_jenis_kartu) ) {
-        //     // }
-        // }
-
         var params = {
             'kode_faktur': kodeFaktur,
             'data_diskon': dataDiskon,
@@ -1583,7 +1675,7 @@ var bayar = {
                 hideLoading();
 
                 if ( data.status == 1 ) {
-                    $('.diskon').val( numeral.formatInt( data.content.total_diskon ) );
+                    $('.diskon').val( numeral.formatDec( data.content.total_diskon ) );
 
                     var ppn = $('.ppn').attr('data-real');
                     var service_charge = $('.service_charge').attr('data-real');

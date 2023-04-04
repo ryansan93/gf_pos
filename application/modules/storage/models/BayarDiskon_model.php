@@ -5,8 +5,8 @@ use \Model\Storage\Conf as Conf;
 class BayarDiskon_model extends Conf {
 	protected $table = 'bayar_diskon';
 
-	public function jenis_kartu()
+	public function diskon()
 	{
-		return $this->hasOne('\Model\Storage\Diskon_model', 'kode_diskon', 'diskon_kode');
+		return $this->hasOne('\Model\Storage\Diskon_model', 'kode', 'diskon_kode');
 	}
 }

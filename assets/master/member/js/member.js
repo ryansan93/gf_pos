@@ -69,7 +69,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -125,7 +126,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.close').on('click', function() {
@@ -159,7 +161,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.close').on('click', function() {
@@ -406,7 +409,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -436,7 +440,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.member').select2();
@@ -470,7 +475,8 @@ var mbr = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.close').on('click', function() {

@@ -84,7 +84,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.button:not(.btn-exit)').click(function() {
@@ -146,7 +147,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -212,7 +214,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.btn-member').click(function() { /* jual.modalMember(); */ mbr.modalMember(); });
@@ -243,7 +246,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -322,7 +326,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -376,7 +381,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.btn-danger').on('click', function() {
@@ -525,7 +531,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var kode_menu = $(elm).data('kode');
@@ -1079,7 +1086,8 @@ var jual = {
                 $(this).find('.modal-dialog').css({'width': '25%', 'max-width': '100%'});
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(modal_dialog).find('.nama_menu').text(nama_menu);
@@ -1163,7 +1171,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_dialog = $(this).find('.modal-dialog');
@@ -1347,7 +1356,8 @@ var jual = {
                     });
 
                     $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                        $(this).priceFormat(Config[$(this).data('tipe')]);
+                        // $(this).priceFormat(Config[$(this).data('tipe')]);
+                        priceFormat( $(this) );
                     });
 
                     $(this).find('.btn-privilege').click(function() { 
@@ -1589,7 +1599,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 if ( !empty(kode_member) ) {
@@ -1631,7 +1642,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 var modal_body = $(this).find('.modal-body');
@@ -1702,7 +1714,8 @@ var jual = {
                 });
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(this).find('.btn-jenis-kartu').click(function() {
@@ -1735,7 +1748,8 @@ var jual = {
                 $(this).find('.modal-dialog').css({'width': '25%', 'max-width': '100%'});
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(modal_dialog).find('.jumlah').text(0);
@@ -1799,7 +1813,8 @@ var jual = {
                 $(this).find('.modal-dialog').css({'width': '25%', 'max-width': '100%'});
 
                 $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                    $(this).priceFormat(Config[$(this).data('tipe')]);
+                    // $(this).priceFormat(Config[$(this).data('tipe')]);
+                    priceFormat( $(this) );
                 });
 
                 $(modal_dialog).find('.jumlah').text(0);
@@ -1981,7 +1996,8 @@ var jual = {
     //                     });
 
     //                     $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-    //                         $(this).priceFormat(Config[$(this).data('tipe')]);
+                            // $(this).priceFormat(Config[$(this).data('tipe')]);
+                            // priceFormat( $(this) );
     //                     });
 
     //                     var modal_body = $(this).find('.modal-body');
@@ -2067,7 +2083,8 @@ var jual = {
                         });
 
                         $('[data-tipe=integer],[data-tipe=angka],[data-tipe=decimal]').each(function(){
-                            $(this).priceFormat(Config[$(this).data('tipe')]);
+                            // $(this).priceFormat(Config[$(this).data('tipe')]);
+                            priceFormat( $(this) );
                         });
 
                         $(this).find('.btn-cancel').click(function() { 

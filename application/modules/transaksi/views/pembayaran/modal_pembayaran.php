@@ -27,7 +27,7 @@
 											<div class="col-xs-12 no-padding"><?php echo !empty($value['nama_kartu']) ? $value['nama_kartu'] : ''; ?></div>
 										<?php endif ?>
 									</td>
-									<td class="text-right"><?php echo angkaRibuan($value['jumlah']); ?></td>
+									<td class="text-right"><?php echo angkaDecimal($value['jumlah']); ?></td>
 									<td class="text-right">
 										<button type="button" class="col-xs-12 btn btn-danger" onclick="bayar.hapusMetodePembayaran(this)" data-id="<?php echo $key; ?>" data-kode="<?php echo isset($data['faktur_kode']) ? $data['faktur_kode'] : null; ?>"><i class="fa fa-times"></i></button>
 									</td>
@@ -50,13 +50,13 @@
 			<div class="col-md-6 no-padding cb_left">
 				<div class="col-md-12 no-padding"><label class="control-label">DISKON</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="<?php echo angkaRibuan($data['diskon']); ?>" readonly>
+					<input type="text" class="form-control text-right diskon" placeholder="DISKON" data-tipe="integer" value="<?php echo angkaDecimal($data['diskon']); ?>" readonly>
 				</div>
 			</div>
 			<div class="col-md-6 no-padding cb_right">
 				<div class="col-md-12 no-padding"><label class="control-label">TOTAL TAGIHAN</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right total_tagihan" placeholder="TOTAL" data-tipe="integer" value="<?php echo angkaRibuan($data['jml_tagihan']); ?>" readonly>
+					<input type="text" class="form-control text-right total_tagihan" placeholder="TOTAL" data-tipe="integer" value="<?php echo angkaDecimal($data['jml_tagihan']); ?>" readonly>
 				</div>
 			</div>
 		</div>
@@ -64,14 +64,14 @@
 			<div class="col-md-6 no-padding cb_left">
 				<div class="col-md-12 no-padding"><label class="control-label">TOTAL BAYAR</label></div>
 				<div class="col-md-12 no-padding">
-					<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaRibuan($total_bayar); ?>" readonly>
+					<input type="text" class="form-control text-right total_bayar" placeholder="TOTAL BAYAR" data-tipe="integer" value="<?php echo angkaDecimal($total_bayar); ?>" readonly>
 				</div>
 			</div>
 			<div class="col-md-6 no-padding cb_right">
 				<div class="col-md-12 no-padding"><label class="control-label">KEMBALIAN</label></div>
 				<div class="col-md-12 no-padding">
 					<?php $kembalian = (($total_bayar - $data['jml_tagihan']) < 0) ? 0 : $total_bayar - $data['jml_tagihan']; ?>
-					<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaRibuan($kembalian); ?>" readonly>
+					<input type="text" class="form-control text-right kembalian" placeholder="KEMBALIAN" data-tipe="integer" value="<?php echo angkaDecimal($kembalian); ?>" readonly>
 				</div>
 			</div>
 		</div>
@@ -82,7 +82,7 @@
 			<button type="button" class="col-xs-12 btn btn-danger" class="close" data-dismiss="modal"><i class="fa fa-times"></i> BATAL</button>
 		</div>
 		<div class="col-xs-6 no-padding cb_right">
-			<button type="button" class="col-xs-12 btn-proses btn btn-primary" data-kode="<?php echo isset($data['faktur_kode']) ? $data['faktur_kode'] : null; ?>" data-id="<?php echo isset($data['id']) ? $data['id'] : null; ?>" onclick="bayar.savePembayaran(this)"><i class="fa fa-save"></i> PROSES</button>
+			<button type="button" class="col-xs-12 btn-proses btn btn-primary" data-kode="<?php echo isset($data['faktur_kode']) ? $data['faktur_kode'] : null; ?>" data-id="<?php echo isset($data['id']) ? $data['id'] : null; ?>" data-hargahpp="<?php echo isset($data['harga_hpp']) ? $data['harga_hpp'] : null; ?>" onclick="bayar.savePembayaran(this)"><i class="fa fa-save"></i> PROSES</button>
 		</div>
 	</div>
 </div>

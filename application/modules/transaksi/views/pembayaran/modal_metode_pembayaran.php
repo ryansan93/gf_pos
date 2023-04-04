@@ -9,13 +9,13 @@
 				<div class="col-xs-6 no-padding cb_left">
 					<div class="col-xs-12 no-padding"><label class="label-control">SALDO MEMBER</label></div>
 					<div class="col-xs-12 no-padding">
-						<input type="text" class="form-control text-right saldo" placeholder="SALDO" value="<?php echo angkaRibuan($saldo_member); ?>" disabled>
+						<input type="text" class="form-control text-right saldo" placeholder="SALDO" value="<?php echo angkaDecimal($saldo_member); ?>" disabled>
 					</div>
 				</div>
 				<div class="col-xs-6 no-padding cb_right">
 					<div class="col-xs-12 no-padding"><label class="label-control">SISA SALDO</label></div>
 					<div class="col-xs-12 no-padding">
-						<input type="text" class="form-control text-right sisa_saldo" placeholder="SISA SALDO" value="<?php echo angkaRibuan($saldo_member); ?>" disabled>
+						<input type="text" class="form-control text-right sisa_saldo" placeholder="SISA SALDO" value="<?php echo angkaDecimal($saldo_member); ?>" disabled>
 					</div>
 				</div>
 			</div>
@@ -26,7 +26,7 @@
 		<div class="col-xs-6 no-padding cb_left">
 			<div class="col-xs-12 no-padding"><label class="label-control">SISA TAGIHAN</label></div>
 			<div class="col-xs-12 no-padding">
-				<input type="text" class="form-control text-right total" value="<?php echo angkaRibuan($data['sisa_tagihan']); ?>" readonly>
+				<input type="text" class="form-control text-right total" value="<?php echo angkaDecimal($data['sisa_tagihan']); ?>" readonly>
 			</div>
 		</div>
 		<div class="col-xs-6 no-padding cb_right">
@@ -40,7 +40,7 @@
 						}
 					}
 				?>
-				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaRibuan($jumlah); ?>" data-tipe="integer" data-val="<?php echo $jumlah; ?>" data-jk="<?php echo $data['kode_jenis_kartu']; ?>" onkeyup="bayar.cekNominalBayarHutang(this)" <?php echo ($data['cl'] == 1) ? 'readonly' : null; ?> >
+				<input type="text" class="form-control text-right jml_bayar" value="<?php echo angkaDecimal($jumlah); ?>" data-tipe="integer" data-val="<?php echo $jumlah; ?>" data-jk="<?php echo $data['kode_jenis_kartu']; ?>" onkeyup="bayar.cekNominalBayarHutang(this)" <?php echo ($data['cl'] == 1) ? 'readonly' : null; ?> >
 			</div>
 		</div>
 	</div>

@@ -56,7 +56,7 @@
                                         <?php echo $v_det['jumlah']; ?>
                                     </div>
                                     <div class="col-xs-3 no-padding text-right">
-                                        <?php echo angkaRibuan($v_det['total']); ?>
+                                        <?php echo angkaDecimal($v_det['total']); ?>
                                     </div>
                                 </div>
                             <?php endforeach ?>

@@ -20,7 +20,16 @@
 							<tbody>
 								<?php if ( !empty($data) ): ?>
 									<?php foreach ($data as $key => $value): ?>
-										<tr class="cursor-p data" onclick="bayar.pilihDiskon(this)" data-aktif="0" data-kode="<?php echo $value['kode']; ?>">
+										<?php
+											$aktif = 0;
+											// if ( !empty($data_diskon_aktif) ) {
+											// 	if ( in_array($value['kode'], $data_diskon_aktif) ) {
+											// 		$aktif = 1;
+											// 	}
+											// }
+										?>
+
+										<tr class="cursor-p data" onclick="bayar.pilihDiskon(this)" data-aktif="<?php echo $aktif; ?>" data-kode="<?php echo $value['kode']; ?>" data-hargahpp="<?php echo $value['harga_hpp']; ?>">
 											<td class="col-xs-2 text-left kode"><?php echo $value['kode']; ?></td>
 											<td class="col-xs-4 text-left nama"><?php echo $value['nama']; ?></td>
 											<td class="col-xs-6 text-left"><?php echo $value['deskripsi']; ?></td>

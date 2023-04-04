@@ -3,7 +3,33 @@
  * @author: mursito&prends <02-04@mitraunggassejati.com>
  *
  */
+function priceFormat(elm) {
+    var _angka = $(elm);
 
+    if (typeof $(elm).data('angka') !== 'undefined') {
+        _angka.on('keyup', function(e) {
+            _angka.val( formatRupiah($(this).val()) );
+        });
+        
+        /* Fungsi */
+        function formatRupiah(angka, prefix)
+        {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split       = number_string.split(','),
+                sisa        = split[0].length % 3,
+                rupiah      = split[0].substr(0, sisa),
+                ribuan      = split[0].substr(sisa).match(/\d{3}/gi);
+                
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+    }
+}
 
 function number_only(e) {
     var pola = "^";
