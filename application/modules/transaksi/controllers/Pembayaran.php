@@ -705,11 +705,11 @@ class Pembayaran extends Public_Controller
                 (select * from bayar where mstatus = 1) b
                 on
                     j.kode_faktur = b.faktur_kode
-            right join
+            left join
                 branch brc
                 on
                     j.branch = brc.kode_branch
-            right join
+            left join
                 pesanan p
                 on
                     j.pesanan_kode = p.kode_pesanan
@@ -739,15 +739,15 @@ class Pembayaran extends Public_Controller
             $m_juali = new \Model\Storage\JualItem_model();
             $sql_juali = "
                 select ji.*, jp.nama as jp_nama, jp.kode as jp_kode, hm.harga as harga_jual from jual_item ji
-                right join
+                left join
                     jenis_pesanan jp
                     on
                         ji.kode_jenis_pesanan = jp.kode
-                right join
+                left join
                     menu m
                     on
                         m.kode_menu = ji.menu_kode
-                right join
+                left join
                     harga_menu hm
                     on
                         m.kode_menu = hm.menu_kode and
@@ -858,15 +858,15 @@ class Pembayaran extends Public_Controller
                     $m_jualig = new \Model\Storage\JualItem_model();
                     $sql_jualig = "
                         select ji.*, jp.nama as jp_nama, jp.kode as jp_kode, hm.harga as harga_jual from jual_item ji
-                        right join
+                        left join
                             jenis_pesanan jp
                             on
                                 ji.kode_jenis_pesanan = jp.kode
-                        right join
+                        left join
                             menu m
                             on
                                 m.kode_menu = ji.menu_kode
-                        right join
+                        left join
                             harga_menu hm
                             on
                                 m.kode_menu = hm.menu_kode and
@@ -1838,11 +1838,11 @@ class Pembayaran extends Public_Controller
                 ) b
                 on
                     j.kode_faktur = b.faktur_kode
-            right join
+            left join
                 branch brc
                 on
                     j.branch = j.branch
-            right join
+            left join
                 pesanan p
                 on
                     j.pesanan_kode = p.kode_pesanan
@@ -1872,15 +1872,15 @@ class Pembayaran extends Public_Controller
             $m_juali = new \Model\Storage\JualItem_model();
             $sql_juali = "
                 select ji.*, jp.nama as jp_nama, jp.kode as jp_kode, hm.harga as harga_jual from jual_item ji
-                right join
+                left join
                     jenis_pesanan jp
                     on
                         ji.kode_jenis_pesanan = jp.kode
-                right join
+                left join
                     menu m
                     on
                         m.kode_menu = ji.menu_kode
-                right join
+                left join
                     harga_menu hm
                     on
                         m.kode_menu = hm.menu_kode and
@@ -1991,15 +1991,15 @@ class Pembayaran extends Public_Controller
                     $m_jualig = new \Model\Storage\JualItem_model();
                     $sql_jualig = "
                         select ji.*, jp.nama as jp_nama, jp.kode as jp_kode, hm.harga as harga_jual from jual_item ji
-                        right join
+                        left join
                             jenis_pesanan jp
                             on
                                 ji.kode_jenis_pesanan = jp.kode
-                        right join
+                        left join
                             menu m
                             on
                                 m.kode_menu = ji.menu_kode
-                        right join
+                        left join
                             harga_menu hm
                             on
                                 m.kode_menu = hm.menu_kode and
