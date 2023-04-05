@@ -748,11 +748,18 @@ class Pembayaran extends Public_Controller
                     on
                         m.kode_menu = ji.menu_kode
                 left join
-                    harga_menu hm
+                    (
+                        select hm1.* from harga_menu hm1
+                        right join
+                            (
+                                select max(id) as id, max(tgl_mulai) as tgl_mulai from harga_menu where tgl_mulai <= GETDATE() group by menu_kode, jenis_pesanan_kode
+                            ) hm2
+                            on
+                                hm1.id = hm2.id
+                    ) hm
                     on
                         m.kode_menu = hm.menu_kode and
-                        jp.kode = hm.jenis_pesanan_kode and
-                        hm.tgl_mulai <= GETDATE()
+                        jp.kode = hm.jenis_pesanan_kode
                 where
                     ji.faktur_kode = '".$d_jual[0]['kode_faktur']."'
             ";
@@ -867,11 +874,18 @@ class Pembayaran extends Public_Controller
                             on
                                 m.kode_menu = ji.menu_kode
                         left join
-                            harga_menu hm
+                            (
+                                select hm1.* from harga_menu hm1
+                                right join
+                                    (
+                                        select max(id) as id, max(tgl_mulai) as tgl_mulai from harga_menu where tgl_mulai <= GETDATE() group by menu_kode, jenis_pesanan_kode
+                                    ) hm2
+                                    on
+                                        hm1.id = hm2.id
+                            ) hm
                             on
                                 m.kode_menu = hm.menu_kode and
-                                jp.kode = hm.jenis_pesanan_kode and
-                                hm.tgl_mulai <= GETDATE()
+                                jp.kode = hm.jenis_pesanan_kode
                         where
                             ji.faktur_kode = '".$v_jg['faktur_kode_gabungan']."'
                     ";
@@ -1613,11 +1627,18 @@ class Pembayaran extends Public_Controller
                         on
                             m.kode_menu = ji.menu_kode
                     right join
-                        harga_menu hm
+                        (
+                            select hm1.* from harga_menu hm1
+                            right join
+                                (
+                                    select max(id) as id, max(tgl_mulai) as tgl_mulai from harga_menu where tgl_mulai <= GETDATE() group by menu_kode, jenis_pesanan_kode
+                                ) hm2
+                                on
+                                    hm1.id = hm2.id
+                        ) hm
                         on
                             m.kode_menu = hm.menu_kode and
-                            jp.kode = hm.jenis_pesanan_kode and
-                            hm.tgl_mulai <= GETDATE()
+                            jp.kode = hm.jenis_pesanan_kode
                     right join
                         (
                             select * from (
@@ -1881,11 +1902,18 @@ class Pembayaran extends Public_Controller
                     on
                         m.kode_menu = ji.menu_kode
                 left join
-                    harga_menu hm
+                    (
+                        select hm1.* from harga_menu hm1
+                        right join
+                            (
+                                select max(id) as id, max(tgl_mulai) as tgl_mulai from harga_menu where tgl_mulai <= GETDATE() group by menu_kode, jenis_pesanan_kode
+                            ) hm2
+                            on
+                                hm1.id = hm2.id
+                    ) hm
                     on
                         m.kode_menu = hm.menu_kode and
-                        jp.kode = hm.jenis_pesanan_kode and
-                        hm.tgl_mulai <= GETDATE()
+                        jp.kode = hm.jenis_pesanan_kode
                 where
                     ji.faktur_kode = '".$d_jual[0]['kode_faktur']."'
             ";
@@ -2000,11 +2028,18 @@ class Pembayaran extends Public_Controller
                             on
                                 m.kode_menu = ji.menu_kode
                         left join
-                            harga_menu hm
+                            (
+                                select hm1.* from harga_menu hm1
+                                right join
+                                    (
+                                        select max(id) as id, max(tgl_mulai) as tgl_mulai from harga_menu where tgl_mulai <= GETDATE() group by menu_kode, jenis_pesanan_kode
+                                    ) hm2
+                                    on
+                                        hm1.id = hm2.id
+                            ) hm
                             on
                                 m.kode_menu = hm.menu_kode and
-                                jp.kode = hm.jenis_pesanan_kode and
-                                hm.tgl_mulai <= GETDATE()
+                                jp.kode = hm.jenis_pesanan_kode
                         where
                             ji.faktur_kode = '".$v_jg['faktur_kode_gabungan']."'
                     ";
