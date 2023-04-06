@@ -1764,8 +1764,10 @@ class Penjualan extends Public_Controller
         $pin = $this->input->post('pin');
 
         try {
+            $idFitur = getIdFitur( $this->current_base_uri );
+            
             $m_po = new \Model\Storage\PinOtorisasi_model();
-            $d_po = $m_po->where('pin', $pin)->where('status', 1)->first();
+            $d_po = $m_po->where('pin', $pin)->where('id_detfitur', $idFitur)->where('status', 1)->first();
 
             if ( $d_po ) {
                 $this->result['status'] = 1;
@@ -2705,16 +2707,21 @@ class Penjualan extends Public_Controller
 
         // cetak_r($data);
 
-        $out = '';
-        $err = '';
+        // $out = '';
+        // $err = '';
 
-        exec("cd assets\websocket\server && node index.js 2>&1", $out, $err);
+        // exec("cd assets\websocket\server && node index.js 2>&1", $out, $err);
 
-        echo "<pre>";
-        print_r($out);
-        echo "</pre>";
-        echo "<pre>";
-        print_r($err);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($out);
+        // echo "</pre>";
+        // echo "<pre>";
+        // print_r($err);
+        // echo "</pre>";
+
+        $idFitur = getIdFitur( $this->current_base_uri );
+
+        cetak_r( substr($this->current_base_uri, 1) );
+        cetak_r( $idFitur );
     }
 }
