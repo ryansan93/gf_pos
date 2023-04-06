@@ -847,7 +847,7 @@ class Pembayaran extends Public_Controller
             $sql_jg = "
                 select jg.faktur_kode_gabungan, j.member, j.kode_member, j.total, j.diskon, j.grand_total, j.ppn, j.service_charge from jual_gabungan jg
                 right join
-                    (select * from jual where mstatus = 1) j
+                    (select * from jual) j
                     on
                         jg.faktur_kode_gabungan = j.kode_faktur
                 where
@@ -2001,7 +2001,7 @@ class Pembayaran extends Public_Controller
             $sql_jg = "
                 select jg.faktur_kode_gabungan, j.member, j.kode_member, j.total, j.diskon, j.grand_total, j.ppn, j.service_charge from jual_gabungan jg
                 right join
-                    (select * from jual where mstatus = 1) j
+                    (select * from jual) j
                     on
                         jg.faktur_kode_gabungan = j.kode_faktur
                 where
@@ -3133,7 +3133,7 @@ class Pembayaran extends Public_Controller
                 foreach ($d_jual_gabungan as $key => $value) {
                     $m_jual = new \Model\Storage\Jual_model();
                     $m_jual->where('kode_faktur', $value['faktur_kode_gabungan'])->update(
-                        array('mstatus', 1)
+                        array('mstatus' => 1)
                     );
                 }
                 
@@ -3150,7 +3150,7 @@ class Pembayaran extends Public_Controller
 
                     $m_jual = new \Model\Storage\Jual_model();
                     $m_jual->where('kode_faktur', $value['kode_faktur'])->update(
-                        array('mstatus', 0)
+                        array('mstatus' => 0)
                     );
 
                     $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
@@ -3168,7 +3168,7 @@ class Pembayaran extends Public_Controller
 
                             $m_jual = new \Model\Storage\Jual_model();
                             $m_jual->where('kode_faktur', $v_jg['kode_faktur'])->update(
-                                array('mstatus', 0)
+                                array('mstatus' => 0)
                             );
                         }
 
