@@ -65,7 +65,7 @@ class ClosingOrder extends Public_Controller
         // }
     }
 
-    public function mappingDataSales($user_id = null, $branch_kode = null)
+    public function mappingDataSales($user_id = null, $branch_kode = null, $jenis = null)
     {
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
@@ -75,17 +75,17 @@ class ClosingOrder extends Public_Controller
         // $start_date = '2023-01-23 00:00:01';
         // $end_date = '2023-01-23 23:59:59';
 
-        $sql_user = null;
-        $sql_user_select = null;
-        $sql_user_group_by = null;
-        if ( !empty($user_id) ) {
-            $sql_user = "and p.user_id = '".$user_id."'";
-            $sql_user_select = "p.user_id, p.nama_user,";
-            $sql_user_group_by = "p.user_id, p.nama_user,";
+        $sql_user_sales = "and p.user_id = '".$user_id."'";
+        $sql_user_select_sales = "p.user_id, p.nama_user,";
+        $sql_user_group_by_sales = "p.user_id, p.nama_user,";
+        if ( empty($user_id) && (empty($jenis) && $jenis <> 'end_shift') ) {
+            $sql_user_sales = null;
+            $sql_user_select_sales = null;
+            $sql_user_group_by_sales = null;
         }
         $sql = "
             select
-                ".$sql_user_select."
+                ".$sql_user_select_sales."
                 km.id as id_kategori_menu,
                 km.nama as nama_kategori_menu,
                 ji.menu_nama,
@@ -118,21 +118,21 @@ class ClosingOrder extends Public_Controller
             where
                 b.kode_branch = '".$branch_kode."' and
                 j.tgl_trans between '".$start_date."' and '".$end_date."' and
-                j.mstatus = 1 ".$sql_user."
+                j.mstatus = 1 ".$sql_user_sales."
             group by
-                ".$sql_user_group_by."
+                ".$sql_user_group_by_sales."
                 km.id,
                 km.nama,
                 ji.menu_nama,
                 ji.menu_kode
         ";
-        $d_data = $m_conf->hydrateRaw( $sql );
+        $d_data_sales = $m_conf->hydrateRaw( $sql );
 
         $data_sales = null;
-        if ( $d_data->count() > 0 ) {
-            $d_data = $d_data->toArray();
+        if ( $d_data_sales->count() > 0 ) {
+            $d_data_sales = $d_data_sales->toArray();
 
-            foreach ($d_data as $k_data => $v_data) {
+            foreach ($d_data_sales as $k_data => $v_data) {
                 if ( !empty($user_id) ) {
                     $data_sales[ $v_data['user_id'] ]['user_id'] = $v_data['user_id'];
                     $data_sales[ $v_data['user_id'] ]['nama'] = $v_data['nama_user'];
@@ -147,13 +147,13 @@ class ClosingOrder extends Public_Controller
             }
         }
 
-        $sql_user = null;
-        $sql_user_select = null;
-        $sql_user_group_by = null;
-        if ( !empty($user_id) ) {
-            $sql_user = "and j.kasir = '".$user_id."'";
-            $sql_user_select = "j.kasir, j.nama_kasir,";
-            $sql_user_group_by = "j.kasir, j.nama_kasir,";
+        $sql_user = "and j.kasir = '".$user_id."'";
+        $sql_user_select = "j.kasir, j.nama_kasir,";
+        $sql_user_group_by = "j.kasir, j.nama_kasir,";
+        if ( empty($user_id) && (empty($jenis) && $jenis <> 'end_shift') ) {
+            $sql_user = null;
+            $sql_user_select = null;
+            $sql_user_group_by = null;
         }
         $sql = "
             select
@@ -191,13 +191,13 @@ class ClosingOrder extends Public_Controller
                 bd.kode_jenis_kartu,
                 bd.jenis_bayar
         ";
-        $d_data = $m_conf->hydrateRaw( $sql );
+        $d_data_cashier = $m_conf->hydrateRaw( $sql );
 
         $data_cashier = null;
-        if ( $d_data->count() > 0 ) {
-            $d_data = $d_data->toArray();
+        if ( $d_data_cashier->count() > 0 ) {
+            $d_data_cashier = $d_data_cashier->toArray();
 
-            foreach ($d_data as $k_data => $v_data) {
+            foreach ($d_data_cashier as $k_data => $v_data) {
                 if ( !empty($user_id) ) {
                     $data_cashier[ $v_data['kasir'] ]['user_id'] = $v_data['kasir'];
                     $data_cashier[ $v_data['kasir'] ]['nama'] = $v_data['nama_kasir'];
@@ -234,8 +234,11 @@ class ClosingOrder extends Public_Controller
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
 
-        $start_date = $now['tanggal'].' 00:00:00';
-        $end_date = $now['tanggal'].' 23:59:59';
+        // $tanggal = '2023-04-05';
+        $tanggal = $now['tanggal'];
+
+        $start_date = $tanggal.' 00:00:00';
+        $end_date = $tanggal.' 23:59:59';
 
         // $sql_sales_total = "
         //     select
@@ -347,16 +350,34 @@ class ClosingOrder extends Public_Controller
 
         $sql_discount = "
             select
-                sum(b.diskon) as total
-            from jual j
-            right join
-                bayar b
-                on
-                    j.kode_faktur = b.faktur_kode
-            where
-                j.branch = '".$branch_kode."' and
-                j.mstatus = 1 and
-                j.tgl_trans between '".$start_date."' and '".$end_date."'
+                sum(nilai) as total
+            from
+            (
+                select
+                    b.id,
+                    b.faktur_kode,
+                    b.mstatus,
+                    b.diskon,
+                    case
+                        when b.jml_tagihan >= bd.nilai then
+                            bd.nilai
+                        else
+                            b.total
+                    end as nilai
+                from jual j
+                right join
+                    bayar b
+                    on
+                        j.kode_faktur = b.faktur_kode
+                right join
+                    bayar_diskon bd
+                    on
+                        bd.id_header = b.id
+                where
+                    j.branch = '".$branch_kode."' and
+                    b.mstatus = 1 and
+                    j.tgl_trans between '".$start_date."' and '".$end_date."'
+            ) _data
         ";
         $nilai_discount = 0;
 
@@ -534,7 +555,7 @@ class ClosingOrder extends Public_Controller
             $m_conf = new \Model\Storage\Conf();
             $now = $m_conf->getDate();
 
-            $data = $this->mappingDataSales($this->userid, $this->kodebranch);
+            $data = $this->mappingDataSales($this->userid, $this->kodebranch, 'end_shift');
 
             if ( !empty($data['data_sales']) ) {
                 $data_sales = $data['data_sales'];
@@ -1286,11 +1307,14 @@ class ClosingOrder extends Public_Controller
 
     public function tes()
     {
-        $m_clo = new \Model\Storage\ClosingOrder_model();
-        $now = $m_clo->getDate();
+        // $m_clo = new \Model\Storage\ClosingOrder_model();
+        // $now = $m_clo->getDate();
 
-        $tanggal = substr( $now['waktu'], 0, 10 );
+        // $tanggal = substr( $now['waktu'], 0, 10 );
 
-        cetak_r( $tanggal );
+    // $data = $this->mappingDataSales(null, $this->kodebranch);
+        $dataSalesRecapitulation = $this->dataSalesRecapitulation($this->kodebranch);
+
+        cetak_r( $dataSalesRecapitulation );
     }
 }

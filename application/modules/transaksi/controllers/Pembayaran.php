@@ -3126,7 +3126,19 @@ class Pembayaran extends Public_Controller
             $data = isset($params['data']) ? $params['data'] : null;
 
             $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
-            $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
+            $d_jual_gabungan = $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->get();
+            if ( $d_jual_gabungan->count() > 0 ) {
+                $d_jual_gabungan = $d_jual_gabungan->toArray();
+
+                foreach ($d_jual_gabungan as $key => $value) {
+                    $m_jual = new \Model\Storage\Jual_model();
+                    $m_jual->where('kode_faktur', $value['faktur_kode_gabungan'])->update(
+                        array('mstatus', 1)
+                    );
+                }
+                
+                $m_jual_gabungan->where('faktur_kode', $data_utama['kode_faktur'])->delete();
+            }
 
             if ( !empty($data) ) {
                 foreach ($data as $key => $value) {
@@ -3135,6 +3147,11 @@ class Pembayaran extends Public_Controller
                     $m_jual_gabungan->faktur_kode_gabungan = $value['kode_faktur'];
                     $m_jual_gabungan->jml_tagihan = $value['total'];
                     $m_jual_gabungan->save();
+
+                    $m_jual = new \Model\Storage\Jual_model();
+                    $m_jual->where('kode_faktur', $value['kode_faktur'])->update(
+                        array('mstatus', 0)
+                    );
 
                     $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
                     $d_jual_gabungan = $m_jual_gabungan->where('faktur_kode', $value['kode_faktur'])->get();
@@ -3148,6 +3165,11 @@ class Pembayaran extends Public_Controller
                             $m_jual_gabungan->faktur_kode_gabungan = $v_jg['faktur_kode_gabungan'];
                             $m_jual_gabungan->jml_tagihan = $v_jg['jml_tagihan'];
                             $m_jual_gabungan->save();
+
+                            $m_jual = new \Model\Storage\Jual_model();
+                            $m_jual->where('kode_faktur', $v_jg['kode_faktur'])->update(
+                                array('mstatus', 0)
+                            );
                         }
 
                         $m_jual_gabungan->where('faktur_kode', $value['kode_faktur'])->delete();
