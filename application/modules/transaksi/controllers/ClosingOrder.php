@@ -350,7 +350,7 @@ class ClosingOrder extends Public_Controller
 
         $sql_discount = "
             select
-                sum(nilai) as total
+                sum(diskon) as total
             from
             (
                 select
