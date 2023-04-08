@@ -663,6 +663,20 @@ class Penjualan extends Public_Controller
             $m_pesanan = new \Model\Storage\Pesanan_model();
             $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->with(['pesanan_item'])->first()->toArray();
 
+            $lunas = 0;
+            $mstatus = 1;
+            $utama = 1;
+            $hutang = 0;
+            if ( !empty($kode_faktur_asal) ) {
+                $m_jual = new \Model\Storage\Jual_model();
+                $d_jual = $m_jual->where('kode_faktur', $kode_faktur_asal)->first();
+
+                $lunas = $d_jual->lunas;
+                $mstatus = $d_jual->mstatus;
+                $utama = $d_jual->utama;
+                $hutang = $d_jual->hutang;
+            }
+
             $m_jual = new \Model\Storage\Jual_model();
 
             $now = $m_jual->getDate();
@@ -680,11 +694,11 @@ class Penjualan extends Public_Controller
             $m_jual->service_charge = $d_pesanan['service_charge'];
             $m_jual->ppn = $d_pesanan['ppn'];
             $m_jual->grand_total = $d_pesanan['grand_total'];
-            $m_jual->lunas = 0;
-            $m_jual->mstatus = 1;
+            $m_jual->lunas = $lunas;
+            $m_jual->mstatus = $mstatus;
             $m_jual->pesanan_kode = $kode_pesanan;
-            $m_jual->utama = 1;
-            $m_jual->hutang = 0;
+            $m_jual->utama = $utama;
+            $m_jual->hutang = $hutang;
             $m_jual->kode_faktur_asal = $kode_faktur_asal;
             $m_jual->save();
 
