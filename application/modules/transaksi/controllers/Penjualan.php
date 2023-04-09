@@ -2446,10 +2446,13 @@ class Penjualan extends Public_Controller
                 }
 
                 $m_jual = new \Model\Storage\Jual_model();
-                $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->get();
 
                 $d_jual_aktif = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->first();
 
+                $result = $this->execSavePenjualan( $params, $kode_pesanan, $d_jual_aktif->kode_faktur );
+                $new_kode_faktur = $result['content']['kode_faktur'];
+
+                $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->whereNotIn('kode_faktur', [$new_kode_faktur])->get();
                 if ( $d_jual->count() > 0 ) {
                     $d_jual = $d_jual->toArray();
 
@@ -2464,10 +2467,6 @@ class Penjualan extends Public_Controller
                         'meja_id' => $params['meja_id']
                     )
                 );
-
-                $result = $this->execSavePenjualan( $params, $kode_pesanan, $d_jual_aktif->kode_faktur );
-
-                $new_kode_faktur = $result['content']['kode_faktur'];
 
                 $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
                 Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
