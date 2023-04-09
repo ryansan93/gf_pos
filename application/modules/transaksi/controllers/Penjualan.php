@@ -2450,25 +2450,28 @@ class Penjualan extends Public_Controller
                 $d_jual_aktif = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->first();
 
                 $result = $this->execSavePenjualan( $params, $kode_pesanan, $d_jual_aktif->kode_faktur );
-                $new_kode_faktur = $result['content']['kode_faktur'];
+                if ( $result['status'] == 1 ) {
+                    $new_kode_faktur = $result['content']['kode_faktur'];
 
-                $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->whereNotIn('kode_faktur', [$new_kode_faktur])->orderBy('kode_faktur', 'desc')->first();
-                if ( $d_jual ) {
-                    $d_jual = $d_jual->toArray();
+                    $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->whereNotIn('kode_faktur', [$new_kode_faktur])->orderBy('kode_faktur', 'desc')->first();
+                    if ( $d_jual ) {
+                        $d_jual = $d_jual->toArray();
 
-                    $this->execDeletePenjualan( $d_jual['kode_faktur'] );
+                        $this->execDeletePenjualan( $d_jual['kode_faktur'] );
 
-                    // foreach ($d_jual as $k_jual => $v_jual) {
-                    //     $this->execDeletePenjualan( $v_jual['kode_faktur'] );
-                    // }
+                        // foreach ($d_jual as $k_jual => $v_jual) {
+                        //     $this->execDeletePenjualan( $v_jual['kode_faktur'] );
+                        // }
+                    }
+                    
+                    $m_mejal = new \Model\Storage\MejaLog_model();
+                    $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
+                        array(
+                            'meja_id' => $params['meja_id']
+                        )
+                    );
                 }
 
-                $m_mejal = new \Model\Storage\MejaLog_model();
-                $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
-                    array(
-                        'meja_id' => $params['meja_id']
-                    )
-                );
 
                 $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
                 Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
