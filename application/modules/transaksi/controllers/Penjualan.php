@@ -2364,223 +2364,38 @@ class Penjualan extends Public_Controller
             $kode_pesanan = $params['pesanan_kode'];
             $kode_faktur = $params['faktur_kode'];
 
-            $new_kode_faktur = null;
+            $m_bayar = new \Model\Storage\Bayar_model();
+            $d_bayar = $m_bayar->where('faktur_kode', $kode_faktur)->where('mstatus', 1)->first();
 
-            $m_jual = new \Model\Storage\Jual_model();
-            $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->get();
-
-            if ( $d_jual->count() == 1 ) {
-                $m_pesanan = new \Model\Storage\Pesanan_model();
-                $now = $m_pesanan->getDate();
-
-                $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->first();
-
-                $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
-                    array(
-                        'branch' => $this->kodebranch,
-                        'member' => $params['member'],
-                        'kode_member' => $params['kode_member'],
-                        // 'user_id' => $this->userid,
-                        // 'nama_user' => $this->userdata['detail_user']['nama_detuser'],
-                        'total' => $params['sub_total'],
-                        'diskon' => $params['diskon'],
-                        'service_charge' => $params['service_charge'],
-                        'ppn' => $params['ppn'],
-                        'grand_total' => $params['grand_total'],
-                        'meja_id' => $params['meja_id'],
-                        'mstatus' => 1,
-                        'privilege' => $params['privilege'],
-                    )
-                );
-
-                $m_pesanani = new \Model\Storage\PesananItem_model();
-                $d_pesanani = $m_pesanani->select('kode_pesanan_item')->where('pesanan_kode', $kode_pesanan)->get()->toArray();
-
-                $m_pesananid = new \Model\Storage\PesananItemDetail_model();
-                $m_pesananid->whereIn('pesanan_item_kode', $d_pesanani)->delete();
-                $m_pesanani->where('pesanan_kode', $kode_pesanan)->delete();
-
-                foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
-                    foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
-                        $m_pesanani = new \Model\Storage\PesananItem_model();
-
-                        $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
-                        $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
-                        $m_pesanani->pesanan_kode = $kode_pesanan;
-                        $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
-                        $m_pesanani->menu_nama = $v_lm['nama_menu'];
-                        $m_pesanani->menu_kode = $v_lm['kode_menu'];
-                        $m_pesanani->jumlah = $v_lm['jumlah'];
-                        $m_pesanani->harga = $v_lm['harga'];
-                        $m_pesanani->total = $v_lm['total'];
-                        $m_pesanani->service_charge = $v_lm['service_charge'];
-                        $m_pesanani->ppn = $v_lm['ppn'];
-                        $m_pesanani->request = $v_lm['request'];
-                        $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
-                        $m_pesanani->save();
-
-                        if ( !empty($v_lm['detail_menu']) ) {
-                            foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
-                                $m_pesananid = new \Model\Storage\PesananItemDetail_model();
-                                $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
-                                $m_pesananid->menu_nama = $v_dm['nama_menu'];
-                                $m_pesananid->menu_kode = $v_dm['kode_menu'];
-                                $m_pesananid->jumlah = $v_dm['jumlah'];
-                                $m_pesananid->save();
-                            }
-                        }
-                    }
-                }
-
-                if ( !empty($params['list_diskon']) ) {
-                    $m_pesanand = new \Model\Storage\PesananDiskon_model();
-                    $m_pesanand->where('pesanan_kode', $kode_pesanan)->delete();
-
-                    foreach ($params['list_diskon'] as $k_ld => $v_ld) {
-                        $m_pesanand = new \Model\Storage\PesananDiskon_model();
-                        $m_pesanand->pesanan_kode = $kode_pesanan;
-                        $m_pesanand->diskon_kode = $v_ld['kode_diskon'];
-                        $m_pesanand->diskon_nama = $v_ld['nama_diskon'];
-                        $m_pesanand->save();
-                    }
-                }
+            if ( !$d_bayar ) {
+                $new_kode_faktur = null;
 
                 $m_jual = new \Model\Storage\Jual_model();
+                $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->get();
 
-                $d_jual_aktif = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->first();
+                if ( $d_jual->count() == 1 ) {
+                    $m_pesanan = new \Model\Storage\Pesanan_model();
+                    $now = $m_pesanan->getDate();
 
-                $result = $this->execSavePenjualan( $params, $kode_pesanan, $d_jual_aktif->kode_faktur );
-                if ( $result['status'] == 1 ) {
-                    $new_kode_faktur = $result['content']['kode_faktur'];
+                    $d_pesanan = $m_pesanan->where('kode_pesanan', $kode_pesanan)->first();
 
-                    $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->whereNotIn('kode_faktur', [$new_kode_faktur])->orderBy('kode_faktur', 'desc')->first();
-                    if ( $d_jual ) {
-                        $d_jual = $d_jual->toArray();
-
-                        $this->execDeletePenjualan( $d_jual['kode_faktur'] );
-
-                        // foreach ($d_jual as $k_jual => $v_jual) {
-                        //     $this->execDeletePenjualan( $v_jual['kode_faktur'] );
-                        // }
-                    }
-                    
-                    $m_mejal = new \Model\Storage\MejaLog_model();
-                    $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
+                    $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
                         array(
-                            'meja_id' => $params['meja_id']
+                            'branch' => $this->kodebranch,
+                            'member' => $params['member'],
+                            'kode_member' => $params['kode_member'],
+                            // 'user_id' => $this->userid,
+                            // 'nama_user' => $this->userdata['detail_user']['nama_detuser'],
+                            'total' => $params['sub_total'],
+                            'diskon' => $params['diskon'],
+                            'service_charge' => $params['service_charge'],
+                            'ppn' => $params['ppn'],
+                            'grand_total' => $params['grand_total'],
+                            'meja_id' => $params['meja_id'],
+                            'mstatus' => 1,
+                            'privilege' => $params['privilege'],
                         )
                     );
-                }
-
-
-                $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
-                Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
-            } else {
-                $m_jual = new \Model\Storage\Jual_model();
-                $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->first();
-
-                $m_jual->where('kode_faktur', $kode_faktur)->update(
-                    array(
-                        'mstatus' => 0
-                    )
-                );
-
-                $now = $m_jual->getDate();
-
-                $new_kode_faktur = $m_jual->getNextKode('FAK');
-                $m_jual->kode_faktur = $new_kode_faktur;
-                $m_jual->tgl_trans = $now['waktu'];
-                $m_jual->branch = $this->kodebranch;
-                $m_jual->member = $params['member'];
-                $m_jual->kode_member = $params['kode_member'];
-                $m_jual->kasir = $this->userid;
-                $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
-                $m_jual->total = $params['sub_total'];
-                $m_jual->diskon = $params['diskon'];
-                $m_jual->service_charge = $params['service_charge'];
-                $m_jual->ppn = $params['ppn'];
-                $m_jual->grand_total = $params['grand_total'];
-                $m_jual->lunas = 0;
-                $m_jual->mstatus = 1;
-                $m_jual->pesanan_kode = $kode_pesanan;
-                $m_jual->utama = $d_jual->utama;
-                $m_jual->hutang = $d_jual->hutang;
-                $m_jual->kode_faktur_asal = $d_jual->kode_faktur;
-                $m_jual->save();
-
-                foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
-                    foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
-                        $m_juali = new \Model\Storage\JualItem_model();
-
-                        $kode_faktur_item = $m_juali->getNextKode('FKI');
-                        $m_juali->kode_faktur_item = $kode_faktur_item;
-                        $m_juali->faktur_kode = $new_kode_faktur;
-                        $m_juali->kode_jenis_pesanan = $v_lp['kode_jp'];
-                        $m_juali->menu_nama = $v_lm['nama_menu'];
-                        $m_juali->menu_kode = $v_lm['kode_menu'];
-                        $m_juali->jumlah = $v_lm['jumlah'];
-                        $m_juali->harga = $v_lm['harga'];
-                        $m_juali->total = $v_lm['total'];
-                        $m_juali->service_charge = $v_lm['service_charge'];
-                        $m_juali->ppn = $v_lm['ppn'];
-                        $m_juali->request = $v_lm['request'];
-                        $m_juali->pesanan_item_kode = isset($v_lm['kode_pesanan_item']) ? $v_lm['kode_pesanan_item'] : null;
-                        $m_juali->save();
-
-                        if ( !empty($v_lm['detail_menu']) ) {
-                            foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
-                                $m_jualid = new \Model\Storage\JualItemDetail_model();
-                                $m_jualid->faktur_item_kode = $kode_faktur_item;
-                                $m_jualid->menu_nama = $v_dm['nama_menu'];
-                                $m_jualid->menu_kode = $v_dm['kode_menu'];
-                                $m_jualid->jumlah = $v_dm['jumlah'];
-                                $m_jualid->save();
-                            }
-                        }
-                    }
-                }
-
-                $m_jg = new \Model\Storage\JualGabungan_model();
-                $m_jg->where('faktur_kode', $kode_faktur)->update(
-                    array('faktur_kode' => $new_kode_faktur)
-                );
-                $m_jg->where('faktur_kode_gabungan', $kode_faktur)->update(
-                    array(
-                        'faktur_kode_gabungan' => $new_kode_faktur,
-                        'jml_tagihan' => $params['grand_total']
-                    )
-                );
-
-                $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
-                Modules::run( 'base/event/save', $m_jual, $deskripsi_log_gaktifitas, $new_kode_faktur );
-
-                $m_conf = new \Model\Storage\Conf();
-                $sql = "
-                    select 
-                        ji.*, 
-                        jid.faktur_item_kode,
-                        jid.menu_nama as menu_nama_det,
-                        jid.menu_kode as menu_kode_det,
-                        jid.jumlah as jumlah_det
-                    from jual_item ji
-                    left join
-                        jual_item_detail jid 
-                        on
-                            ji.kode_faktur_item = jid.faktur_item_kode 
-                    right join
-                        jual j
-                        on
-                            ji.faktur_kode = j.kode_faktur
-                    where
-                        j.pesanan_kode = '".$kode_pesanan."' and
-                        j.mstatus = 1
-                    order by
-                        ji.kode_faktur_item asc
-                ";
-                $d_ji = $m_conf->hydrateRaw( $sql );
-
-                if ( $d_ji->count() > 0 ) {
-                    $d_ji = $d_ji->toArray();
 
                     $m_pesanani = new \Model\Storage\PesananItem_model();
                     $d_pesanani = $m_pesanani->select('kode_pesanan_item')->where('pesanan_kode', $kode_pesanan)->get()->toArray();
@@ -2589,126 +2404,318 @@ class Penjualan extends Public_Controller
                     $m_pesananid->whereIn('pesanan_item_kode', $d_pesanani)->delete();
                     $m_pesanani->where('pesanan_kode', $kode_pesanan)->delete();
 
-                    $kode_faktur_item = null;
-                    $kode_pesanan_item = null;
-                    foreach ($d_ji as $k_ji => $v_ji) {
-                        if ( $kode_faktur_item != $v_ji['kode_faktur_item'] ) {
+                    foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
+                        foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
                             $m_pesanani = new \Model\Storage\PesananItem_model();
 
                             $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
                             $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
                             $m_pesanani->pesanan_kode = $kode_pesanan;
-                            $m_pesanani->kode_jenis_pesanan = $v_ji['kode_jenis_pesanan'];
-                            $m_pesanani->menu_nama = $v_ji['menu_nama'];
-                            $m_pesanani->menu_kode = $v_ji['menu_kode'];
-                            $m_pesanani->jumlah = $v_ji['jumlah'];
-                            $m_pesanani->harga = $v_ji['harga'];
-                            $m_pesanani->total = $v_ji['total'];
-                            $m_pesanani->service_charge = $v_ji['service_charge'];
-                            $m_pesanani->ppn = $v_ji['ppn'];
-                            $m_pesanani->request = $v_ji['request'];
-                            $m_pesanani->proses = isset($v_ji['proses']) ? $v_ji['proses'] : null;
+                            $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
+                            $m_pesanani->menu_nama = $v_lm['nama_menu'];
+                            $m_pesanani->menu_kode = $v_lm['kode_menu'];
+                            $m_pesanani->jumlah = $v_lm['jumlah'];
+                            $m_pesanani->harga = $v_lm['harga'];
+                            $m_pesanani->total = $v_lm['total'];
+                            $m_pesanani->service_charge = $v_lm['service_charge'];
+                            $m_pesanani->ppn = $v_lm['ppn'];
+                            $m_pesanani->request = $v_lm['request'];
+                            $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
                             $m_pesanani->save();
 
-                            if ( $v_ji['jumlah_det'] > 0 ) {
-                                $m_pesananid = new \Model\Storage\PesananItemDetail_model();
-                                $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
-                                $m_pesananid->menu_nama = $v_ji['menu_nama_det'];
-                                $m_pesananid->menu_kode = $v_ji['menu_kode_det'];
-                                $m_pesananid->jumlah = $v_ji['jumlah_det'];
-                                $m_pesananid->save();
-                            }
-
-                            $m_juali = new \Model\Storage\JualItem_model();
-                            $m_juali->where('kode_faktur_item', $v_ji['kode_faktur_item'])->update(
-                                array('pesanan_item_kode' => $kode_pesanan_item)
-                            );
-
-                            $kode_faktur_item = $v_ji['kode_faktur_item'];
-                        } else {
-                            if ( $v_ji['jumlah_det'] > 0 ) {
-                                $m_pesananid = new \Model\Storage\PesananItemDetail_model();
-                                $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
-                                $m_pesananid->menu_nama = $v_ji['menu_nama_det'];
-                                $m_pesananid->menu_kode = $v_ji['menu_kode_det'];
-                                $m_pesananid->jumlah = $v_ji['jumlah_det'];
-                                $m_pesananid->save();
+                            if ( !empty($v_lm['detail_menu']) ) {
+                                foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
+                                    $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                                    $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                                    $m_pesananid->menu_nama = $v_dm['nama_menu'];
+                                    $m_pesananid->menu_kode = $v_dm['kode_menu'];
+                                    $m_pesananid->jumlah = $v_dm['jumlah'];
+                                    $m_pesananid->save();
+                                }
                             }
                         }
                     }
 
-                    $m_conf = new \Model\Storage\Conf();
-                    $sql = "
-                        select
-                            p.kode_pesanan,
-                            sum(pi.total) as grand_total,
-                            sum(pi.service_charge) as service_charge,
-                            sum(pi.ppn) as ppn,
-                            ( sum(pi.total) - sum(pi.service_charge) - sum(pi.ppn) ) as total
-                        from pesanan p
-                        left join
-                            pesanan_item pi
-                            on
-                                pi.pesanan_kode = p.kode_pesanan
-                        where
-                            p.kode_pesanan = '".$kode_pesanan."'
-                        group by
-                            p.kode_pesanan
-                    ";
-                    $d_pesanan = $m_conf->hydrateRaw( $sql );
-                    if ( $d_pesanan->count() > 0 ) {
-                        $d_pesanan = $d_pesanan->toArray()[0];
+                    if ( !empty($params['list_diskon']) ) {
+                        $m_pesanand = new \Model\Storage\PesananDiskon_model();
+                        $m_pesanand->where('pesanan_kode', $kode_pesanan)->delete();
 
-                        $m_pesanan = new \Model\Storage\Pesanan_model();
-                        $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
+                        foreach ($params['list_diskon'] as $k_ld => $v_ld) {
+                            $m_pesanand = new \Model\Storage\PesananDiskon_model();
+                            $m_pesanand->pesanan_kode = $kode_pesanan;
+                            $m_pesanand->diskon_kode = $v_ld['kode_diskon'];
+                            $m_pesanand->diskon_nama = $v_ld['nama_diskon'];
+                            $m_pesanand->save();
+                        }
+                    }
+
+                    $m_jual = new \Model\Storage\Jual_model();
+
+                    $d_jual_aktif = $m_jual->where('pesanan_kode', $kode_pesanan)->where('mstatus', 1)->first();
+
+                    $result = $this->execSavePenjualan( $params, $kode_pesanan, $d_jual_aktif->kode_faktur );
+                    if ( $result['status'] == 1 ) {
+                        $new_kode_faktur = $result['content']['kode_faktur'];
+
+                        $d_jual = $m_jual->where('pesanan_kode', $kode_pesanan)->whereNotIn('kode_faktur', [$new_kode_faktur])->orderBy('kode_faktur', 'desc')->first();
+                        if ( $d_jual ) {
+                            $d_jual = $d_jual->toArray();
+
+                            $this->execDeletePenjualan( $d_jual['kode_faktur'] );
+
+                            // foreach ($d_jual as $k_jual => $v_jual) {
+                            //     $this->execDeletePenjualan( $v_jual['kode_faktur'] );
+                            // }
+                        }
+
+                        $m_mejal = new \Model\Storage\MejaLog_model();
+                        $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
                             array(
-                                'grand_total' => $d_pesanan['grand_total'],
-                                'service_charge' => $d_pesanan['service_charge'],
-                                'ppn' => $d_pesanan['ppn'],
-                                'total' => $d_pesanan['total']
+                                'meja_id' => $params['meja_id']
                             )
                         );
-
-                        $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
-                        Modules::run( 'base/event/update', $m_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
-                    }
-                }
-            }
-
-            if ( isset($params['waste']) && !empty($params['waste']) ) {
-                foreach ($params['waste'] as $k_waste => $v_waste) {
-                    $m_menu = new \Model\Storage\Menu_model();
-                    $d_menu = $m_menu->where('kode_menu', $v_waste['menu_kode'])->first();
-
-                    $m_wm = new \Model\Storage\WasteMenu_model();
-                    $d_wm = $m_wm->where('tanggal', $now['tanggal'])->where('branch_kode', $d_menu->branch_kode)->first();
-
-                    $id = null;
-                    if ( !$d_wm ) {
-                        $m_wm->tanggal = $now['tanggal'];
-                        $m_wm->branch_kode = $d_menu->branch_kode;
-                        $m_wm->save();
-
-                        $id = $m_wm->id;
-                    } else {
-                        $id = $d_wm->id;
                     }
 
-                    $m_wmi = new \Model\Storage\WasteMenuItem_model();
-                    $m_wmi->id_header = $id;
-                    $m_wmi->menu_kode = $v_waste['menu_kode'];
-                    $m_wmi->jumlah = $v_waste['jumlah'];
-                    $m_wmi->pesanan_kode = $kode_pesanan;
-                    $m_wmi->user_id = $this->userid;
-                    $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
-                    $m_wmi->keterangan = $v_waste['keterangan'];
-                    $m_wmi->save();
+
+                    $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                    Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
+                } else {
+                    $m_jual = new \Model\Storage\Jual_model();
+                    $d_jual = $m_jual->where('kode_faktur', $kode_faktur)->first();
+
+                    $m_jual->where('kode_faktur', $kode_faktur)->update(
+                        array(
+                            'mstatus' => 0
+                        )
+                    );
+
+                    $now = $m_jual->getDate();
+
+                    $new_kode_faktur = $m_jual->getNextKode('FAK');
+                    $m_jual->kode_faktur = $new_kode_faktur;
+                    $m_jual->tgl_trans = $now['waktu'];
+                    $m_jual->branch = $this->kodebranch;
+                    $m_jual->member = $params['member'];
+                    $m_jual->kode_member = $params['kode_member'];
+                    $m_jual->kasir = $this->userid;
+                    $m_jual->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
+                    $m_jual->total = $params['sub_total'];
+                    $m_jual->diskon = $params['diskon'];
+                    $m_jual->service_charge = $params['service_charge'];
+                    $m_jual->ppn = $params['ppn'];
+                    $m_jual->grand_total = $params['grand_total'];
+                    $m_jual->lunas = 0;
+                    $m_jual->mstatus = 1;
+                    $m_jual->pesanan_kode = $kode_pesanan;
+                    $m_jual->utama = $d_jual->utama;
+                    $m_jual->hutang = $d_jual->hutang;
+                    $m_jual->kode_faktur_asal = $d_jual->kode_faktur;
+                    $m_jual->save();
+
+                    foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
+                        foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
+                            $m_juali = new \Model\Storage\JualItem_model();
+
+                            $kode_faktur_item = $m_juali->getNextKode('FKI');
+                            $m_juali->kode_faktur_item = $kode_faktur_item;
+                            $m_juali->faktur_kode = $new_kode_faktur;
+                            $m_juali->kode_jenis_pesanan = $v_lp['kode_jp'];
+                            $m_juali->menu_nama = $v_lm['nama_menu'];
+                            $m_juali->menu_kode = $v_lm['kode_menu'];
+                            $m_juali->jumlah = $v_lm['jumlah'];
+                            $m_juali->harga = $v_lm['harga'];
+                            $m_juali->total = $v_lm['total'];
+                            $m_juali->service_charge = $v_lm['service_charge'];
+                            $m_juali->ppn = $v_lm['ppn'];
+                            $m_juali->request = $v_lm['request'];
+                            $m_juali->pesanan_item_kode = isset($v_lm['kode_pesanan_item']) ? $v_lm['kode_pesanan_item'] : null;
+                            $m_juali->save();
+
+                            if ( !empty($v_lm['detail_menu']) ) {
+                                foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
+                                    $m_jualid = new \Model\Storage\JualItemDetail_model();
+                                    $m_jualid->faktur_item_kode = $kode_faktur_item;
+                                    $m_jualid->menu_nama = $v_dm['nama_menu'];
+                                    $m_jualid->menu_kode = $v_dm['kode_menu'];
+                                    $m_jualid->jumlah = $v_dm['jumlah'];
+                                    $m_jualid->save();
+                                }
+                            }
+                        }
+                    }
+
+                    $m_jg = new \Model\Storage\JualGabungan_model();
+                    $m_jg->where('faktur_kode', $kode_faktur)->update(
+                        array('faktur_kode' => $new_kode_faktur)
+                    );
+                    $m_jg->where('faktur_kode_gabungan', $kode_faktur)->update(
+                        array(
+                            'faktur_kode_gabungan' => $new_kode_faktur,
+                            'jml_tagihan' => $params['grand_total']
+                        )
+                    );
+
+                    $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                    Modules::run( 'base/event/save', $m_jual, $deskripsi_log_gaktifitas, $new_kode_faktur );
+
+                    $m_conf = new \Model\Storage\Conf();
+                    $sql = "
+                        select 
+                            ji.*, 
+                            jid.faktur_item_kode,
+                            jid.menu_nama as menu_nama_det,
+                            jid.menu_kode as menu_kode_det,
+                            jid.jumlah as jumlah_det
+                        from jual_item ji
+                        left join
+                            jual_item_detail jid 
+                            on
+                                ji.kode_faktur_item = jid.faktur_item_kode 
+                        right join
+                            jual j
+                            on
+                                ji.faktur_kode = j.kode_faktur
+                        where
+                            j.pesanan_kode = '".$kode_pesanan."' and
+                            j.mstatus = 1
+                        order by
+                            ji.kode_faktur_item asc
+                    ";
+                    $d_ji = $m_conf->hydrateRaw( $sql );
+
+                    if ( $d_ji->count() > 0 ) {
+                        $d_ji = $d_ji->toArray();
+
+                        $m_pesanani = new \Model\Storage\PesananItem_model();
+                        $d_pesanani = $m_pesanani->select('kode_pesanan_item')->where('pesanan_kode', $kode_pesanan)->get()->toArray();
+
+                        $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                        $m_pesananid->whereIn('pesanan_item_kode', $d_pesanani)->delete();
+                        $m_pesanani->where('pesanan_kode', $kode_pesanan)->delete();
+
+                        $kode_faktur_item = null;
+                        $kode_pesanan_item = null;
+                        foreach ($d_ji as $k_ji => $v_ji) {
+                            if ( $kode_faktur_item != $v_ji['kode_faktur_item'] ) {
+                                $m_pesanani = new \Model\Storage\PesananItem_model();
+
+                                $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
+                                $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
+                                $m_pesanani->pesanan_kode = $kode_pesanan;
+                                $m_pesanani->kode_jenis_pesanan = $v_ji['kode_jenis_pesanan'];
+                                $m_pesanani->menu_nama = $v_ji['menu_nama'];
+                                $m_pesanani->menu_kode = $v_ji['menu_kode'];
+                                $m_pesanani->jumlah = $v_ji['jumlah'];
+                                $m_pesanani->harga = $v_ji['harga'];
+                                $m_pesanani->total = $v_ji['total'];
+                                $m_pesanani->service_charge = $v_ji['service_charge'];
+                                $m_pesanani->ppn = $v_ji['ppn'];
+                                $m_pesanani->request = $v_ji['request'];
+                                $m_pesanani->proses = isset($v_ji['proses']) ? $v_ji['proses'] : null;
+                                $m_pesanani->save();
+
+                                if ( $v_ji['jumlah_det'] > 0 ) {
+                                    $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                                    $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                                    $m_pesananid->menu_nama = $v_ji['menu_nama_det'];
+                                    $m_pesananid->menu_kode = $v_ji['menu_kode_det'];
+                                    $m_pesananid->jumlah = $v_ji['jumlah_det'];
+                                    $m_pesananid->save();
+                                }
+
+                                $m_juali = new \Model\Storage\JualItem_model();
+                                $m_juali->where('kode_faktur_item', $v_ji['kode_faktur_item'])->update(
+                                    array('pesanan_item_kode' => $kode_pesanan_item)
+                                );
+
+                                $kode_faktur_item = $v_ji['kode_faktur_item'];
+                            } else {
+                                if ( $v_ji['jumlah_det'] > 0 ) {
+                                    $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                                    $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                                    $m_pesananid->menu_nama = $v_ji['menu_nama_det'];
+                                    $m_pesananid->menu_kode = $v_ji['menu_kode_det'];
+                                    $m_pesananid->jumlah = $v_ji['jumlah_det'];
+                                    $m_pesananid->save();
+                                }
+                            }
+                        }
+
+                        $m_conf = new \Model\Storage\Conf();
+                        $sql = "
+                            select
+                                p.kode_pesanan,
+                                sum(pi.total) as grand_total,
+                                sum(pi.service_charge) as service_charge,
+                                sum(pi.ppn) as ppn,
+                                ( sum(pi.total) - sum(pi.service_charge) - sum(pi.ppn) ) as total
+                            from pesanan p
+                            left join
+                                pesanan_item pi
+                                on
+                                    pi.pesanan_kode = p.kode_pesanan
+                            where
+                                p.kode_pesanan = '".$kode_pesanan."'
+                            group by
+                                p.kode_pesanan
+                        ";
+                        $d_pesanan = $m_conf->hydrateRaw( $sql );
+                        if ( $d_pesanan->count() > 0 ) {
+                            $d_pesanan = $d_pesanan->toArray()[0];
+
+                            $m_pesanan = new \Model\Storage\Pesanan_model();
+                            $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
+                                array(
+                                    'grand_total' => $d_pesanan['grand_total'],
+                                    'service_charge' => $d_pesanan['service_charge'],
+                                    'ppn' => $d_pesanan['ppn'],
+                                    'total' => $d_pesanan['total']
+                                )
+                            );
+
+                            $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                            Modules::run( 'base/event/update', $m_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
+                        }
+                    }
                 }
+
+                if ( isset($params['waste']) && !empty($params['waste']) ) {
+                    foreach ($params['waste'] as $k_waste => $v_waste) {
+                        $m_menu = new \Model\Storage\Menu_model();
+                        $d_menu = $m_menu->where('kode_menu', $v_waste['menu_kode'])->first();
+
+                        $m_wm = new \Model\Storage\WasteMenu_model();
+                        $d_wm = $m_wm->where('tanggal', $now['tanggal'])->where('branch_kode', $d_menu->branch_kode)->first();
+
+                        $id = null;
+                        if ( !$d_wm ) {
+                            $m_wm->tanggal = $now['tanggal'];
+                            $m_wm->branch_kode = $d_menu->branch_kode;
+                            $m_wm->save();
+
+                            $id = $m_wm->id;
+                        } else {
+                            $id = $d_wm->id;
+                        }
+
+                        $m_wmi = new \Model\Storage\WasteMenuItem_model();
+                        $m_wmi->id_header = $id;
+                        $m_wmi->menu_kode = $v_waste['menu_kode'];
+                        $m_wmi->jumlah = $v_waste['jumlah'];
+                        $m_wmi->pesanan_kode = $kode_pesanan;
+                        $m_wmi->user_id = $this->userid;
+                        $m_wmi->nama_user = $this->userdata['detail_user']['nama_detuser'];
+                        $m_wmi->keterangan = $v_waste['keterangan'];
+                        $m_wmi->save();
+                    }
+                }
+
+                $this->result['status'] = 1;
+                $this->result['content'] = array('kode_pesanan' => $kode_pesanan, 'kode_faktur' => $new_kode_faktur);
+                $this->result['message'] = 'Data berhasil di ubah.';
+            } else {
+                $this->result['message'] = 'Pesanan ini sudah di lakukan pembayaran oleh kasir.<br><b>Harap lakukan pembatalan perubahan data !</b>';
             }
-            
-            $this->result['status'] = 1;
-            $this->result['content'] = array('kode_pesanan' => $kode_pesanan, 'kode_faktur' => $new_kode_faktur);
-            $this->result['message'] = 'Data berhasil di ubah.';
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
         }
