@@ -2364,10 +2364,13 @@ class Penjualan extends Public_Controller
             $kode_pesanan = $params['pesanan_kode'];
             $kode_faktur = $params['faktur_kode'];
 
+            $m_jual = new \Model\Storage\Jual_model();
+            $cek_d_jual = $m_jual->where('kode_faktur', $kode_faktur)->where('mstatus', 0)->first();
+
             $m_bayar = new \Model\Storage\Bayar_model();
             $d_bayar = $m_bayar->where('faktur_kode', $kode_faktur)->where('mstatus', 1)->first();
 
-            if ( !$d_bayar ) {
+            if ( !$d_bayar && !$cek_d_jual ) {
                 $new_kode_faktur = null;
 
                 $m_jual = new \Model\Storage\Jual_model();
@@ -2714,7 +2717,16 @@ class Penjualan extends Public_Controller
                 $this->result['content'] = array('kode_pesanan' => $kode_pesanan, 'kode_faktur' => $new_kode_faktur);
                 $this->result['message'] = 'Data berhasil di ubah.';
             } else {
-                $this->result['message'] = 'Pesanan ini sudah di lakukan pembayaran oleh kasir.<br><b>Harap lakukan pembatalan perubahan data !</b>';
+                $keterangan = '';
+                if ( $cek_d_jual ) {
+                    $keterangan = 'Pesanan sudah di update waitress lain.<br><b>Harap lakukan pembatalan perubahan data !</b>';
+                }
+
+                if ( $d_bayar ) {
+                    $keterangan = 'Pesanan ini sudah di lakukan pembayaran oleh kasir.<br><b>Harap lakukan pembatalan perubahan data !</b>';
+                }
+
+                $this->result['message'] = $keterangan;
             }
         } catch (Exception $e) {
             $this->result['message'] = $e->getMessage();
