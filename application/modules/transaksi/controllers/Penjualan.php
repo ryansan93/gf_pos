@@ -702,6 +702,11 @@ class Penjualan extends Public_Controller
             $m_jual->kode_faktur_asal = $kode_faktur_asal;
             $m_jual->save();
 
+            $total = 0;
+            $total_service_charge = 0;
+            $total_ppn = 0;
+            $grand_total = 0;
+
             foreach ($d_pesanan['pesanan_item'] as $k_pi => $v_pi) {
                 $m_juali = new \Model\Storage\JualItem_model();
 
@@ -728,6 +733,23 @@ class Penjualan extends Public_Controller
                     $m_jualid->jumlah = $v_pid['jumlah'];
                     $m_jualid->save();
                 }
+
+                $m_jp = new \Model\Storage\JenisPesanan_model();
+                $d_jp = $m_jp->where('kode', $v_pi['kode_jenis_pesanan'])->first();
+
+                if ( $d_jp->exclude == 1 ) {
+                    $total += $v_pi['total'];
+                    $total_service_charge += $v_pi['service_charge'];
+                    $total_ppn += $v_pi['ppn'];
+                    $grand_total = $total + $total_service_charge + $total_ppn;
+                }
+
+                if ( $d_jp->include == 1 ) {
+                    $total += $v_pi['total'] - ($v_pi['service_charge'] + $v_pi['ppn']);
+                    $total_service_charge += $v_pi['service_charge'];
+                    $total_ppn += $v_pi['ppn'];
+                    $grand_total += $v_pi['total'];
+                }
             }
 
             if ( !empty($params['list_diskon']) ) {
@@ -739,6 +761,26 @@ class Penjualan extends Public_Controller
                     $m_juald->save();
                 }
             }
+
+            $m_jual = new \Model\Storage\Jual_model();
+            $m_jual->where('kode_faktur', $kode_faktur)->update(
+                array(
+                    'total' => $total,
+                    'service_charge' => $total_service_charge,
+                    'ppn' => $total_ppn,
+                    'grand_total' => $grand_total
+                )
+            );
+
+            $m_pesanan = new \Model\Storage\Pesanan_model();
+            $m_jual->where('kode_pesanan', $kode_pesanan)->update(
+                array(
+                    'total' => $total,
+                    'service_charge' => $total_service_charge,
+                    'ppn' => $total_ppn,
+                    'grand_total' => $grand_total
+                )
+            );
 
             $d_jual_old = $m_jual->whereNotIn('kode_faktur', [$kode_faktur])->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
             if ( $d_jual_old ) {
@@ -2478,7 +2520,6 @@ class Penjualan extends Public_Controller
                             )
                         );
                     }
-
 
                     $deskripsi_log_gaktifitas = 'di-update oleh ' . $this->userdata['detail_user']['nama_detuser'];
                     Modules::run( 'base/event/update', $d_pesanan, $deskripsi_log_gaktifitas, $kode_pesanan );
