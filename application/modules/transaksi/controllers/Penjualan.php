@@ -773,7 +773,7 @@ class Penjualan extends Public_Controller
             );
 
             $m_pesanan = new \Model\Storage\Pesanan_model();
-            $m_jual->where('kode_pesanan', $kode_pesanan)->update(
+            $m_pesanan->where('kode_pesanan', $kode_pesanan)->update(
                 array(
                     'total' => $total,
                     'service_charge' => $total_service_charge,
