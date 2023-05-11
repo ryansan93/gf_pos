@@ -2414,6 +2414,9 @@ class Pembayaran extends Public_Controller
                         if ( $v_kjk['cl'] == 1 ) {
                             $jumlah = $data['grand_total'];
                         }
+                        if ( $v_kjk['id'] == 4 && $data['jml_bayar'] < $data['grand_total'] ) {
+                            $jumlah = $data['grand_total'] - $data['jml_bayar'];
+                        }
                         $printer -> text(buatBaris3Kolom(ucfirst($v_kjk['nama']).'.', '=', angkaRibuan($jumlah), 'footer'));
                     }
 
@@ -4324,7 +4327,7 @@ class Pembayaran extends Public_Controller
 
     public function tes()
     {
-        cetak_r( $this->getDataPenjualanAfterSave( 'FAK-2302230079', 400709 ) );
+        cetak_r( $this->getDataPenjualanAfterSave( 'FAK-2305110001', 421751 ) );
         // phpinfo();
 
         // if (!extension_loaded('imagick')){

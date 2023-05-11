@@ -298,7 +298,13 @@
 		        				<?php foreach ($kategori_pembayaran as $k_kp => $v_kp): ?>
 		        					<tr>
 			        					<td class="col-xs-8 text-right"><label class="control-label"><?php echo ucfirst($v_kp['nama']); ?>. =</label></td>
-			        					<td class="col-xs-4 text-right"><label class="control-label kategori_jenis_kartu kategori_jenis_kartu<?php echo $v_kp['id']; ?>" data-val="<?php echo $v_kp['nominal']; ?>"><?php echo angkaDecimal($v_kp['nominal']); ?></label></td>
+			        					<?php
+			        						$jumlah = $v_kp['nominal'];
+			        						if ( $v_kp['id'] == 4 and $data_bayar['jml_bayar'] < $data['grand_total'] ) {
+			        							$jumlah = $data['grand_total'] - $data_bayar['jml_bayar'];
+			        						}
+			        					?>
+			        					<td class="col-xs-4 text-right"><label class="control-label kategori_jenis_kartu kategori_jenis_kartu<?php echo $v_kp['id']; ?>" data-val="<?php echo $jumlah; ?>"><?php echo angkaDecimal($jumlah); ?></label></td>
 			        				</tr>
 		        				<?php endforeach ?>
 							</tbody>

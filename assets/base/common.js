@@ -6,7 +6,10 @@
 function priceFormat(elm) {
     var _angka = $(elm);
 
-    if (typeof $(elm).data('angka') !== 'undefined') {
+    console.log( $(elm).data('angka') );
+
+    if (typeof $(elm).data('angka') === 'undefined') {
+
         _angka.on('keyup', function(e) {
             _angka.val( formatRupiah($(this).val()) );
         });

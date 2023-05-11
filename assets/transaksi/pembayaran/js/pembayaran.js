@@ -933,6 +933,8 @@ var bayar = {
         $('.kategori_jenis_kartu').text( numeral.formatDec(0) );
 
         var jenis_bayar = '';
+        var total_bayar = 0;
+        var total_tagihan = $('.nota_total_bayar').attr('data-val');
 
         if ( !empty(dataMetodeBayar) ) {
             for (var i = 0; i < dataMetodeBayar.length; i++) {
@@ -941,6 +943,7 @@ var bayar = {
                     var val = $('.kategori_jenis_kartu'+id).attr('data-val');
 
                     var total = (dataMetodeBayar[i].cl == 0) ? dataMetodeBayar[i].jumlah : $('.nota_total_bayar').attr('data-val');
+                    total_bayar += parseFloat(total);
 
                     $('.kategori_jenis_kartu'+id).attr('data-val', total);
                     $('.kategori_jenis_kartu'+id).text( numeral.formatDec(total) );
@@ -950,6 +953,16 @@ var bayar = {
                         jenis_bayar += '<br>';
                     }
                 }
+            }
+
+            console.log(total_bayar);
+            console.log(total_tagihan);
+
+            if ( total_bayar < total_tagihan ) {
+                var sisa_tagihan = total_tagihan - total_bayar;
+
+                $('.kategori_jenis_kartu4').attr('data-val', sisa_tagihan);
+                $('.kategori_jenis_kartu4').text(numeral.formatDec(sisa_tagihan));
             }
         }
 

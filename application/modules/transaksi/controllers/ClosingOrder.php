@@ -942,24 +942,36 @@ class ClosingOrder extends Public_Controller
                         $m_bayar = new \Model\Storage\Bayar_model();
                         $now = $m_bayar->getDate();
 
-                        $tagihan = $d_jual['total'] + $d_jual['service_charge'] + $d_jual['ppn'];
+                        $d_bayar = $m_bayar->where('faktur_kode', $d_jual['kode_faktur'])->where('mstatus', 1)->orderBy('id', 'desc')->first();
 
-                        $m_bayar->tgl_trans = $now['waktu'];
-                        $m_bayar->faktur_kode = $d_jual['kode_faktur'];
-                        $m_bayar->jml_tagihan = $tagihan;
-                        $m_bayar->jml_bayar = 0;
-                        $m_bayar->ppn = $d_jual['ppn'];
-                        $m_bayar->service_charge = $d_jual['service_charge'];
-                        $m_bayar->diskon = 0;
-                        $m_bayar->total = $tagihan;
-                        $m_bayar->member_kode = $d_jual['kode_member'];
-                        $m_bayar->member = $d_jual['member'];
-                        $m_bayar->kasir = $this->userid;
-                        $m_bayar->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
-                        $m_bayar->mstatus = 1;
-                        $m_bayar->save();
+                        if ( !$d_bayar ) {
+                            $tagihan = $d_jual['total'] + $d_jual['service_charge'] + $d_jual['ppn'];
 
-                        $id_header = $m_bayar->id;
+                            $m_bayar->tgl_trans = $now['waktu'];
+                            $m_bayar->faktur_kode = $d_jual['kode_faktur'];
+                            $m_bayar->jml_tagihan = $tagihan;
+                            $m_bayar->jml_bayar = 0;
+                            $m_bayar->ppn = $d_jual['ppn'];
+                            $m_bayar->service_charge = $d_jual['service_charge'];
+                            $m_bayar->diskon = 0;
+                            $m_bayar->total = $tagihan;
+                            $m_bayar->member_kode = $d_jual['kode_member'];
+                            $m_bayar->member = $d_jual['member'];
+                            $m_bayar->kasir = $this->userid;
+                            $m_bayar->nama_kasir = $this->userdata['detail_user']['nama_detuser'];
+                            $m_bayar->mstatus = 1;
+                            $m_bayar->save();
+
+                            $id_header = $m_bayar->id;
+
+                            $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                            Modules::run( 'base/event/save', $m_bayar, $deskripsi_log_gaktifitas, $id_header );
+                        } else {
+                            $id_header = $d_bayar->id;
+
+                            $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
+                            Modules::run( 'base/event/save', $d_bayar, $deskripsi_log_gaktifitas, $id_header );
+                        }
 
                         $m_jk = new \Model\Storage\JenisKartu_model();
                         $d_jk = $m_jk->where('cl', 1)->first();
@@ -972,9 +984,6 @@ class ClosingOrder extends Public_Controller
                         $m_bayard->no_kartu = null;
                         $m_bayard->nama_kartu = null;
                         $m_bayard->save();
-
-                        $deskripsi_log_gaktifitas = 'di-submit oleh ' . $this->userdata['detail_user']['nama_detuser'];
-                        Modules::run( 'base/event/save', $m_bayar, $deskripsi_log_gaktifitas, $id_header );
                     }
                 }
             }
