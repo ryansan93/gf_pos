@@ -4197,7 +4197,8 @@ class Pembayaran extends Public_Controller
                                 ) _data
                                 group by
                                     _data.id,
-                                    _data.faktur_kode
+                                    _data.faktur_kode,
+                                    _data.jml_bayar
                             ) b 
                             on
                                 byr.id = b.id
