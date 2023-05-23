@@ -4218,7 +4218,7 @@ class Pembayaran extends Public_Controller
                         $total_bayar = $d_bayar_hutang->toArray()[0]['total_bayar'];
                     }
 
-                    if ( $value['grand_total'] > $total_bayar ) {
+                    if ( ($value['grand_total']-$total_diskon) > $total_bayar ) {
                         $data[] = array(
                             'tgl_pesan' => $value['tgl_pesan'],
                             'faktur_kode' => $value['kode_faktur'],
