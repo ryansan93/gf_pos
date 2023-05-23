@@ -4182,17 +4182,18 @@ class Pembayaran extends Public_Controller
                         right join
                             (
                                 select * from (
-                                    select b.id, b.faktur_kode from bayar b where b.mstatus = 1
+                                    select b.id, b.faktur_kode, b.jml_bayar from bayar b where b.mstatus = 1
 
                                     union all
 
-                                    select b.id, bh.faktur_kode as faktur_kode from bayar_hutang bh
+                                    select b.id, bh.faktur_kode as faktur_kode, bh.bayar as jml_bayar from bayar_hutang bh
                                     right join
                                         bayar b
                                         on
                                             bh.id_header = b.id
                                     where
-                                        b.mstatus = 1
+                                        b.mstatus = 1 and
+                                        bh.bayar > 0
                                 ) _data
                                 group by
                                     _data.id,
