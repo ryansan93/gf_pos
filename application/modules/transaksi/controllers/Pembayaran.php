@@ -2221,6 +2221,8 @@ class Pembayaran extends Public_Controller
                 }
             }
 
+            $grand_total = ($total + $ppn + $service_charge + $d_jual[0]['hutang'])-$diskon;
+
             $data = array(
                 'kode_faktur' => $d_jual[0]['kode_faktur'],
                 'tgl_trans' => $d_jual[0]['tgl_trans'],
@@ -2240,7 +2242,7 @@ class Pembayaran extends Public_Controller
                 'service_charge' => $service_charge,
                 'ppn_include' => $ppn_include,
                 'service_charge_include' => $service_charge_include,
-                'grand_total' => ($total + $ppn + $service_charge + $d_jual[0]['hutang'])-$diskon,
+                'grand_total' => ($grand_total > 0) ? $grand_total : 0,
                 'jml_bayar' => $d_jual[0]['jml_bayar'],
                 'hutang' => $d_jual[0]['hutang'],
                 'bayar_hutang' => $d_bayar_hutang[0]['nominal'],
