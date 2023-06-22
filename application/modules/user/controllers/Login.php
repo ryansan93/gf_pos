@@ -163,6 +163,32 @@ class Login extends MY_Controller
 		echo display_json($this->result);
 	}
 
+	public function copyStok()
+	{
+		$m_conf = new \Model\Storage\Conf();
+		$now = $m_conf->getDate();
+
+		$sql = "EXEC sp_copy_stok '".$now['tanggal']."'";
+
+        $d_conf = $m_conf->hydrateRaw($sql);
+
+        if ( $d_conf->count() > 0 ) {
+        	$m_cs = new \Model\Storage\CopyStok_model();
+
+        	$m_cs->tanggal = $now['tanggal'];
+        	$m_cs->save();
+
+        	$deskripsi_log = 'di-copy';
+            Modules::run( 'base/event/save', $m_cs, $deskripsi_log );
+
+        	$this->result['status'] = 1;
+        } else {
+        	$this->result['message'] = 'Data stok gagal di copy.';
+        }
+
+		echo display_json($this->result);
+	}
+
 	public function logout()
 	{
 		$this->session->sess_destroy();

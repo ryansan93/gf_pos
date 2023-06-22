@@ -70,10 +70,10 @@ class ClosingOrder extends Public_Controller
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
 
-        $start_date = $now['tanggal'].' 00:00:01';
-        $end_date = $now['tanggal'].' 23:59:59';
-        // $start_date = '2023-05-14 00:00:01';
-        // $end_date = '2023-05-14 23:59:59';
+        // $start_date = $now['tanggal'].' 00:00:01';
+        // $end_date = $now['tanggal'].' 23:59:59';
+        $start_date = '2023-06-14 00:00:01';
+        $end_date = '2023-06-14 23:59:59';
 
         $sql_user_sales = "and p.user_id = '".$user_id."'";
         $sql_user_select_sales = "p.user_id, p.nama_user,";
@@ -109,7 +109,35 @@ class ClosingOrder extends Public_Controller
                 on
                     km.id = m.kategori_menu_id 
             right join
-                jual j
+                (
+                    select 
+                        j.branch as kode_branch, 
+                        j.tgl_trans as tgl_trans, 
+                        j.kode_faktur as kode_faktur, 
+                        j.mstatus, 
+                        j.pesanan_kode,
+                        j.lunas
+                    from jual j 
+                    where 
+                        mstatus = 1
+
+                    union all
+
+                    select 
+                        j.branch as kode_branch, 
+                        j.tgl_trans as tgl_trans, 
+                        jg.faktur_kode_gabungan as kode_faktur, 
+                        j.mstatus, 
+                        j.pesanan_kode,
+                        j.lunas
+                    from jual_gabungan jg
+                    right join
+                        jual j
+                        on
+                            jg.faktur_kode = j.kode_faktur
+                    where
+                        j.mstatus = 1
+                ) j
                 on
                     j.kode_faktur = ji.faktur_kode
             right join
@@ -129,6 +157,8 @@ class ClosingOrder extends Public_Controller
                 j.lunas
         ";
         $d_data_sales = $m_conf->hydrateRaw( $sql );
+
+        // cetak_r( $sql );
 
         $data_sales = null;
         if ( $d_data_sales->count() > 0 ) {
@@ -1708,22 +1738,9 @@ class ClosingOrder extends Public_Controller
 
     public function tes()
     {
-        // $m_clo = new \Model\Storage\ClosingOrder_model();
-        // $now = $m_clo->getDate();
+        $data = $this->mappingDataSales(null, $this->kodebranch);
+        $dataSalesRecapitulation = $this->dataSalesRecapitulation($this->kodebranch);
 
-        // $tanggal = substr( $now['waktu'], 0, 10 );
-
-        $data = $this->mappingDataSales($this->userid, $this->kodebranch, 'end_shift');
-        // $dataSalesRecapitulation = $this->dataSalesRecapitulation($this->kodebranch);
-
-        $data_cashier = $data['data_cashier'];
-
-        cetak_r($data_cashier, 1);
-
-        foreach ($data_cashier as $k_dc => $v_dc) {
-            foreach ($v_dc['jenis_kartu'] as $k_jk => $v_jk) {
-                cetak_r( $v_jk );
-            }
-        }
+        cetak_r( $data );
     }
 }

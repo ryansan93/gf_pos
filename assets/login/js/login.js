@@ -48,10 +48,8 @@ var login = {
                     beforeSend: function() {showLoading();},
                     success: function(data) {
                         if (data.status) {
-                            // NOTE : IF USERNAME AND PASSWORD VALID
-                            $('#divinfo').html('<br><div class="alert alert-success">' + data.message + ' success' + '</div>');
                             var redirectPage = (window.location.hash != '') ? window.location.hash.substr(1) : defaultPage;
-                            window.location.href = redirectPage;
+                            login.copyStok(data.message, redirectPage);
                         } else {
                             // NOTE : IF USERNAME AND PASSWORD NOT VALID
                             $('#divinfo').html('<br><div class="alert alert-danger"> Gagal <br>' + data.message + '</div>');
@@ -65,6 +63,28 @@ var login = {
 
         return false;
     }, // end - login
+
+    copyStok: function (message, redirectPage) {
+        var baseurl = $('head base').attr('href');
+        
+        $.ajax({
+            url: baseurl + 'user/Login/copyStok',
+            data: {},
+            type: 'POST',
+            dataType: 'JSON',
+            beforeSend: function() { showLoading('Copy Stok . . .'); },
+            success: function(data) {
+                hideLoading();
+                if ( data.status == 1 ) {
+                    // NOTE : IF USERNAME AND PASSWORD VALID
+                    $('#divinfo').html('<br><div class="alert alert-success">' + message + ' success' + '</div>');
+                    window.location.href = redirectPage;
+                } else {
+                    bootbox.alert( data.message );
+                }
+            }
+        });
+    }, // end - copyStok
 
     enterToTab: function(e, elm) {
         if (e.keyCode == 13) {
