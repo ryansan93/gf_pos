@@ -158,7 +158,7 @@ class ClosingOrder extends Public_Controller
         ";
         $d_data_sales = $m_conf->hydrateRaw( $sql );
 
-        // cetak_r( $sql );
+        // cetak_r( $sql ); 
 
         $data_sales = null;
         if ( $d_data_sales->count() > 0 ) {
