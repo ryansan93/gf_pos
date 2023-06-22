@@ -70,10 +70,10 @@ class ClosingOrder extends Public_Controller
         $m_conf = new \Model\Storage\Conf();
         $now = $m_conf->getDate();
 
-        // $start_date = $now['tanggal'].' 00:00:01';
-        // $end_date = $now['tanggal'].' 23:59:59';
-        $start_date = '2023-06-14 00:00:01';
-        $end_date = '2023-06-14 23:59:59';
+        $start_date = $now['tanggal'].' 00:00:01';
+        $end_date = $now['tanggal'].' 23:59:59';
+        // $start_date = '2023-06-14 00:00:01';
+        // $end_date = '2023-06-14 23:59:59';
 
         $sql_user_sales = "and p.user_id = '".$user_id."'";
         $sql_user_select_sales = "p.user_id, p.nama_user,";
