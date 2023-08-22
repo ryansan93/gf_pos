@@ -749,9 +749,9 @@ var jual = {
         var txt_harga = $(elm).find('div.harga_menu').text();
         var status_ppn = $('div.menu[data-kode="'+kode_menu+'"]').attr('data-ppn');
         var status_service_charge = $('div.menu[data-kode="'+kode_menu+'"]').attr('data-sc');
-        var persen_ppn = $('.persen_ppn').attr('data-val');
+        var persen_ppn = parseFloat($('.persen_ppn').attr('data-val'));
         var persen_service_charge = $('.persen_service_charge').attr('data-val');
-        var harga = numeral.unformat(txt_harga);
+        var harga = parseFloat(numeral.unformat(txt_harga));
 
         if ( jenis == 'edit' ) {
             var div_menu = $(elm).closest('.menu');

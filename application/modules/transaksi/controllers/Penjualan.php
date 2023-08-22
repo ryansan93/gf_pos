@@ -589,6 +589,13 @@ class Penjualan extends Public_Controller
             $deskripsi_log = 'di-delete oleh ' . $this->userdata['detail_user']['nama_detuser'];
             Modules::run( 'base/event/update', $d_jual, $deskripsi_log, $params );
 
+            $m_mejal = new \Model\Storage\MejaLog_model();
+            $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
+                array(
+                    'status' => 0
+                )
+            );
+
             $m_pesanan = new \Model\Storage\Pesanan_model();
             $m_pesanan->where('kode_pesanan', $params)->update(
                 array(
