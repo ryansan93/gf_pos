@@ -590,7 +590,7 @@ class Penjualan extends Public_Controller
             Modules::run( 'base/event/update', $d_jual, $deskripsi_log, $params );
 
             $m_mejal = new \Model\Storage\MejaLog_model();
-            $m_mejal->where('pesanan_kode', $kode_pesanan)->update(
+            $m_mejal->where('pesanan_kode', $params)->update(
                 array(
                     'status' => 0
                 )
