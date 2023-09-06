@@ -3128,7 +3128,7 @@ class Pembayaran extends Public_Controller
         $end_date = $today.' 23:59:59';
 
         $m_pesanan = new \Model\Storage\Pesanan_model();
-        $d_pesanan = $m_pesanan->where('kode_pesanan', '<>', $d_jual_utama['pesanan_kode'])->whereBetween('tgl_pesan', [$start_date, $end_date])->where('mstatus', 1)->with(['meja'])->get();
+        $d_pesanan = $m_pesanan->where('kode_pesanan', '<>', $d_jual_utama['pesanan_kode'])->whereBetween('tgl_pesan', [$start_date, $end_date])->where('branch', $this->kodebranch)->where('mstatus', 1)->with(['meja'])->get();
 
         $content['pesanan_kode'] = $d_jual_utama['pesanan_kode'];
         $content['data_utama'] = $data_utama;
