@@ -774,8 +774,15 @@ class ClosingOrder extends Public_Controller
             if ( !empty($data['data_sales']) ) {
                 $data_sales = $data['data_sales'];
 
+                $m_ps = new \Model\Storage\PrinterStation_model();
+                $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+
+                $m_printer = new \Model\Storage\Printer_model();
+                $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
+
                 // Enter the share name for your USB printer here
-                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
                 // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
                 // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
@@ -861,8 +868,15 @@ class ClosingOrder extends Public_Controller
             if ( !empty($data['data_cashier']) ) {
                 $data_cashier = $data['data_cashier'];
 
+                $m_ps = new \Model\Storage\PrinterStation_model();
+                $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+
+                $m_printer = new \Model\Storage\Printer_model();
+                $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
+
                 // Enter the share name for your USB printer here
-                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+                $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
                 // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
                 // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
@@ -1493,8 +1507,15 @@ class ClosingOrder extends Public_Controller
                 return implode($hasilBaris, "\n") . "\n";
             }
 
+            $m_ps = new \Model\Storage\PrinterStation_model();
+            $d_ps = $m_ps->where('nama', 'CASHIER')->first();
+
+            $m_printer = new \Model\Storage\Printer_model();
+            $d_printer = $m_printer->where('printer_station_id', $d_ps->id)->where('branch_kode', $this->kodebranch)->where('status', 1)->first();
+
             // Enter the share name for your USB printer here
-            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+            // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('GTR_KASIR');
+            $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector($d_printer->sharing_name);
             // $computer_name = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             // $connector = new Mike42\Escpos\PrintConnectors\WindowsPrintConnector('smb://'.$computer_name.'/kasir');
 
