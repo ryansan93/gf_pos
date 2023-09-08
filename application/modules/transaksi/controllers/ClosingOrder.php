@@ -48,7 +48,7 @@ class ClosingOrder extends Public_Controller
             $start_date = $now['tanggal'].' 00:00:01';
             $end_date = $now['tanggal'].' 23:59:59';
 
-            $d_clo = $m_clo->whereBetween('tanggal', [$start_date, $end_date])->first();
+            $d_clo = $m_clo->whereBetween('tanggal', [$start_date, $end_date])->where('branch_kode', $this->kodebranch)->first();
 
             $content['akses'] = $this->hakAkses;
             $content['persen_ppn'] = $this->persen_ppn;
