@@ -1880,7 +1880,7 @@ class Pembayaran extends Public_Controller
             left join
                 branch brc
                 on
-                    j.branch = j.branch
+                    brc.kode_branch = j.branch
             left join
                 pesanan p
                 on
