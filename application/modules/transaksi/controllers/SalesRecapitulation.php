@@ -86,7 +86,8 @@ class SalesRecapitulation extends Public_Controller
                     j.nama_kasir as nama_kasir,
                     j.grand_total as grand_total,
                     jg.id as id_gabungan,
-                    0 as status_gabungan
+                    0 as status_gabungan,
+                    j.branch
                 from jual j
                 right join
                     pesanan p
@@ -133,7 +134,8 @@ class SalesRecapitulation extends Public_Controller
                     _jg.nama_kasir as nama_kasir,
                     j.grand_total as grand_total,
                     jg.id as id_gabungan,
-                    1 as status_gabungan
+                    1 as status_gabungan,
+                    j.branch
                 from jual_gabungan jg
                 right join
                     (
@@ -159,7 +161,7 @@ class SalesRecapitulation extends Public_Controller
             where 
                 _data.tgl_trans between '".$start_date."' and '".$end_date."' and
                 _data.nama_kasir is not null and
-                SUBSTRING(_data.kode_pesanan, 1, 3) = '".$kode_branch."'
+                _data.branch = '".$kode_branch."'
             group by
                 _data.tgl_trans,
                 _data.mstatus,
