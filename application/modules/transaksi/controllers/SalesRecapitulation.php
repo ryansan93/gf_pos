@@ -171,7 +171,8 @@ class SalesRecapitulation extends Public_Controller
                 _data.kode_faktur_utama,
                 _data.nama_waitress,
                 _data.nama_kasir,
-                _data.grand_total
+                _data.grand_total,
+                _data.branch
             order by
                 _data.tgl_trans desc,
                 _data.kode_pesanan desc,
