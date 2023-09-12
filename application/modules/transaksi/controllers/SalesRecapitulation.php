@@ -119,7 +119,8 @@ class SalesRecapitulation extends Public_Controller
                     p.nama_user,
                     j.nama_kasir,
                     j.grand_total,
-                    jg.id
+                    jg.id,
+                    j.branch
 
                 union all
 
