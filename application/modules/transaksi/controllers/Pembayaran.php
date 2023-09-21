@@ -764,12 +764,14 @@ class Pembayaran extends Public_Controller
                     ji.faktur_kode = '".$d_jual[0]['kode_faktur']."'
             ";
             $d_juali = $m_juali->hydrateRaw( $sql_juali );
+
+            $detail[ $d_jual[0]['kode_faktur'] ]['kode'] = $d_jual[0]['kode_faktur'];
+            $detail[ $d_jual[0]['kode_faktur'] ]['member'] = $d_jual[0]['member'];
+            $detail[ $d_jual[0]['kode_faktur'] ]['kode_member'] = $d_jual[0]['kode_member'];
+
             if ( $d_juali->count() > 0 ) {
                 $d_juali = $d_juali->toArray();
 
-                $detail[ $d_jual[0]['kode_faktur'] ]['kode'] = $d_jual[0]['kode_faktur'];
-                $detail[ $d_jual[0]['kode_faktur'] ]['member'] = $d_jual[0]['member'];
-                $detail[ $d_jual[0]['kode_faktur'] ]['kode_member'] = $d_jual[0]['kode_member'];
                 foreach ($d_juali as $k_ji => $v_ji) {
                     $key = $v_ji['jp_nama'].' | '.$v_ji['jp_kode'];
                     $key_item = $v_ji['menu_nama'].' | '.$v_ji['menu_kode'];
@@ -901,13 +903,13 @@ class Pembayaran extends Public_Controller
                             $key_item = $v_jig['menu_nama'].' | '.$v_jig['menu_kode'];
 
                             $m_jp = new \Model\Storage\JenisPesanan_model();
-                            $d_jp = $m_jp->where('kode', $v_ji['jp_kode'])->first();
+                            $d_jp = $m_jp->where('kode', $v_jig['jp_kode'])->first();
 
                             $include = $d_jp->include;
                             $exclude = $d_jp->exclude;
 
                             $m_hm = new \Model\Storage\HargaMenu_model();
-                            $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
+                            $d_hm = $m_hm->where('menu_kode', $v_jig['menu_kode'])->where('jenis_pesanan_kode', $v_jig['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
 
                             if ( !isset($detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]) ) {
                                 $jual_item = null;
@@ -2073,13 +2075,13 @@ class Pembayaran extends Public_Controller
                             $key_item = $v_jig['menu_nama'].' | '.$v_jig['menu_kode'];
 
                             $m_jp = new \Model\Storage\JenisPesanan_model();
-                            $d_jp = $m_jp->where('kode', $v_ji['jp_kode'])->first();
+                            $d_jp = $m_jp->where('kode', $v_jig['jp_kode'])->first();
 
                             $include = $d_jp->include;
                             $exclude = $d_jp->exclude;
 
                             $m_hm = new \Model\Storage\HargaMenu_model();
-                            $d_hm = $m_hm->where('menu_kode', $v_ji['menu_kode'])->where('jenis_pesanan_kode', $v_ji['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
+                            $d_hm = $m_hm->where('menu_kode', $v_jig['menu_kode'])->where('jenis_pesanan_kode', $v_jig['kode_jenis_pesanan'])->orderBy('id', 'desc')->first();
 
                             if ( !isset($detail[ $v_jg['faktur_kode_gabungan'] ]['jenis_pesanan'][$key]) ) {
                                 $jual_item = null;

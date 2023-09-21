@@ -223,26 +223,28 @@
 								</table>
 								<div class="col-xs-12 text-center no-padding font10"><hr class="dashed"></div>
 							</div>
-							<?php foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp): ?>
-								<table class="table table-nobordered" style="margin-bottom: 0px;">
-									<tbody>
-										<tr>
-											<td class="col-xs-12"><label class="control-label"><?php echo $v_jp['nama']; ?></label></td>
-										</tr>
-									</tbody>
-								</table>
-								<table class="table table-nobordered" style="margin-bottom: 0px;">
-									<tbody>
-										<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji): ?>
-											<tr class="menu">
-												<td class="col-xs-1 jumlah" data-jumlah="<?php echo $v_ji['jumlah']; ?>"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
-												<td class="col-xs-7"><label class="control-label"><?php echo $v_ji['nama']; ?></label></td>
-												<td class="col-xs-4 text-right total" data-harga="<?php echo $v_ji['harga']; ?>" data-hj="<?php echo $v_ji['harga_jual']; ?>" data-exclude="<?php echo $v_ji['exclude']; ?>" data-include="<?php echo $v_ji['include']; ?>" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
+							<?php if (isset($v_det['jenis_pesanan']) && !empty($v_det['jenis_pesanan'])) { ?>
+								<?php foreach ($v_det['jenis_pesanan'] as $k_jp => $v_jp): ?>
+									<table class="table table-nobordered" style="margin-bottom: 0px;">
+										<tbody>
+											<tr>
+												<td class="col-xs-12"><label class="control-label"><?php echo $v_jp['nama']; ?></label></td>
 											</tr>
-										<?php endforeach ?>
-									</tbody>
-								</table>
-							<?php endforeach ?>
+										</tbody>
+									</table>
+									<table class="table table-nobordered" style="margin-bottom: 0px;">
+										<tbody>
+											<?php foreach ($v_jp['jual_item'] as $k_ji => $v_ji): ?>
+												<tr class="menu">
+													<td class="col-xs-1 jumlah" data-jumlah="<?php echo $v_ji['jumlah']; ?>"><label class="control-label"><?php echo $v_ji['jumlah'].'X'; ?></label></td>
+													<td class="col-xs-7"><label class="control-label"><?php echo $v_ji['nama']; ?></label></td>
+													<td class="col-xs-4 text-right total" data-harga="<?php echo $v_ji['harga']; ?>" data-hj="<?php echo $v_ji['harga_jual']; ?>" data-exclude="<?php echo $v_ji['exclude']; ?>" data-include="<?php echo $v_ji['include']; ?>" data-sc="<?php echo $v_ji['service_charge']; ?>" data-ppn="<?php echo $v_ji['ppn']; ?>"><label class="control-label"><?php echo angkaDecimal($v_ji['total_show']); ?></label></td>
+												</tr>
+											<?php endforeach ?>
+										</tbody>
+									</table>
+								<?php endforeach ?>
+							<?php } ?>
 						<?php endforeach ?>
 					</div>
 					<div class="col-xs-12 text-center font10"><hr class="double-dashed"></div>

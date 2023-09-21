@@ -2459,33 +2459,35 @@ class Penjualan extends Public_Controller
                     $m_pesananid->whereIn('pesanan_item_kode', $d_pesanani)->delete();
                     $m_pesanani->where('pesanan_kode', $kode_pesanan)->delete();
 
-                    foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
-                        foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
-                            $m_pesanani = new \Model\Storage\PesananItem_model();
+                    if ( isset($params['list_pesanan']) && !empty($params['list_pesanan']) ) {
+                        foreach ($params['list_pesanan'] as $k_lp => $v_lp) {
+                            foreach ($v_lp['list_menu'] as $k_lm => $v_lm) {
+                                $m_pesanani = new \Model\Storage\PesananItem_model();
 
-                            $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
-                            $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
-                            $m_pesanani->pesanan_kode = $kode_pesanan;
-                            $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
-                            $m_pesanani->menu_nama = $v_lm['nama_menu'];
-                            $m_pesanani->menu_kode = $v_lm['kode_menu'];
-                            $m_pesanani->jumlah = $v_lm['jumlah'];
-                            $m_pesanani->harga = $v_lm['harga'];
-                            $m_pesanani->total = $v_lm['total'];
-                            $m_pesanani->service_charge = $v_lm['service_charge'];
-                            $m_pesanani->ppn = $v_lm['ppn'];
-                            $m_pesanani->request = $v_lm['request'];
-                            $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
-                            $m_pesanani->save();
+                                $kode_pesanan_item = $m_pesanani->getNextKode('FKI');
+                                $m_pesanani->kode_pesanan_item = $kode_pesanan_item;
+                                $m_pesanani->pesanan_kode = $kode_pesanan;
+                                $m_pesanani->kode_jenis_pesanan = $v_lp['kode_jp'];
+                                $m_pesanani->menu_nama = $v_lm['nama_menu'];
+                                $m_pesanani->menu_kode = $v_lm['kode_menu'];
+                                $m_pesanani->jumlah = $v_lm['jumlah'];
+                                $m_pesanani->harga = $v_lm['harga'];
+                                $m_pesanani->total = $v_lm['total'];
+                                $m_pesanani->service_charge = $v_lm['service_charge'];
+                                $m_pesanani->ppn = $v_lm['ppn'];
+                                $m_pesanani->request = $v_lm['request'];
+                                $m_pesanani->proses = isset($v_lm['proses']) ? $v_lm['proses'] : null;
+                                $m_pesanani->save();
 
-                            if ( !empty($v_lm['detail_menu']) ) {
-                                foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
-                                    $m_pesananid = new \Model\Storage\PesananItemDetail_model();
-                                    $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
-                                    $m_pesananid->menu_nama = $v_dm['nama_menu'];
-                                    $m_pesananid->menu_kode = $v_dm['kode_menu'];
-                                    $m_pesananid->jumlah = $v_dm['jumlah'];
-                                    $m_pesananid->save();
+                                if ( !empty($v_lm['detail_menu']) ) {
+                                    foreach ($v_lm['detail_menu'] as $k_dm => $v_dm) {
+                                        $m_pesananid = new \Model\Storage\PesananItemDetail_model();
+                                        $m_pesananid->pesanan_item_kode = $kode_pesanan_item;
+                                        $m_pesananid->menu_nama = $v_dm['nama_menu'];
+                                        $m_pesananid->menu_kode = $v_dm['kode_menu'];
+                                        $m_pesananid->jumlah = $v_dm['jumlah'];
+                                        $m_pesananid->save();
+                                    }
                                 }
                             }
                         }
