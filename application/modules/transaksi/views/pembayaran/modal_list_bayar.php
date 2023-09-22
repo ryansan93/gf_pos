@@ -71,7 +71,7 @@
 													<?php if ( $akses_waitress['a_delete'] == 1 ): ?>
 														<td class="col-lg-1 text-center">
 															<?php if ( $value['utama'] == 1 ): ?>
-																<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.verifikasiPinOtorisasi('<?php echo $value['kode_pesanan']; ?>', null, null)"><i class="fa fa-trash"></i></button>
+																<button type="button" class="btn btn-danger" style="padding: 1px 0px; width: 100%;" onclick="jual.verifikasiPinOtorisasi('<?php echo $value['kode_pesanan']; ?>', null, null, <?php echo $value['gabung']; ?>)"><i class="fa fa-trash"></i></button>
 															<?php endif ?>
 														</td>
 													<?php endif ?>

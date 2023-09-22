@@ -64,7 +64,7 @@
 			<div class="col-md-12 no-padding" style="border: 1px solid #dedede; height: 100%; padding: 5px;">
 				<div class="col-md-12 no-padding lpesanan" style="height: 100%;">
 					<div class="col-md-12 no-padding" style="border-top: 1px solid #dedede;"><b>PESANAN</b></div>
-					<div class="col-md-12 no-padding list_pesanan"></div>
+					<div class="col-md-12 no-padding pesanan_contain list_pesanan"></div>
 					<div class="col-md-12 no-padding" style="border-top: 1px solid #dedede;"><b>DISKON</b></div>
 					<div class="col-md-12 no-padding list_diskon"></div>
 				</div>

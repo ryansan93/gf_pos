@@ -726,6 +726,7 @@ var jual = {
 
     pilihMenu: function (elm, detail = 'kosong', arr_detail = null, request = null, jml_menu, jenis, kode_menu) {
         var _div_list_pesanan = $('div.list_pesanan');
+        // var _div_list_pesanan = $('div.pesanan_contain');
 
         var div_jenis_pesanan = null;
         var _div_jenis_pesanan = '';
@@ -965,16 +966,21 @@ var jual = {
             if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
                 $(div_jenis_pesanan).remove();
             }
-        }
 
-        jual.hitSubTotal();
+            jual.hitSubTotal();
+        }
     }, // end- hapusMenu
 
     verifikasiPinOtorisasiHapusMenu: function(elm, jenis = null) {
         var pin = null;
 
+        var keterangan = 'Masukkan PIN Otorisasi dan keterangan untuk menghapus data.';
+        if ( !empty(jenis) ) {
+            keterangan = 'Masukkan PIN Otorisasi dan keterangan untuk merubah data.';
+        }
+
         bootbox.dialog({
-            message: '<p>Masukkan PIN Otorisasi dan Keterangan untuk menghapus data.</p><p><b>Keterangan</b></p><p><textarea class="form-control keterangan"></textarea></p><b>PIN</b><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
+            message: '<p>'+keterangan+'</p><p><b>Keterangan</b></p><p><textarea class="form-control keterangan"></textarea></p><b>PIN</b><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
             buttons: {
                 cancel: {
                     label: '<i class="fa fa-times"></i> Batal',
@@ -1001,11 +1007,12 @@ var jual = {
                                 success: function(data) {
                                     hideLoading();
                                     if ( data.status == 1 ) {
-                                        if ( empty(jenis) ) {
-                                            var pesanan_kode = $('div.button.edit').attr('data-kode');
-                                            var div_menu = $(elm).closest('div.menu');
-                                            var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
+                                        // var pesanan_kode = $('div.button.edit').attr('data-kode');
+                                        var pesanan_kode = $(elm).attr('data-pesanankode');
+                                        var div_menu = $(elm).closest('div.menu');
+                                        var jumlah = numeral.unformat($(elm).closest('div.menu').find('.jumlah').text());
 
+                                        if ( empty(jenis) ) {
                                             // waste.push({'pesanan_kode': pesanan_kode, 'menu_kode': menu_kode, 'jumlah': jumlah});
                                             var key = $(div_menu).attr('data-kode')+' | '+$(div_menu).attr('data-detail')+' | '+$(div_menu).find('span.request').text();
                                             waste[key] = {'pesanan_kode': pesanan_kode, 'menu_kode': $(div_menu).attr('data-kode'), 'jumlah': jumlah, 'keterangan': keterangan_waste};
@@ -1022,6 +1029,8 @@ var jual = {
                                             if ( $(div_jenis_pesanan).find('div.pesanan div.menu').length == 0 ) {
                                                 $(div_jenis_pesanan).remove();
                                             }
+
+                                            jual.hitSubTotal();
                                         } else {
                                             jual.modalPaketMenu( $(elm) );
                                         }
@@ -1240,22 +1249,24 @@ var jual = {
     }, // end - resetDiskon
 
     hitSubTotal: function() {
-        var div = $('.list_pesanan');
+        // var div = $('.list_pesanan, .list_pesanan_gabungan');
 
         var sub_total = 0;
         var sub_total_real = 0;
         var sub_total_ppn = 0;
         var sub_total_service_charge = 0;
-        $.map( $(div).find('.menu'), function(div_menu) {
-            var total = numeral.unformat($(div_menu).find('.total').text());
-            var total_real = $(div_menu).find('.total').attr('data-val');
-            var ppn = $(div_menu).find('.total').attr('data-ppn');
-            var service_charge = $(div_menu).find('.total').attr('data-sc');
-
-            sub_total += parseFloat(total);
-            sub_total_real += parseFloat(total_real);
-            sub_total_ppn += parseFloat(ppn);
-            sub_total_service_charge += parseFloat(service_charge);
+        $.map( $('.list_pesanan, .list_pesanan_gabungan'), function (div) {
+            $.map( $(div).find('.menu'), function(div_menu) {
+                var total = numeral.unformat($(div_menu).find('.total').text());
+                var total_real = $(div_menu).find('.total').attr('data-val');
+                var ppn = $(div_menu).find('.total').attr('data-ppn');
+                var service_charge = $(div_menu).find('.total').attr('data-sc');
+    
+                sub_total += parseFloat(total);
+                sub_total_real += parseFloat(total_real);
+                sub_total_ppn += parseFloat(ppn);
+                sub_total_service_charge += parseFloat(service_charge);
+            });
         });
 
         if ( jenis_harga_exclude == 1 ) {
@@ -2120,55 +2131,59 @@ var jual = {
         });
     }, // end - modalDetailFaktur
 
-    verifikasiPinOtorisasi: function(kode_pesanan = null, kode_faktur = null, id_pembayaran = null) {
-        bootbox.dialog({
-            message: '<p>Masukkan PIN Otorisasi untuk menghapus data.</p><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
-            buttons: {
-                cancel: {
-                    label: '<i class="fa fa-times"></i> Batal',
-                    className: 'btn-danger',
-                    callback: function(){}
-                },
-                ok: {
-                    label: '<i class="fa fa-check"></i> Lanjut',
-                    className: 'btn-primary',
-                    callback: function(){
-                        var pin = $('.pin').val();
-                        var keterangan = $('.keterangan').val();
+    verifikasiPinOtorisasi: function(kode_pesanan = null, kode_faktur = null, id_pembayaran = null, gabung = 0) {
+        if ( gabung == 0 ) {
+            bootbox.dialog({
+                message: '<p>Masukkan PIN Otorisasi untuk menghapus data.</p><p><input type="password" class="form-control text-center pin" data-tipe="angka" placeholder="PIN" /></p>',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Batal',
+                        className: 'btn-danger',
+                        callback: function(){}
+                    },
+                    ok: {
+                        label: '<i class="fa fa-check"></i> Lanjut',
+                        className: 'btn-primary',
+                        callback: function(){
+                            var pin = $('.pin').val();
+                            var keterangan = $('.keterangan').val();
 
-                        $.ajax({
-                            url: 'transaksi/Penjualan/cekPinOtorisasi',
-                            data: {
-                                'pin': pin
-                            },
-                            type: 'POST',
-                            dataType: 'JSON',
-                            beforeSend: function() { showLoading(); },
-                            success: function(data) {
-                                // hideLoading();
-                                if ( data.status == 1 ) {
-                                    if ( empty(id_pembayaran) ) {
-                                        if ( !empty(kode_pesanan) && empty(kode_faktur) ) {
-                                            jual.deletePesanan(kode_pesanan);
-                                        } 
+                            $.ajax({
+                                url: 'transaksi/Penjualan/cekPinOtorisasi',
+                                data: {
+                                    'pin': pin
+                                },
+                                type: 'POST',
+                                dataType: 'JSON',
+                                beforeSend: function() { showLoading(); },
+                                success: function(data) {
+                                    // hideLoading();
+                                    if ( data.status == 1 ) {
+                                        if ( empty(id_pembayaran) ) {
+                                            if ( !empty(kode_pesanan) && empty(kode_faktur) ) {
+                                                jual.deletePesanan(kode_pesanan);
+                                            } 
 
-                                        if ( empty(kode_pesanan) && !empty(kode_faktur) ) {
-                                            jual.deletePenjualan(kode_faktur);
+                                            if ( empty(kode_pesanan) && !empty(kode_faktur) ) {
+                                                jual.deletePenjualan(kode_faktur);
+                                            }
+                                        } else {
+                                            jual.deletePembayaran(kode_faktur, id_pembayaran);
                                         }
                                     } else {
-                                        jual.deletePembayaran(kode_faktur, id_pembayaran);
+                                        bootbox.alert(data.message, function() {
+                                            jual.verifikasiPinOtorisasi(kode_faktur);
+                                        });
                                     }
-                                } else {
-                                    bootbox.alert(data.message, function() {
-                                        jual.verifikasiPinOtorisasi(kode_faktur);
-                                    });
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            bootbox.alert('Faktur ini adalah faktur gabungan.');
+        }
     }, // end - verifikasiPinOtorisasi
 
     deletePesanan: function(kode_pesanan) {
