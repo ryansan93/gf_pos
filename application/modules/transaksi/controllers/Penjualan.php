@@ -583,7 +583,7 @@ class Penjualan extends Public_Controller
             $m_jg = new \Model\Storage\JualGabungan_model();
             $d_jg = $m_jg->where('faktur_kode', $d_jual->kode_faktur)->get();
 
-            if ( $d_jg->count() > 0 ) {
+            if ( $d_jg->count() == 0 ) {
                 $m_jual = new \Model\Storage\Jual_model();
                 $m_jual->where('pesanan_kode', $params)->update(
                     array(

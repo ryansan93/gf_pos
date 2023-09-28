@@ -902,30 +902,43 @@ var bayar = {
         var modal = $(elm).closest('.modal-body');
 
         var cl = $(elm).attr('data-cl');
+        var cl_sudah_ada = 0;
 
         $('div.jenis_pembayaran').find('button').removeAttr('disabled');
         if ( cl == 1 ) {
             $('div.jenis_pembayaran').find('button:not([data-cl="1"])').attr('disabled', 'disabled');
+            if ( dataMetodeBayar.length > 0 ) {
+                for (let i = 0; i < dataMetodeBayar.length; i++) {
+                    if ( !empty( dataMetodeBayar[i] ) ) {
+                        if ( dataMetodeBayar[i]['cl'] == 1 ) {
+                            cl_sudah_ada = 1;
+                        }
+                    }
+                }
+            }
         } else {
             $('div.jenis_pembayaran').find('button[data-cl="1"]').attr('disabled', 'disabled');
         }
 
-        var _dataMetodeBayar = {
-            'nama': $(elm).data('nama'),
-            'kode_jenis_kartu': $(elm).data('kode'),
-            'kategori_jenis_kartu': $(elm).data('kategori'),
-            'no_kartu': $(modal).find('.no_kartu').val(),
-            'nama_kartu': $(modal).find('.nama_kartu').val(),
-            'jumlah': numeral.unformat($(modal).find('.jml_bayar').val()),
-            'cl': cl
-        };
+        if ( cl_sudah_ada == 0 ) {
+            var _dataMetodeBayar = {
+                'nama': $(elm).data('nama'),
+                'kode_jenis_kartu': $(elm).data('kode'),
+                'kategori_jenis_kartu': $(elm).data('kategori'),
+                'no_kartu': $(modal).find('.no_kartu').val(),
+                'nama_kartu': $(modal).find('.nama_kartu').val(),
+                'jumlah': numeral.unformat($(modal).find('.jml_bayar').val()),
+                'cl': cl
+            };
 
-        dataMetodeBayar.push( _dataMetodeBayar );
-        
-        // bayar.hitKategoriPembayaran();
-        bayar.getDataDiskon( $(elm).attr('data-kodefaktur') );
-
-        $('.modal').modal('hide');
+            dataMetodeBayar.push( _dataMetodeBayar );
+            
+            // bayar.hitKategoriPembayaran();
+            bayar.getDataDiskon( $(elm).attr('data-kodefaktur') );
+            $('.modal').modal('hide');
+        } else {
+            bootbox.alert('CL sudah anda apply.');
+        }
     }, // end - saveMetodePembayaran
 
     hitKategoriPembayaran: function() {
