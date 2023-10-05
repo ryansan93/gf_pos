@@ -2217,15 +2217,16 @@ class Pembayaran extends Public_Controller
 
                 $m_bayar = new \Model\Storage\Bayar_model();
                 $sql = "
-                    select sum(bd.nominal) as nominal from bayar b 
+                    select sum(bh.bayar) as nominal from bayar_hutang bh 
                     right join
-                        bayar_det bd 
+                        bayar b 
                         on
-                            b.id = bd.id_header 
+                            bh.id_header = b.id
                     where
-                        b.id = ".$id_bayar."
+                        b.id = ".$id_bayar." and
+                        bh.faktur_kode = '".trim($kode_faktur)."'
                     group by
-                        bd.id_header
+                        bh.id_header
                 ";
                 $d_bayar_hutang = $m_bayar->hydrateRaw( $sql );
                 if ( $d_bayar_hutang->count() > 0 ) {
