@@ -587,7 +587,7 @@ class Penjualan extends Public_Controller
                 $m_jual = new \Model\Storage\Jual_model();
                 $m_jual->where('pesanan_kode', $params)->update(
                     array(
-                        'mstatus' => 0P
+                        'mstatus' => 0
                     )
                 );
 
