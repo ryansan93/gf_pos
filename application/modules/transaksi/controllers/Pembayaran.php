@@ -2258,7 +2258,7 @@ class Pembayaran extends Public_Controller
                 'grand_total' => ($grand_total > 0) ? $grand_total : 0,
                 'jml_bayar' => $d_jual[0]['jml_bayar'],
                 'hutang' => $d_jual[0]['hutang'],
-                'bayar_hutang' => $d_bayar_hutang[0]['nominal'],
+                'bayar_hutang' => isset($d_bayar_hutang[0]) ? $d_bayar_hutang[0]['nominal'] : 0,
                 'lunas' => $d_jual[0]['lunas'],
                 'kategori_jenis_kartu' => $d_kjk,
                 'jenis_bayar' => $d_jb,
