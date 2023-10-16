@@ -3130,6 +3130,13 @@ class Penjualan extends Public_Controller
                 $keterangan = '';
                 if ( $cek_d_jual ) {
                     $keterangan = 'Pesanan sudah di update waitress lain.<br><b>Harap lakukan pembatalan perubahan data !</b>';
+
+                    $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
+                    $cek_d_jual_gabungan = $m_jual_gabungan->where('faktur_kode_gabungan', $kode_faktur)->first();
+
+                    if ( $cek_d_jual_gabungan ) {
+                        $keterangan = 'Pesanan sudah di lakukan gabung bill oleh kasir.<br><b>Harap hubungi kasir terlebih dahulu sebelum melakukan perubahan data !</b>';
+                    }
                 }
 
                 if ( $d_bayar ) {

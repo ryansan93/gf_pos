@@ -527,10 +527,10 @@ var bayar = {
                         'menu_nama': $(tr).find('span.menu_nama').text().toUpperCase(),
                         'menu_kode': $(tr).find('span.menu_nama').data('kode'),
                         'jumlah': numeral.unformat($(tr).find('td.jumlah').text()),
-                        'harga': numeral.unformat($(tr).find('td.harga').text()),
-                        'total': numeral.unformat($(tr).find('td.total').text()),
-                        'ppn': $(tr).find('td.total').attr('data-ppn'),
-                        'sc': $(tr).find('td.total').attr('data-sc'),
+                        'harga': numeral.unformat($(tr).find('span.harga').text()),
+                        'total': numeral.unformat($(tr).find('span.total').text()),
+                        'ppn': $(tr).find('span.total').attr('data-ppn'),
+                        'sc': $(tr).find('span.total').attr('data-sc'),
                         'request': $(tr).find('span.request').text(),
                         'jual_item_detail': jual_item_detail
                     };
@@ -578,10 +578,10 @@ var bayar = {
                     'menu_nama': $(tr).find('span.menu_nama').text().toUpperCase(),
                     'menu_kode': $(tr).find('span.menu_nama').data('kode'),
                     'jumlah': numeral.unformat($(tr).find('td.jumlah').text()),
-                    'harga': numeral.unformat($(tr).find('td.harga').text()),
-                    'total': numeral.unformat($(tr).find('td.total').text()),
-                    'ppn': $(tr).find('td.total').attr('data-ppn'),
-                    'sc': $(tr).find('td.total').attr('data-sc'),
+                    'harga': numeral.unformat($(tr).find('span.harga').text()),
+                    'total': numeral.unformat($(tr).find('span.total').text()),
+                    'ppn': $(tr).find('span.total').attr('data-ppn'),
+                    'sc': $(tr).find('span.total').attr('data-sc'),
                     'request': $(tr).find('span.request').text(),
                     'jual_item_detail': jual_item_detail
                 };

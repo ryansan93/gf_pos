@@ -2428,7 +2428,6 @@ var jual = {
                         dataType: 'JSON',
                         beforeSend: function() { showLoading(); },
                         success: function(data) {
-                            // hideLoading();
                             if ( data.status == 1 ) {
                                 // ws.send(JSON.stringify("pesan"));
 
@@ -2444,6 +2443,7 @@ var jual = {
                                 $('.simpan_pesanan').removeClass('hide');
                                 $('.edit_pesanan').addClass('hide');
                             } else {
+                                hideLoading();
                                 bootbox.alert(data.message);
                             }
                         }
