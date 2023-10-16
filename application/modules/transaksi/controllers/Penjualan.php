@@ -800,12 +800,14 @@ class Penjualan extends Public_Controller
             $d_jual_old = $m_jual->whereNotIn('kode_faktur', [$kode_faktur])->where('pesanan_kode', $kode_pesanan)->orderBy('kode_faktur', 'desc')->first();
             if ( $d_jual_old ) {
                 $kode_faktur_old = $d_jual_old->kode_faktur;
+            }
 
+            if ( !empty($kode_faktur_asal) ) {
                 $m_jg = new \Model\Storage\JualGabungan_model();
-                $m_jg->where('faktur_kode', $kode_faktur_old)->update(
+                $m_jg->where('faktur_kode', $kode_faktur_asal)->update(
                     array('faktur_kode' => $kode_faktur)
                 );
-                $m_jg->where('faktur_kode_gabungan', $kode_faktur_old)->update(
+                $m_jg->where('faktur_kode_gabungan', $kode_faktur_asal)->update(
                     array(
                         'faktur_kode_gabungan' => $kode_faktur,
                         'jml_tagihan' => $d_pesanan['grand_total']
