@@ -1,7 +1,7 @@
 <div class="col-xs-12" style="padding-top: 15px;">
 	<div class="col-xs-12 no-padding">
 		<button type="button" class="btn btn-primary pull-left" onclick="clo.printClosingOrder()"><i class="fa fa-print"></i> Print Closing Shift</button>
-		<button type="button" class="btn btn-primary pull-right" onclick="clo.saveClosingOrder()" <?php echo ($closing_order == 1) ? 'disabled' : ''; ?> ><i class="fa fa-clock-o"></i> Closing Order</button>
+		<button type="button" class="btn btn-danger pull-right" onclick="clo.saveClosingOrder()" <?php echo ($closing_order == 1) ? 'disabled' : ''; ?> ><i class="fa fa-clock-o"></i> Closing Order Shift 2</button>
 		<button type="button" class="btn btn-primary pull-right" style="margin-right: 10px;" onclick="clo.saveEndShift()" <?php echo ($closing_order == 1) ? 'disabled' : ''; ?>><i class="fa fa-clock-o"></i> End Shift</button>
 	</div>
 </div>
