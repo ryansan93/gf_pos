@@ -3290,26 +3290,11 @@ class Pembayaran extends Public_Controller
 
                         foreach ($d_jual_gabungan as $k_jg => $v_jg) {
                             $_faktur_kode_gabungan = $v_jg['faktur_kode_gabungan'];
-                            $faktur_kode_gabungan = null;
-                            $_jml_tagihan = $value['total'];
-                            $jml_tagihan = null;
-
-                            do {
-                                $m_jual = new \Model\Storage\Jual_model();
-                                $d_jual = $m_jual->where('kode_faktur_asal', $_faktur_kode_gabungan)->first();
-
-                                if ( $d_jual ) {
-                                    $_faktur_kode_gabungan = $d_jual->kode_faktur;
-                                    $_jml_tagihan = $d_jual->grand_total;
-                                } else {
-                                    $faktur_kode_gabungan = $_faktur_kode_gabungan;
-                                    $jml_tagihan = $_jml_tagihan;
-                                }
-                            } while ( empty($faktur_kode_gabungan) );
+                            $jml_tagihan = $value['total'];
 
                             $m_jual_gabungan = new \Model\Storage\JualGabungan_model();
                             $m_jual_gabungan->faktur_kode = $kode_faktur_utama;
-                            $m_jual_gabungan->faktur_kode_gabungan = $faktur_kode_gabungan;
+                            $m_jual_gabungan->faktur_kode_gabungan = $_faktur_kode_gabungan;
                             $m_jual_gabungan->jml_tagihan = $jml_tagihan;
                             $m_jual_gabungan->save();
 
